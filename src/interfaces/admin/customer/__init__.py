@@ -1,0 +1,4 @@
+from src.interfaces.admin.customer.left_panel_elements import LeftPanelElements
+from interfaces.admin.customer.statement_history.statement_history_elements import StatementHistoryElements
+from src.interfaces.admin.customer.statistics_elements import StatisticsElements
+from src.interfaces.admin.customer.submenu_elements import SubmenuElements

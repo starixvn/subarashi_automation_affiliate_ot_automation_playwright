@@ -1,0 +1,4 @@
+from src.interfaces.admin.affiliate.affiliate_info_elements import AffiliateInfoElements
+from src.interfaces.admin.affiliate.email_history_elements import EmailHistoryElements
+from src.interfaces.admin.affiliate.revenue_group_elements import RevenueGroupElements
+from src.interfaces.admin.affiliate.submenu_elements import SubmenuElements

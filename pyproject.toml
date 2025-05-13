@@ -1,0 +1,84 @@
+[project]
+name = "aff-12b-automation-python-playwright"
+authors = [
+    { name="victor", email="victor.nguyen@starixsoft.com" }
+]
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pytest",
+    "pytz",
+    "playwright",
+    "jsonpath-ng",
+    "pyodbc",
+    "lxml",
+    "pandas",
+    "google-auth",
+    "google-auth-oauthlib",
+    "google-api-python-client",
+    "cryptography",
+    "python-dotenv",
+    "anthropic>=0.45.1",
+    "argparse>=1.4.0",
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.6.0",
+    "nest-asyncio>=1.6.0",
+    "requests>=2.31.0",
+    "google-auth-httplib2>=0.1.1",
+    "psutil>=7.0.0",
+    "pytest-html>=4.1.1",
+    "pyyaml>=6.0.2",
+    "allure-pytest>=2.14.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "flake8",
+    "mypy",
+    "pytest-xdist",
+]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["test_suites"]
+python_files = "TestSuites_*.py"
+python_classes = ["Test*", "*Test", "*Tests", "*Suite"]
+python_functions = ["test_*", "test*", "*_test"]
+addopts = """
+    --cache-clear
+    --html=reports/report.html
+    --self-contained-html
+    -s
+    --capture=tee-sys
+"""
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203"
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "build",
+    "dist"
+]
