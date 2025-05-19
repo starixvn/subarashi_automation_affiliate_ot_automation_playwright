@@ -48,16 +48,16 @@ class Common():
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
 
-    def select_date_picker(self, element, date_value='10-05-2025'):
+    def select_date_picker(self, element, date_value='05-16-2025'):
         """
         Select a date using the date picker component
-        Format: day-month-year (e.g., '10-05-2025')
+        Format: month-day-year (e.g., '05-16-2025')
         
         Example element: div.daterange-container input.datepicker
         """
         try:
-            day = date_value.split("-")[0]
-            month = date_value.split("-")[1]
+            month = date_value.split("-")[0]
+            day = date_value.split("-")[1]
             year = date_value.split("-")[2]
             
             # Click the input field to open the date picker
@@ -65,16 +65,16 @@ class Common():
             self.utils.page.wait_load_page()
             
             # Select year from the dropdown
-            year_selector = "//div[contains(@class, 'rdr-DateRange')]//span[contains(@class, 'rdr-MonthAndYear-year')]//select"
+            year_selector = f"{element}//div[contains(@class, 'rdr-DateRange')]//span[contains(@class, 'rdr-MonthAndYear-year')]//select"
             self.utils.page.select_options(year_selector, year)
             
             # Select month from the dropdown
-            month_selector = "//div[contains(@class, 'rdr-DateRange')]//span[contains(@class, 'rdr-MonthAndYear-month')]//select"
+            month_selector = f"{element}//div[contains(@class, 'rdr-DateRange')]//span[contains(@class, 'rdr-MonthAndYear-month')]//select"
             month_index = int(month) - 1
             self.utils.page.select_options(month_selector, str(month_index))
             
             # Select the day
-            day_selector = f"//div[contains(@class, 'rdr-Days')]//span[contains(@class, 'rdr-Day') and not(contains(@class, 'is-passive')) and text()='{int(day)}']"
+            day_selector = f"{element}//div[contains(@class, 'rdr-Days')]//span[contains(@class, 'rdr-Day') and not(contains(@class, 'is-passive')) and text()='{int(day)}']"
             self.utils.page.click(day_selector)
             self.utils.page.wait_load_page()
         except Exception as e:

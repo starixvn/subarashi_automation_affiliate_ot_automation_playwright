@@ -31,7 +31,7 @@ class ReferrersElements:
     
     # First table - Site URLs
     div_table_first = "//div[@class='table-responsive table-striped my-2'][1]"
-    tbl_site_urls = "//div[@class='table-responsive table-striped my-2'][1]//table[@class='table']"
+    tbl_site_urls = "//div[@class='table-responsive table-striped my-2'][1]//div[@class='body-content']"
     
     # First table headers
     th_site_urls = "//div[@class='table-responsive table-striped my-2'][1]//th[@title='Site URLs']"
@@ -42,7 +42,7 @@ class ReferrersElements:
     
     # Second table - Website URL
     div_table_second = "//div[@class='table-responsive table-striped my-2'][2]"
-    tbl_website_url = "//div[@class='table-responsive table-striped my-2'][2]//table[@class='table']"
+    tbl_website_url = "//div[@class='table-responsive table-striped my-2'][2]//div[@class='body-content']"
     
     # Second table headers
     th_website_url = "//div[@class='table-responsive table-striped my-2'][2]//th[@title='Website URL']"

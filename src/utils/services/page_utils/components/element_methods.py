@@ -109,3 +109,29 @@ class ElementMethods(ExtractTestCaseFailed):
         except Exception as e:
             logger.error(f"Failed to select multiple values: {str(e)}")
             self.extract_TestCaseFailed(e)
+
+    @log_exceptions(log_level="DEBUG")
+    @monitor_performance()
+    def count_element(self, frame_xpath, element, idxChildFrame=None, idxLatestFrame=None):
+        try :
+            validate_not_none(frame_xpath, "frame_xpath")
+            validate_not_none(element, "element")
+            if idxChildFrame == None and idxLatestFrame == None:
+                if frame_xpath == "":
+                    element = self.page.locator(element)
+                else:
+                    frame = self.page.frame_locator(frame_xpath)
+                    element = frame.locator(element)
+            elif idxLatestFrame == None:
+                frames = self.page.frames
+                childframe = frames[1].child_frames
+                element = childframe[idxChildFrame].locator(element)
+            else:
+                frames = self.page.frames[idxLatestFrame]
+                element = frames.locator(element)
+            
+            logger.debug(f"Total count of elements: {element.count()}")
+
+            return element.count()
+        except Exception as e:
+            self.extract_TestCaseFailed(e)

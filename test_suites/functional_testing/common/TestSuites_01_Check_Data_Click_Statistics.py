@@ -9,8 +9,7 @@ unittest.TestLoader.testMethodPrefix = "TestCase"
 unittest.TestLoader.sortTestMethodsUsing = None
 
 # Add based on your function you define
-from actions.common.action_common import Common
-from actions.common.action_compare_data_click_statistics import CompareDataClickStatistics
+from actions.common.get_data_on_function.get_data_customer import CompareDataClickStatistics
 
 class TestSuites_01_Check_Data_Click_Statistics(unittest.TestCase):
     @classmethod
@@ -25,5 +24,11 @@ class TestSuites_01_Check_Data_Click_Statistics(unittest.TestCase):
         self.CheckDataClickStatistics.tearDown()
 
     def TestCase_01_Check_Data_Click_Statistics(self):
-        self.CheckDataClickStatistics.get_data_referrers_in_customer()
+        self.CheckDataClickStatistics.get_data_statement_history_in_customer("12BetAff001","04-01-2025","05-14-2025")
+
+    def TestCase_02_Check_Data_Click_Statistics(self):
+        self.CheckDataClickStatistics.get_data_referrers_in_customer("12BetAff001","04-01-2025","05-14-2025","All")
+
+    def TestCase_03_Check_Data_Click_Statistics(self):
+        self.CheckDataClickStatistics.get_data_landing_pages_in_customer("12BetAff001","All","All","04-01-2025","05-14-2025","All")
 
