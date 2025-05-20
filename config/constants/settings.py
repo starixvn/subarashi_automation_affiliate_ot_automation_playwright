@@ -67,7 +67,7 @@ USER_12BET_URL = {
     "local": "https://aff-12b.nexdev.net/UserAsian",
     "uat": "https://aff15.starixuat.com/UserAsian",
     "prod": "https://affiliate.easymon5678.com/"}
-USER_12BET_USERNAME = "vnTestAutomation"
-USER_12BET_PASSWORD = "@TestAutomation#"
+USER_12BET_USERNAME = "12betaff001"
+USER_12BET_PASSWORD = "1234aa"
 USER_12BET_SALT_PASSWORD = b'\x88\x05\xa8\xe2\xab\x05/>\x16\x9b\x13\xdf\xba\xa3\xe79'
 USER_12BET_ENCRYPTED_PASSWORD = b'gAAAAABmcl_WeYFYWquz9xURv9eSjs7wKqx9DBmt3GtoytZswEIbwCb_ouHnTE8D39_5uCcp4DRD2KtN0wzMZZuVHaeIS5cn1Q=='

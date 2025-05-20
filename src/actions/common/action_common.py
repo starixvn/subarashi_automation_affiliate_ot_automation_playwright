@@ -9,21 +9,23 @@ from src.interfaces.admin.common.common_elements import CommonElements as elm_co
 from src.interfaces.admin.common.header_elements import HeaderElements as elm_header
 
 class Common():    
+    def __init__(self):
+        self.playwright = None
+
     def referUtils(self, Utils):
         self.utils = Utils
         
     def setup(self):
         self.utils = utilities()
         self.env = self.utils.env
+        self.playwright = self.utils.page.page
+        self.login_admin()
 
     def destroy(self):
         self.utils.destroy()
     
     def tearDown(self):
         self.utils.destroy()
-
-    def get_page(self) -> Page:
-        return self.utils.page.page
 
     def login_admin(self):
         try:

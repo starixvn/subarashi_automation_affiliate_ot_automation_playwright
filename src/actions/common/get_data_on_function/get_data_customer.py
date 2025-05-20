@@ -1,3 +1,5 @@
+import time
+
 from src.utils.services.utils import utilities
 from config.constants.settings import *
 
@@ -10,25 +12,11 @@ from src.interfaces.admin.customer.click_statistics.referrers_elements import Re
 from src.interfaces.admin.customer.click_statistics.landing_pages_elements import LandingPagesElements as elm_landing_pages
 from src.interfaces.admin.customer.click_statistics.marketing_page_elements import MarketingPageElements as elm_marketing_page
 from src.interfaces.admin.customer.statement_history.statement_history_elements import StatementHistoryElements as elm_statement_history
-class CompareDataClickStatistics(Common):
-    def __init__(self):
-        self.playwright = None
+from src.interfaces.admin.customer.adjustment.adjustment_elements import AdjustmentElements as elm_adjustment
+from src.interfaces.admin.customer.edit.edit_elements import EditElements as elm_edit_customer
 
-    def referUtils(self, Utils):
-        self.utils = Utils
-        
-    def setup(self):
-        self.utils = utilities()
-        self.env = self.utils.env
-        self.playwright = self.utils.page.page
-        super().login_admin()
-
-    def destroy(self):
-        self.utils.destroy()
+class GetDataCustomer(Common):
     
-    def tearDown(self):
-        self.utils.destroy()
-
     def get_data_referrers_in_customer(self,user_name, from_date, to_date, device_type):
         try:
             super().selectMenu("Customer")
@@ -65,24 +53,76 @@ class CompareDataClickStatistics(Common):
             self.utils.page.click(elm_submenu.click_statistics)
             self.utils.page.wait_load_page()
             self.utils.page.click(elm_submenu_click_statistics.li_landing_pages)
-            self.utils.page.select_options(elm_landing_pages.sel_page,page_name)
-            self.utils.page.select_options(elm_landing_pages.sel_language,language)
+            self.utils.page.select_options(elm_landing_pages.sel_page, page_name)
+            self.utils.page.select_options(elm_landing_pages.sel_language, language)
             super().select_date_picker(elm_landing_pages.div_from_date, from_date)
             super().select_date_picker(elm_landing_pages.div_to_date, to_date)
             self.utils.page.select_options(elm_landing_pages.sel_device, device_type)
             self.utils.page.click(elm_landing_pages.btn_search)
             self.utils.page.wait_load_page()
-            data_table = []
-            number_of_rows = self.utils.page.count_element("",f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))]")
+            time.sleep(3)
+            
+            result = {
+                "pages_data": [],
+                "website_urls_data": {}
+            }
+            
+            number_of_rows = self.utils.page.count_element("", f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))]")
             for i in range(1, number_of_rows + 1):
-                page_name = self.utils.page.get_text(f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[1]")
-                language = self.utils.page.get_text(f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[2]")
-                total_click = self.utils.page.get_text(f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[3]")
-                unique_click = self.utils.page.get_text(f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[4]")
-                signups = self.utils.page.get_text(f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[5]")
-                fdm = self.utils.page.get_text(f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[6]")
-                data_table.append([page_name, language, total_click, unique_click, signups, fdm])
-            return data_table
+                row_selector = f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))][{i}]"
+                page_name = self.utils.page.get_text(f"{row_selector}//td[1]")
+                language = self.utils.page.get_text(f"{row_selector}//td[2]")
+                total_click = self.utils.page.get_text(f"{row_selector}//td[3]")
+                unique_click = self.utils.page.get_text(f"{row_selector}//td[4]")
+                signups = self.utils.page.get_text(f"{row_selector}//td[5]")
+                fdm = self.utils.page.get_text(f"{row_selector}//td[6]")
+                
+                page_data = {
+                    "page_name": page_name,
+                    "language": language,
+                    "total_click": total_click,
+                    "unique_click": unique_click,
+                    "signups": signups,
+                    "fdm": fdm
+                }
+                result["pages_data"].append(page_data)
+                
+                if page_name.lower() != "none":
+                    try:
+                        self.utils.page.click(f"{row_selector}//td[1]")
+                        self.utils.page.wait_load_page()
+                        time.sleep(1)
+                        
+                        website_urls = []
+                        url_rows = self.utils.page.count_element("", f"{elm_landing_pages.tbl_website_url}//tbody/tr[not(contains(@class, 'first-row'))]")
+                        
+                        for j in range(1, url_rows + 1):
+                            url_row_selector = f"{elm_landing_pages.tbl_website_url}//tbody/tr[not(contains(@class, 'first-row'))][{j}]"
+                            website_url = self.utils.page.get_text(f"{url_row_selector}//td[1]")
+                            total_clicks = self.utils.page.get_text(f"{url_row_selector}//td[2]")
+                            unique_clicks = self.utils.page.get_text(f"{url_row_selector}//td[3]")
+                            sign_up = self.utils.page.get_text(f"{url_row_selector}//td[4]")
+                            url_fdm = self.utils.page.get_text(f"{url_row_selector}//td[5]")
+                            
+                            url_data = {
+                                "website_url": website_url,
+                                "total_clicks": total_clicks,
+                                "unique_clicks": unique_clicks,
+                                "sign_up": sign_up,
+                                "fdm": url_fdm
+                            }
+                            website_urls.append(url_data)
+                        
+                        page_key = f"{page_name} - {language}"
+                        result["website_urls_data"][page_key] = website_urls
+                        
+                        self.utils.page.click(f"{row_selector}//td[1]")
+                        self.utils.page.wait_load_page()
+                        time.sleep(1)
+                    except Exception as click_error:
+                        self.utils.page.extract_TestCaseFailed(f"Warning: Cannot get detail data for page {page_name}: {str(click_error)}")
+                
+            return result
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
 
@@ -302,7 +342,77 @@ class CompareDataClickStatistics(Common):
             self.utils.page.wait_load_page()
             self.utils.page.click(elm_submenu.edit)
             self.utils.page.wait_load_page()
-            self.utils.page.click()
+            data = {
+                "user_name": self.utils.page.get_text(elm_edit_customer.txt_username),
+                "first_name": self.utils.page.get_text(elm_edit_customer.inp_first_name),
+                "last_name": self.utils.page.get_text(elm_edit_customer.inp_last_name),
+                "gender": self.utils.page.get_text(elm_edit_customer.sel_gender),
+                "contact_number": self.utils.page.get_text(elm_edit_customer.inp_contact_number),
+                "msn_ym_qq": self.utils.page.get_text(elm_edit_customer.inp_msn_ym_qq),
+            }
+            return data
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
-        
+    
+    def get_data_additional_infomation_in_edit(self, username):
+        try:
+            super().selectMenu("Customer")
+            self.utils.page.input(elm_left_panel.inp_aff_name, username)
+            self.utils.page.click(elm_left_panel.btn_search)
+            self.utils.page.wait_load_page()
+            self.utils.page.click(elm_submenu.edit)
+            self.utils.page.wait_load_page()
+            data = {
+                "address": self.utils.page.get_text(elm_edit_customer.inp_address),
+                "city": self.utils.page.get_text(elm_edit_customer.inp_city),
+                "state": self.utils.page.get_text(elm_edit_customer.inp_state),
+                "postcode": self.utils.page.get_text(elm_edit_customer.inp_postcode),
+                "country": self.utils.page.get_text(elm_edit_customer.sel_country),
+                "security_question": self.utils.page.get_text(elm_edit_customer.txt_security_question),
+                "security_answer": self.utils.page.get_text(elm_edit_customer.txt_security_answer),
+            }
+            return data
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)
+    
+    def get_email_format_preference_in_edit(self, username):
+        try:
+            super().selectMenu("Customer")
+            self.utils.page.input(elm_left_panel.inp_aff_name, username)
+            self.utils.page.click(elm_left_panel.btn_search)
+            self.utils.page.wait_load_page()
+            data = {
+                "email_format": self.utils.page.get_text(elm_edit_customer.sel_email_format),
+            }
+            return data
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)
+    
+    def get_website_information_in_edit(self, username):
+        try:
+            super().selectMenu("Customer")
+            self.utils.page.input(elm_left_panel.inp_aff_name, username)
+            self.utils.page.click(elm_left_panel.btn_search)
+            self.utils.page.wait_load_page()
+            data = {
+                "website_url": self.utils.page.get_text(elm_edit_customer.txt_website_url),
+                "no_site_description": self.utils.page.get_text(elm_edit_customer.txt_no_site_description),
+            }
+            return data
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)
+    
+    def get_data_payment_information_in_edit(self, username):
+        try:
+            super().selectMenu("Customer")
+            self.utils.page.input(elm_left_panel.inp_aff_name, username)
+            self.utils.page.click(elm_left_panel.btn_search)
+            self.utils.page.wait_load_page()
+            data = {
+                "preferred_payment": self.utils.page.get_text(elm_edit_customer.sel_preferred_payment),
+                "player_username": self.utils.page.get_text(elm_edit_customer.inp_player_username),
+                "minimum_payment": self.utils.page.get_text(elm_edit_customer.txt_minimum_payment),
+            }
+            return data
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)
