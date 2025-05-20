@@ -4,13 +4,6 @@ import json
 from datetime import datetime, timedelta
 
 from src.actions.common.get_data_on_function.get_data_customer import GetDataCustomer
-from config.constants.settings import *
-env = ENVIRONMENT
-
-from src.interfaces.admin.customer.click_statistics.submenu_elements import SubmenuElements as elm_submenu
-from src.interfaces.admin.customer.click_statistics.landing_pages_elements import LandingPagesElements as elm_landing_pages
-from src.interfaces.admin.customer.click_statistics.marketing_page_elements import MarketingPageElements as elm_marketing_page
-from src.interfaces.admin.customer.click_statistics.referrers_elements import ReferrersElements as elm_referrers
 
 
 class GetDataBaselineLandingPageLastMonth(GetDataCustomer):
@@ -47,11 +40,17 @@ class GetDataBaselineLandingPageLastMonth(GetDataCustomer):
                     "page_name": page_name,
                     "language": language,
                     "device_type": device_type
-                }
+                },
+                "has_data": True
             },
             "pages_data": {},
             "website_urls_data": {}
         }
+        
+        if not raw_data.get("has_data", True):
+            collected_data["metadata"]["has_data"] = False
+            self._save_data(collected_data)
+            return collected_data
         
         for page_data in raw_data["pages_data"]:
             page_name = page_data["page_name"]
@@ -93,16 +92,16 @@ class GetDataBaselineLandingPageLastMonth(GetDataCustomer):
         """save data to file"""
         os.makedirs(self.data_directory, exist_ok=True)
         
-        json_file = os.path.join(self.data_directory, "data_landing_pages_last_month.json")
-        with open(json_file, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
-        
         py_file = os.path.join(self.data_directory, "data_landing_pages_last_month.py")
         current_time_gmt8 = datetime.now(self.timezone).strftime("%Y-%m-%d %H:%M:%S %z")
+        
+        json_str = json.dumps(data, indent=4, ensure_ascii=False)
+        python_str = json_str.replace('"has_data": true', '"has_data": True').replace('"has_data": false', '"has_data": False')
+        
         with open(py_file, "w", encoding="utf-8") as f:
-            f.write(f"# get data baseline landing page last month at {current_time_gmt8} (GMT+8)\n\n")
+            f.write(f"# get data baseline landing page last month at {current_time_gmt8} (GMT+8)\n\n")  # hoặc last_week, yesterday
             f.write(f"class DataLandingPagesLastMonth:\n")
             f.write(f"    data_landing_pages_last_month = ")
-            f.write(json.dumps(data, indent=4, ensure_ascii=False))
+            f.write(python_str)
             f.write("\n")
         

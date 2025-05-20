@@ -17,7 +17,7 @@ from src.interfaces.admin.customer.edit.edit_elements import EditElements as elm
 
 class GetDataCustomer(Common):
     
-    def get_data_referrers_in_customer(self,user_name, from_date, to_date, device_type):
+    def get_data_referrers_in_customer(self, user_name, from_date=None, to_date=None, device_type="All"):
         try:
             super().selectMenu("Customer")
             self.utils.page.input(elm_left_panel.inp_aff_name, user_name)
@@ -31,16 +31,72 @@ class GetDataCustomer(Common):
             self.utils.page.select_options(elm_referrers.sel_device, device_type)
             self.utils.page.click(elm_referrers.btn_search)
             self.utils.page.wait_load_page()
-            data_table = []
-            number_of_rows = self.utils.page.count_element("",f"{elm_referrers.div_table_first}//tbody/tr[not(contains(@class, 'first-row'))]")
+            time.sleep(3)
+            
+            result = {
+                "site_urls_data": [],
+                "website_urls_data": {},
+                "has_data": True
+            }
+            
+            no_data_message = self.utils.page.count_element("", f"//*[contains(text(), 'There is no information available')]")
+            if no_data_message > 0:
+                result["has_data"] = False
+                return result
+            
+            number_of_rows = self.utils.page.count_element("", f"{elm_referrers.div_table_first}//tbody/tr[not(contains(@class, 'first-row'))]")
             for i in range(1, number_of_rows + 1):
-                site_urls = self.utils.page.get_text(f"{elm_referrers.tbl_site_urls}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[1]")
-                total_click = self.utils.page.get_text(f"{elm_referrers.tbl_site_urls}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[2]")
-                unique_click = self.utils.page.get_text(f"{elm_referrers.tbl_site_urls}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[3]")
-                signups = self.utils.page.get_text(f"{elm_referrers.tbl_site_urls}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[4]")
-                fdm = self.utils.page.get_text(f"{elm_referrers.tbl_site_urls}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[5]")
-                data_table.append([site_urls, total_click, unique_click, signups, fdm])
-            return data_table
+                row_selector = f"{elm_referrers.div_table_first}//tbody/tr[not(contains(@class, 'first-row'))][{i}]"
+                site_url = self.utils.page.get_text(f"{row_selector}//td[1]")
+                total_click = self.utils.page.get_text(f"{row_selector}//td[2]")
+                unique_click = self.utils.page.get_text(f"{row_selector}//td[3]")
+                signups = self.utils.page.get_text(f"{row_selector}//td[4]")
+                fdm = self.utils.page.get_text(f"{row_selector}//td[5]")
+                
+                site_data = {
+                    "site_url": site_url,
+                    "total_click": total_click,
+                    "unique_click": unique_click,
+                    "signups": signups,
+                    "fdm": fdm
+                }
+                result["site_urls_data"].append(site_data)
+                
+                if site_url.lower() != "none":
+                    try:
+                        self.utils.page.click(f"{row_selector}//button")
+                        self.utils.page.wait_load_page()
+                        time.sleep(1)
+                        
+                        website_urls = []
+                        url_rows = self.utils.page.count_element("", f"{elm_referrers.tbl_website_url}//tbody/tr[not(contains(@class, 'first-row'))]")
+                        
+                        for j in range(1, url_rows + 1):
+                            url_row_selector = f"{elm_referrers.tbl_website_url}//tbody/tr[not(contains(@class, 'first-row'))][{j}]"
+                            website_url = self.utils.page.get_text(f"{url_row_selector}//td[1]")
+                            total_clicks = self.utils.page.get_text(f"{url_row_selector}//td[2]")
+                            unique_clicks = self.utils.page.get_text(f"{url_row_selector}//td[3]")
+                            sign_up = self.utils.page.get_text(f"{url_row_selector}//td[4]")
+                            url_fdm = self.utils.page.get_text(f"{url_row_selector}//td[5]")
+                            
+                            url_data = {
+                                "website_url": website_url,
+                                "total_clicks": total_clicks,
+                                "unique_clicks": unique_clicks,
+                                "sign_up": sign_up,
+                                "fdm": url_fdm
+                            }
+                            website_urls.append(url_data)
+                        
+                        result["website_urls_data"][site_url] = website_urls
+                        
+                        self.utils.page.click(f"{row_selector}//td[1]")
+                        self.utils.page.wait_load_page()
+                        time.sleep(1)
+                    except Exception as click_error:
+                        self.utils.page.extract_TestCaseFailed(f"Warning: Cannot get detail data for site {site_url}: {str(click_error)}")
+            
+            return result
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
 
@@ -64,8 +120,14 @@ class GetDataCustomer(Common):
             
             result = {
                 "pages_data": [],
-                "website_urls_data": {}
+                "website_urls_data": {},
+                "has_data": True
             }
+            
+            no_data_message = self.utils.page.count_element("", f"//*[contains(text(), 'There is no information available')]")
+            if no_data_message > 0:
+                result["has_data"] = False
+                return result
             
             number_of_rows = self.utils.page.count_element("", f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))]")
             for i in range(1, number_of_rows + 1):
@@ -89,7 +151,7 @@ class GetDataCustomer(Common):
                 
                 if page_name.lower() != "none":
                     try:
-                        self.utils.page.click(f"{row_selector}//td[1]")
+                        self.utils.page.click(f"{row_selector}//button")
                         self.utils.page.wait_load_page()
                         time.sleep(1)
                         
@@ -146,20 +208,79 @@ class GetDataCustomer(Common):
 
             self.utils.page.click(elm_marketing_page.btn_search)
             self.utils.page.wait_load_page()
+            time.sleep(3)
+            
+            result = {
+                "channels_data": [],
+                "channel_details_data": {},
+                "has_data": True
+            }
 
-            data_table = []
-            number_of_rows = self.utils.page.count_element("",f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))]")
+            no_data_message = self.utils.page.count_element("", f"//*[contains(text(), 'There is no information available')]")
+            if no_data_message > 0:
+                result["has_data"] = False
+                return result
 
+            number_of_rows = self.utils.page.count_element("", f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))]")
+            
             for i in range(1, number_of_rows + 1):
-                channel_name = self.utils.page.get_text(f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[1]")
-                language = self.utils.page.get_text(f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[2]")
-                total_click = self.utils.page.get_text(f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[3]")
-                signups = self.utils.page.get_text(f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[4]")
-                fdm = self.utils.page.get_text(f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i}]//td[5]")
-                data_table.append([channel_name, language, total_click, signups, fdm])
+                row_selector = f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i}]"
+                channel_name = self.utils.page.get_text(f"{row_selector}//td[1]")
+                language = self.utils.page.get_text(f"{row_selector}//td[2]")
+                total_click = self.utils.page.get_text(f"{row_selector}//td[3]")
+                unique_click = self.utils.page.get_text(f"{row_selector}//td[4]")
+                signups = self.utils.page.get_text(f"{row_selector}//td[5]")
+                fdm = self.utils.page.get_text(f"{row_selector}//td[6]")
                 
-            return data_table
-
+                channel_data = {
+                    "channel_name": channel_name,
+                    "language": language,
+                    "total_click": total_click,
+                    "unique_click": unique_click,
+                    "signups": signups,
+                    "fdm": fdm
+                }
+                result["channels_data"].append(channel_data)
+                
+                if channel_name != "-":
+                    try:
+                        self.utils.page.click(f"{row_selector}//td[1]")
+                        self.utils.page.wait_load_page()
+                        time.sleep(1)
+                        
+                        detail_urls = []
+                        
+                        detail_rows = self.utils.page.count_element("", f"{row_selector}/following-sibling::tr[contains(@class, 'child-row')]")
+                        
+                        for j in range(1, detail_rows + 1):
+                            detail_row_selector = f"{row_selector}/following-sibling::tr[contains(@class, 'child-row')][{j}]"
+                            url = self.utils.page.get_text(f"{detail_row_selector}//td[1]")
+                            url_language = self.utils.page.get_text(f"{detail_row_selector}//td[2]")
+                            url_total_clicks = self.utils.page.get_text(f"{detail_row_selector}//td[3]")
+                            url_unique_clicks = self.utils.page.get_text(f"{detail_row_selector}//td[4]") 
+                            url_signups = self.utils.page.get_text(f"{detail_row_selector}//td[5]")
+                            url_fdm = self.utils.page.get_text(f"{detail_row_selector}//td[6]")
+                            
+                            url_data = {
+                                "url": url,
+                                "language": url_language,
+                                "total_clicks": url_total_clicks,
+                                "unique_clicks": url_unique_clicks,
+                                "signups": url_signups,
+                                "fdm": url_fdm
+                            }
+                            detail_urls.append(url_data)
+                        
+                        channel_key = f"{channel_name} - {language}"
+                        result["channel_details_data"][channel_key] = detail_urls
+                        
+                        self.utils.page.click(f"{row_selector}//td[1]")
+                        self.utils.page.wait_load_page()
+                        time.sleep(1)
+                    except Exception as click_error:
+                        self.utils.page.extract_TestCaseFailed(f"Warning: Cannot get detail data for channel {channel_name}: {str(click_error)}")
+            
+            return result
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
 

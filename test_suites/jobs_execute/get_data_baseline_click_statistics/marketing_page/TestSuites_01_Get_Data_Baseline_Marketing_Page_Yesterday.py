@@ -8,3 +8,21 @@ sys.path.append(root_dir)
 import unittest
 unittest.TestLoader.testMethodPrefix = "TestCase"
 unittest.TestLoader.sortTestMethodsUsing = None
+
+from src.jobs.common.get_data_baseline_click_statistics.marketing_page.get_data_baseline_marketing_page_yesterday import GetDataBaselineMarketingPageYesterday
+
+class TestSuites_01_Get_Data_Baseline_Marketing_Page_Yesterday(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        self.get_data_baseline_marketing_page_yesterday = GetDataBaselineMarketingPageYesterday()
+        self.get_data_baseline_marketing_page_yesterday.setup()
+        self.utils = self.get_data_baseline_marketing_page_yesterday.utils
+
+    @classmethod
+    def tearDownClass(self):
+        self.get_data_baseline_marketing_page_yesterday.tearDown()
+
+    def TestCase_01_Get_Data_Baseline_Marketing_Page_Yesterday(self):
+        self.get_data_baseline_marketing_page_yesterday.get_data_marketing_page_yesterday()
+
+
