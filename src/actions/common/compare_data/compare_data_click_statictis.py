@@ -15,9 +15,28 @@ from src.interfaces.admin.common.common_elements import CommonElements as elm_co
 from src.interfaces.admin.common.header_elements import HeaderElements as elm_header
 from src.interfaces.admin.common.menu_elements import MenuElements as elm_menu
 
+from src.test_data.common.data_click_statistics.data_referrers.data_referrers_last_month import DataReferrersLastMonth
+from src.test_data.common.data_click_statistics.data_referrers.data_referrers_last_week import DataReferrersLastWeek
+from src.test_data.common.data_click_statistics.data_referrers.data_referrers_yesterday import DataReferrersYesterday
+from src.test_data.common.data_click_statistics.data_referrers.data_referrers_last_month_by_desktop import DataReferrersLastMonthByDesktop
+from src.test_data.common.data_click_statistics.data_referrers.data_referrers_last_week_by_desktop import DataReferrersLastWeekByDesktop
+from src.test_data.common.data_click_statistics.data_referrers.data_referrers_yesterday_by_desktop import DataReferrersYesterdayByDesktop
+from src.test_data.common.data_click_statistics.data_referrers.data_referrers_last_month_by_mobile import DataReferrersLastMonthByMobile
+from src.test_data.common.data_click_statistics.data_referrers.data_referrers_last_week_by_mobile import DataReferrersLastWeekByMobile
+from src.test_data.common.data_click_statistics.data_referrers.data_referrers_yesterday_by_mobile import DataReferrersYesterdayByMobile
+
 Data = {
     "TestCase_spread_sheet_id": TestCase_Spread_Sheet_Id,
-    "TestCase_Auto_Status": TestCase_Auto_Status
+    "TestCase_Auto_Status": TestCase_Auto_Status,
+    "Referres_Last_Month" : DataReferrersLastMonth.data_referrers_last_month,
+    "Referres_Last_Week" : DataReferrersLastWeek.data_referrers_last_week,
+    "Referres_Yesterday" : DataReferrersYesterday.data_referrers_yesterday,
+    "Referres_Last_Month_By_Desktop" : DataReferrersLastMonthByDesktop.data_referrers_last_month_by_desktop,
+    "Referres_Last_Week_By_Desktop" : DataReferrersLastWeekByDesktop.data_referrers_last_week_by_desktop,
+    "Referres_Yesterday_By_Desktop" : DataReferrersYesterdayByDesktop.data_referrers_yesterday_by_desktop,
+    "Referres_Last_Month_By_Mobile" : DataReferrersLastMonthByMobile.data_referrers_last_month_by_mobile,
+    "Referres_Last_Week_By_Mobile" : DataReferrersLastWeekByMobile.data_referrers_last_week_by_mobile,
+    "Referres_Yesterday_By_Mobile" : DataReferrersYesterdayByMobile.data_referrers_yesterday_by_mobile,
 }
 Checklist_Sheet_Name = "Compare_Data_Clickstatistics"
 
@@ -47,8 +66,14 @@ class CompareDataClickStatistics(GetDataCustomer):
             indexChl = 0
             try:
                 subAutoTestCase = subAutoTestCase + '- Verify that the data displayed is correct according to the last month'
-                
 
+                username = Data["Referres_Last_Month"]["metadata"]["filters"]["username"]
+                device_type = Data["Referres_Last_Month"]["metadata"]["filters"]["device_type"]
+                from_date = Data["Referres_Last_Month"]["metadata"]["period"]["from_date"]
+                to_date = Data["Referres_Last_Month"]["metadata"]["period"]["to_date"]
+                
+                data_referrers_in_customer = self.get_data_referrers_in_customer(username,from_date,to_date,device_type)
+                
                 self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0],sheet_name=Checklist_Sheet_Name)
                 indexChl = indexChl + 1 
                 subAutoTestCase = ""

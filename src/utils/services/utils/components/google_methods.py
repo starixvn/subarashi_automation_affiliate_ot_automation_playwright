@@ -3,6 +3,9 @@ from googleapiclient import discovery
 import os
 from os.path import dirname as d
 from os.path import abspath
+from pathlib import Path
+from config.constants.settings import ENVIRONMENT
+environment = ENVIRONMENT
 
 from src.utils.core import (
     get_logger,
@@ -16,14 +19,14 @@ from src.utils.services.utils.components.extract_testcase_failed import ExtractT
 from datetime import datetime
 
 logger = get_logger(__name__)
-root_dir = d(d(abspath(__file__)))
+project_root = str(Path(__file__).resolve().parents[5])
 
 class GoogleMethods(ExtractTestCaseFailed):
     @log_exceptions(log_level="DEBUG")
     def prepare_google_api(self):
         try:
             logger.debug("Preparing Google Sheets API client")
-            SERVICE_ACCOUNT_FILE_PATH = root_dir + os.sep + 'config' + os.sep + 'client_secret.json'
+            SERVICE_ACCOUNT_FILE_PATH = os.path.join(project_root, 'config', 'secrets', 'client_secret.json')
             
             if not os.path.exists(SERVICE_ACCOUNT_FILE_PATH):
                 logger.error(f"Service account file not found: {SERVICE_ACCOUNT_FILE_PATH}")
@@ -188,25 +191,67 @@ class GoogleMethods(ExtractTestCaseFailed):
             logger.debug(f"Searching for matching checklist '{checklist}' and test case '{auto_testcase}'")
             match_found = False
             
-            for i in range(2, len(values)):
-                if len(values[i]) >= 11:
-                    if values[i][2] == checklist and values[i][11] == auto_testcase: 
-                        logger.debug(f"Match found at row {i+1}")
+            env_column_map = {
+                "local": "G",
+                "uat": "H",
+                "pro": "I"
+            }
+            sub_testcase_column = "F"
+            date_column = "J"
+            latest_env_run_column = "K"
+            
+            for i in range(1, len(values)):
+                if len(values[i]) >= 5: 
+                    if values[i][2] == checklist and values[i][4] == auto_testcase:
                         match_found = True
-                        rangeUpdateResult = f'{sheet_name}!M{str(i+1)}:O{str(i+1)}'
-                        dataUpdateResult = {
-                            'values': [
-                                        [sub_auto_testcases, auto_status, toDate]
-                                    ]
+                        
+                        sub_testcase_range = f'{sheet_name}!{sub_testcase_column}{str(i+1)}'
+                        sub_testcase_data = {
+                            'values': [[sub_auto_testcases]]
                         }
-                        update_response = service.spreadsheets().values().update(
+                        
+                        status_column = env_column_map[environment]
+                        status_range = f'{sheet_name}!{status_column}{str(i+1)}'
+                        status_data = {
+                            'values': [[auto_status]]
+                        }
+                        
+                        date_range = f'{sheet_name}!{date_column}{str(i+1)}'
+                        date_data = {
+                            'values': [[toDate]]
+                        }
+                        latest_env_run_range = f'{sheet_name}!{latest_env_run_column}{str(i+1)}'
+                        latest_env_run_data = {
+                            'values': [[environment.upper()]]
+                        }
+                        
+                        service.spreadsheets().values().update(
                             spreadsheetId=spread_sheet_id, 
-                            range=rangeUpdateResult,
+                            range=sub_testcase_range,
                             valueInputOption='USER_ENTERED', 
-                            body=dataUpdateResult
+                            body=sub_testcase_data
                         ).execute()
                         
-                        logger.info(f"Updated test result in Google Sheet at range: {rangeUpdateResult}")
+                        service.spreadsheets().values().update(
+                            spreadsheetId=spread_sheet_id, 
+                            range=status_range,
+                            valueInputOption='USER_ENTERED', 
+                            body=status_data
+                        ).execute()
+                        
+                        service.spreadsheets().values().update(
+                            spreadsheetId=spread_sheet_id, 
+                            range=date_range,
+                            valueInputOption='USER_ENTERED', 
+                            body=date_data
+                        ).execute()
+                        
+                        service.spreadsheets().values().update(
+                            spreadsheetId=spread_sheet_id, 
+                            range=latest_env_run_range,
+                            valueInputOption='USER_ENTERED', 
+                            body=latest_env_run_data
+                        ).execute()
                         break
                         
             if not match_found:
