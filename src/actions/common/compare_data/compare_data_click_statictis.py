@@ -47,23 +47,7 @@ class CompareDataClickStatistics(GetDataCustomer):
             indexChl = 0
             try:
                 subAutoTestCase = subAutoTestCase + '- Verify that the data displayed is correct according to the last month'
-                last_month_date = time.strftime("%Y-%m", time.localtime(time.time() - 30 * 24 * 60 * 60))
-                year, month = last_month_date.split('-')
-                from_date = f"{month}-01-{year}"
-                if month in ['01','03','05','07','08','10','12']:
-                    to_date = f"{month}-31-{year}"
-                elif month == '02':
-                    if int(year) % 4 == 0 and (int(year) % 100 != 0 or int(year) % 400 == 0):
-                        to_date = f"{month}-29-{year}"
-                    else:
-                        to_date = f"{month}-28-{year}"
-                else:
-                    to_date = f"{month}-30-{year}"
-                print("last_month_date: ", last_month_date)
-                print("from_date: ", from_date)
-                print("to_date: ", to_date)
-                data_referrers_in_customer = self.get_data_referrers_in_customer("12Betaff001",from_date,to_date,"All")
-                print("data_referrers_in_customer: ", data_referrers_in_customer)
+                
 
                 self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0],sheet_name=Checklist_Sheet_Name)
                 indexChl = indexChl + 1 

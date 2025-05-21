@@ -1,15 +1,15 @@
-# get data baseline referrers last month at 2025-05-21 01:01:48 +0800 (GMT+8)
+# get data baseline referrers last month at 2025-05-21 15:22:16 +0800 (GMT+8)
 
 class DataReferrersLastMonth:
     data_referrers_last_month = {
     "metadata": {
-        "collected_at": "2025-05-21 01:01:48 +0800",
+        "collected_at": "2025-05-21 15:22:16 +0800",
         "period": {
             "from_date": "04-01-2025",
             "to_date": "04-30-2025"
         },
         "filters": {
-            "username": "12betaff001",
+            "username": "12BETAFF001",
             "device_type": "All"
         },
         "has_data": True
@@ -48,7 +48,7 @@ class DataReferrersLastMonth:
             },
             {
                 "website_url": "https://aff-12b.nexdev.net/UserAsian/en/UserPanel/Main/",
-                "total_clicks": 4,
+                "total_clicks": 3,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0

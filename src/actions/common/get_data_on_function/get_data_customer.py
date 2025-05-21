@@ -1,8 +1,6 @@
 import time
 
-from src.utils.services.utils import utilities
 from config.constants.settings import *
-
 from src.actions.common.action_common import Common
 from src.interfaces.admin.customer.left_panel_elements import LeftPanelElements as elm_left_panel
 from src.interfaces.admin.customer.submenu_elements import SubmenuElements as elm_submenu
@@ -200,7 +198,6 @@ class GetDataCustomer(Common):
 
             super().select_date_picker(elm_marketing_page.div_from_date, from_date)
             super().select_date_picker(elm_marketing_page.div_to_date, to_date)
-
             self.utils.page.select_options(elm_marketing_page.sel_language, language)
 
             if include_inactive_tracking:
@@ -221,64 +218,83 @@ class GetDataCustomer(Common):
                 result["has_data"] = False
                 return result
 
-            number_of_rows = self.utils.page.count_element("", f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))]")
+            rows = self.utils.page.count_element("", f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))]")
+            i = 1
             
-            for i in range(1, number_of_rows + 1):
+            while i <= rows:
                 row_selector = f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i}]"
-                channel_name = self.utils.page.get_text(f"{row_selector}//td[1]")
-                language = self.utils.page.get_text(f"{row_selector}//td[2]")
-                total_click = self.utils.page.get_text(f"{row_selector}//td[3]")
-                unique_click = self.utils.page.get_text(f"{row_selector}//td[4]")
-                signups = self.utils.page.get_text(f"{row_selector}//td[5]")
-                fdm = self.utils.page.get_text(f"{row_selector}//td[6]")
                 
-                channel_data = {
-                    "channel_name": channel_name,
-                    "language": language,
-                    "total_click": total_click,
-                    "unique_click": unique_click,
-                    "signups": signups,
-                    "fdm": fdm
-                }
-                result["channels_data"].append(channel_data)
+                first_cell = self.utils.page.get_text(f"{row_selector}/td[1]").strip()
                 
-                if channel_name != "-":
-                    try:
-                        self.utils.page.click(f"{row_selector}//td[1]")
-                        self.utils.page.wait_load_page()
-                        time.sleep(1)
-                        
-                        detail_urls = []
-                        
-                        detail_rows = self.utils.page.count_element("", f"{row_selector}/following-sibling::tr[contains(@class, 'child-row')]")
-                        
-                        for j in range(1, detail_rows + 1):
-                            detail_row_selector = f"{row_selector}/following-sibling::tr[contains(@class, 'child-row')][{j}]"
-                            url = self.utils.page.get_text(f"{detail_row_selector}//td[1]")
-                            url_language = self.utils.page.get_text(f"{detail_row_selector}//td[2]")
-                            url_total_clicks = self.utils.page.get_text(f"{detail_row_selector}//td[3]")
-                            url_unique_clicks = self.utils.page.get_text(f"{detail_row_selector}//td[4]") 
-                            url_signups = self.utils.page.get_text(f"{detail_row_selector}//td[5]")
-                            url_fdm = self.utils.page.get_text(f"{detail_row_selector}//td[6]")
+                if first_cell.isdigit():
+                    channel_row_number = first_cell
+                    channel_name = self.utils.page.get_text(f"{row_selector}/td[2]").strip()
+                    language = self.utils.page.get_text(f"{row_selector}/td[3]").strip()
+                    total_click = self.utils.page.get_text(f"{row_selector}/td[4]").strip()
+                    unique_click = self.utils.page.get_text(f"{row_selector}/td[5]").strip()
+                    signups = self.utils.page.get_text(f"{row_selector}/td[6]").strip()
+                    fdm = self.utils.page.get_text(f"{row_selector}/td[7]").strip()
+                    
+                    channel_key = f"{channel_row_number} - {channel_name}"
+                    
+                    channel_data = {
+                        "channel_name": channel_name,
+                        "language": language,
+                        "total_click": total_click,
+                        "unique_click": unique_click,
+                        "signups": signups,
+                        "fdm": fdm
+                    }
+                    result["channels_data"].append(channel_data)
+                    
+                    can_expand = self.utils.page.count_element("", f"{row_selector}/td[2]//*[contains(@class, 'caret')]") > 0
+                    
+                    if can_expand:
+                        try:
+                            self.utils.page.click(f"{row_selector}/td[2]")
+                            self.utils.page.wait_load_page()
+                            time.sleep(1)
                             
-                            url_data = {
-                                "url": url,
-                                "language": url_language,
-                                "total_clicks": url_total_clicks,
-                                "unique_clicks": url_unique_clicks,
-                                "signups": url_signups,
-                                "fdm": url_fdm
-                            }
-                            detail_urls.append(url_data)
+                            new_rows = self.utils.page.count_element("", f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))]")
+                            details_count = new_rows - rows
+                            
+                            detail_urls = []
+                            
+                            for j in range(1, details_count + 1):
+                                detail_row_selector = f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i + j}]"
+                                
+                                url = self.utils.page.get_text(f"{detail_row_selector}/td[1]").strip()
+                                url_language = self.utils.page.get_text(f"{detail_row_selector}/td[2]").strip()
+                                url_total_clicks = self.utils.page.get_text(f"{detail_row_selector}/td[3]").strip()
+                                url_unique_clicks = self.utils.page.get_text(f"{detail_row_selector}/td[4]").strip()
+                                url_signups = self.utils.page.get_text(f"{detail_row_selector}/td[5]").strip()
+                                url_fdm = self.utils.page.get_text(f"{detail_row_selector}/td[6]").strip()
+                                
+                                url_data = {
+                                    "url": url,
+                                    "language": url_language,
+                                    "total_clicks": url_total_clicks,
+                                    "unique_clicks": url_unique_clicks,
+                                    "signups": url_signups,
+                                    "fdm": url_fdm
+                                }
+                                detail_urls.append(url_data)
+                            
+                            result["channel_details_data"][channel_key] = detail_urls
+                            
+                            self.utils.page.click(f"{row_selector}/td[2]")
+                            self.utils.page.wait_load_page()
+                            time.sleep(1)
+                            
+                            rows = self.utils.page.count_element("", f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))]")
                         
-                        channel_key = f"{channel_name} - {language}"
-                        result["channel_details_data"][channel_key] = detail_urls
-                        
-                        self.utils.page.click(f"{row_selector}//td[1]")
-                        self.utils.page.wait_load_page()
-                        time.sleep(1)
-                    except Exception as click_error:
-                        self.utils.page.extract_TestCaseFailed(f"Warning: Cannot get detail data for channel {channel_name}: {str(click_error)}")
+                        except Exception as click_error:
+                            self.utils.page.extract_TestCaseFailed(f"Warning: Cannot get detail data for channel {channel_name}: {str(click_error)}")
+                    
+                    i += 1
+                    
+                else:
+                    i += 1
             
             return result
         except Exception as e:

@@ -1,15 +1,15 @@
-# get data baseline landing page last month at 2025-05-21 00:56:18 +0800 (GMT+8)
+# get data baseline landing page last month at 2025-05-21 15:18:01 +0800 (GMT+8)
 
 class DataLandingPagesLastMonth:
     data_landing_pages_last_month = {
     "metadata": {
-        "collected_at": "2025-05-21 00:56:18 +0800",
+        "collected_at": "2025-05-21 15:18:01 +0800",
         "period": {
             "from_date": "04-01-2025",
             "to_date": "04-30-2025"
         },
         "filters": {
-            "username": "12betaff001",
+            "username": "12BETAFF001",
             "page_name": "All",
             "language": "All",
             "device_type": "All"
@@ -17,89 +17,73 @@ class DataLandingPagesLastMonth:
         "has_data": True
     },
     "pages_data": {
-        "blocked - English": {
+        "blocked - en-US": {
             "page_name": "blocked",
-            "language": "English",
+            "language": "en-US",
             "total_clicks": 1,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "eSport - English": {
+        "eSport - en-US": {
             "page_name": "eSport",
-            "language": "English",
+            "language": "en-US",
             "total_clicks": 1,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "home - English": {
+        "home - en-US": {
             "page_name": "home",
-            "language": "English",
+            "language": "en-US",
             "total_clicks": 5,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "inr-12join - English (India)": {
+        "inr-12join - en-IN": {
             "page_name": "inr-12join",
-            "language": "English (India)",
+            "language": "en-IN",
             "total_clicks": 9,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "inr-12join - Telugu": {
+        "inr-12join - te-IN": {
             "page_name": "inr-12join",
-            "language": "Telugu",
+            "language": "te-IN",
             "total_clicks": 14,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "join - Bengali": {
+        "join - en-US": {
             "page_name": "join",
-            "language": "Bengali",
-            "total_clicks": 2,
-            "unique_clicks": 1,
-            "signups": 0,
-            "fdm": 0
-        },
-        "join - Chinese Simplified": {
-            "page_name": "join",
-            "language": "Chinese Simplified",
-            "total_clicks": 50,
-            "unique_clicks": 1,
-            "signups": 0,
-            "fdm": 0
-        },
-        "join - English": {
-            "page_name": "join",
-            "language": "English",
+            "language": "en-US",
             "total_clicks": 89,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "join - kh": {
+        "join - ko-KR": {
             "page_name": "join",
-            "language": "kh",
-            "total_clicks": 2,
-            "unique_clicks": 1,
-            "signups": 0,
-            "fdm": 0
-        },
-        "join - Korean": {
-            "page_name": "join",
-            "language": "Korean",
+            "language": "ko-KR",
             "total_clicks": 21,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "slots - English": {
+        "join - zh-CN": {
+            "page_name": "join",
+            "language": "zh-CN",
+            "total_clicks": 50,
+            "unique_clicks": 1,
+            "signups": 0,
+            "fdm": 0
+        },
+        "slots - en-US": {
             "page_name": "slots",
-            "language": "English",
+            "language": "en-US",
             "total_clicks": 14,
             "unique_clicks": 1,
             "signups": 0,
@@ -107,7 +91,7 @@ class DataLandingPagesLastMonth:
         }
     },
     "website_urls_data": {
-        "blocked - English": [
+        "blocked - en-US": [
             {
                 "website_url": "none",
                 "total_clicks": 1,
@@ -116,7 +100,7 @@ class DataLandingPagesLastMonth:
                 "fdm": 0
             }
         ],
-        "eSport - English": [
+        "eSport - en-US": [
             {
                 "website_url": "none",
                 "total_clicks": 1,
@@ -125,7 +109,7 @@ class DataLandingPagesLastMonth:
                 "fdm": 0
             }
         ],
-        "home - English": [
+        "home - en-US": [
             {
                 "website_url": "none",
                 "total_clicks": 5,
@@ -134,7 +118,7 @@ class DataLandingPagesLastMonth:
                 "fdm": 0
             }
         ],
-        "inr-12join - English (India)": [
+        "inr-12join - en-IN": [
             {
                 "website_url": "none",
                 "total_clicks": 5,
@@ -150,7 +134,7 @@ class DataLandingPagesLastMonth:
                 "fdm": 0
             }
         ],
-        "inr-12join - Telugu": [
+        "inr-12join - te-IN": [
             {
                 "website_url": "none",
                 "total_clicks": 11,
@@ -166,32 +150,7 @@ class DataLandingPagesLastMonth:
                 "fdm": 0
             }
         ],
-        "join - Bengali": [
-            {
-                "website_url": "https://aff-12b.nexdev.net/UserAsian/en/UserPanel/Main/",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "none",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "join - Chinese Simplified": [
-            {
-                "website_url": "none",
-                "total_clicks": 50,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "join - English": [
+        "join - en-US": [
             {
                 "website_url": "https://aff-12b.nexdev.net/",
                 "total_clicks": 1,
@@ -228,16 +187,7 @@ class DataLandingPagesLastMonth:
                 "fdm": 0
             }
         ],
-        "join - kh": [
-            {
-                "website_url": "none",
-                "total_clicks": 2,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "join - Korean": [
+        "join - ko-KR": [
             {
                 "website_url": "none",
                 "total_clicks": 21,
@@ -246,7 +196,16 @@ class DataLandingPagesLastMonth:
                 "fdm": 0
             }
         ],
-        "slots - English": [
+        "join - zh-CN": [
+            {
+                "website_url": "none",
+                "total_clicks": 50,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            }
+        ],
+        "slots - en-US": [
             {
                 "website_url": "none",
                 "total_clicks": 14,
