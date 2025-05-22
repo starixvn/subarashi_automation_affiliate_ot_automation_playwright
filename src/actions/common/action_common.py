@@ -65,20 +65,22 @@ class Common():
             # Click the input field to open the date picker
             self.utils.page.click(element)
             self.utils.page.wait_load_page()
+            time.sleep(1)
             
             # Select year from the dropdown
             year_selector = f"{element}//div[contains(@class, 'rdr-DateRange')]//span[contains(@class, 'rdr-MonthAndYear-year')]//select"
             self.utils.page.select_options(year_selector, year)
-            
+            time.sleep(1)
             # Select month from the dropdown
             month_selector = f"{element}//div[contains(@class, 'rdr-DateRange')]//span[contains(@class, 'rdr-MonthAndYear-month')]//select"
             month_index = int(month) - 1
             self.utils.page.select_options(month_selector, str(month_index))
-            
+            time.sleep(1)
             # Select the day
             day_selector = f"{element}//div[contains(@class, 'rdr-Days')]//span[contains(@class, 'rdr-Day') and not(contains(@class, 'is-passive')) and text()='{int(day)}']"
             self.utils.page.click(day_selector)
             self.utils.page.wait_load_page()
+            time.sleep(1)
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
 

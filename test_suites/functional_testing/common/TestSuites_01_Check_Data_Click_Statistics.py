@@ -10,19 +10,21 @@ unittest.TestLoader.testMethodPrefix = "TestCase"
 unittest.TestLoader.sortTestMethodsUsing = None
 
 # Add based on your function you define
-from src.actions.common.compare_data.compare_data_click_statictis import CompareDataClickStatistics
+from actions.common.compare_data.click_statictis_referrers.compare_data_referrers import CompareDataReferrers
 
 class TestSuites_01_Check_Data_Click_Statistics(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.check_data_click_statistics = CompareDataClickStatistics()
-        self.check_data_click_statistics.setup()
-        self.utils = self.check_data_click_statistics.utils
+        self.check_data_referrers = CompareDataReferrers()
+        self.check_data_referrers.setup()
+        self.utils = self.check_data_referrers.utils
 
     @classmethod
     def tearDownClass(self):
-        self.check_data_click_statistics.tearDown()
+        self.check_data_referrers.tearDown()
 
-    def TestCase_01_Check_Data_Referrers_In_Customer(self):
-        self.check_data_click_statistics.check_data_referrers_in_customer(inspect.currentframe().f_code.co_name)
-
+    def TestCase_01_Check_Data_Referrers_Filter_By_Date_And_Device(self):
+        self.check_data_referrers.check_data_referrers_filter_by_date_and_device(inspect.currentframe().f_code.co_name)
+    
+    def TestCase_02_Check_Data_Referrers_Click_Statistics_And_Compare(self):
+        self.check_data_referrers.check_data_referrers_click_statistics_and_compare(inspect.currentframe().f_code.co_name)
