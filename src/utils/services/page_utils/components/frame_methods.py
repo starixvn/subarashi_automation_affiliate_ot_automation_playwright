@@ -7,6 +7,7 @@ from src.utils.core import (
     truncate_string
 )
 from src.utils.services.page_utils.components.extract_testcase_failed import ExtractTestCaseFailed
+import time
 
 logger = get_logger(__name__)
 
@@ -100,4 +101,54 @@ class FrameMethods(ExtractTestCaseFailed):
             logger.error(f"Failed to get text of frame element '{element}': {str(e)}")
             self.extract_TestCaseFailed(e)
             
-    # Và nhiều phương thức frame khác
+    @log_exceptions(log_level="DEBUG")
+    def wait_for_element_on_frame(self, frame_xpath, element, state='visible', timeout=30, idxChildFrame=None, idxLatestFrame=None):
+        try:
+            validate_not_none(element, "element")
+            logger.debug(f"Waiting for element '{element}' on frame to be {state}")
+            
+            start_time = time.time()
+            retry_interval = 0.5
+            
+            while time.time() - start_time < timeout:
+                try:
+                    if idxChildFrame == None and idxLatestFrame == None:
+                        if frame_xpath == "":
+                            element_obj = self.page.locator(element)
+                        else:
+                            frame = self.page.frame_locator(frame_xpath)
+                            element_obj = frame.locator(element)
+                    elif idxLatestFrame == None:
+                        frames = self.page.frames
+                        childframe = frames[1].child_frames
+                        element_obj = childframe[idxChildFrame].locator(element)
+                    else:
+                        frames = self.page.frames[idxLatestFrame]
+                        element_obj = frames.locator(element)
+                    
+                    if state == 'visible' and element_obj.is_visible():
+                        logger.debug(f"Element '{element}' on frame is now visible")
+                        return True
+                    elif state == 'hidden' and not element_obj.is_visible():
+                        logger.debug(f"Element '{element}' on frame is now hidden")
+                        return True
+                    elif state == 'enabled' and element_obj.is_enabled():
+                        logger.debug(f"Element '{element}' on frame is now enabled")
+                        return True
+                    elif state == 'attached' and element_obj.count() > 0:
+                        logger.debug(f"Element '{element}' on frame is now attached")
+                        return True
+                    elif state == 'detached' and element_obj.count() == 0:
+                        logger.debug(f"Element '{element}' on frame is now detached")
+                        return True
+                    
+                    time.sleep(retry_interval)
+                except Exception as e:
+                    logger.debug(f"Exception while waiting for element on frame: {str(e)}")
+                    time.sleep(retry_interval)
+            
+            logger.error(f"Element '{element}' on frame not in state '{state}' after {timeout} seconds")
+            return False
+        except Exception as e:
+            logger.error(f"Failed to wait for element on frame: {str(e)}")
+            return False

@@ -29,6 +29,10 @@ class PlayerElements:
     # System Name filter
     lbl_system_name = "//div[@class='filter-container my-2']//label[text()='System Name']"
     inp_system_name = "//div[@class='filter-container my-2']//input[@name='ibcUserName']"
+
+    # Include Removed Players filter
+    lbl_include_removed_players = "//div[@class='filter-container my-2']//label[text()='Include removed Players']"
+    chk_include_removed_players = "//div[@class='filter-container my-2']//label[text()='Include removed Players']//input[@type='checkbox']"
     
     # Search button
     btn_search = "//div[@class='filter-container my-2']//button[@class='btn btn-outline-primary']"

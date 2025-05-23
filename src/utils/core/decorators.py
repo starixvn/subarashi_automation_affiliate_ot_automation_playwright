@@ -7,6 +7,11 @@ import time
 import functools
 import traceback
 from typing import Any, Callable, Optional, Type, TypeVar, Union, cast, Dict
+from datetime import datetime, timedelta
+import inspect
+
+# Xóa import này để tránh circular import
+# from src.utils.services.utils.components.google_methods import GoogleMethods
 
 from src.utils.core.exceptions import AutomationException
 from src.utils.core.logging import get_logger
@@ -14,6 +19,9 @@ from src.utils.core.logging import get_logger
 logger = get_logger(__name__)
 
 F = TypeVar('F', bound=Callable[..., Any])
+
+# Dictionary toàn cục để lưu thông tin checklist cuối cùng của mỗi test case
+_test_case_last_checklist = {}
 
 def retry(
     max_attempts: Union[int, Callable[[Any], int]] = 3,
@@ -227,4 +235,113 @@ def convert_exceptions(
         return cast(F, wrapper)
 
     return decorator
+
+def track_last_checklist(original_update_method):
+    """
+    Decorator cho update_result_to_ggsheet để theo dõi checklist cuối cùng của mỗi test case
+    """
+    @functools.wraps(original_update_method)
+    def wrapper(self, spread_sheet_id, checklist, auto_testcase, sub_auto_testcases, auto_status, sheet_name="Checklist", duration=None):
+        # Lưu checklist cuối cùng được cập nhật cho test case
+        _test_case_last_checklist[auto_testcase] = {
+            'spread_sheet_id': spread_sheet_id,
+            'checklist': checklist,
+            'sheet_name': sheet_name
+        }
+        return original_update_method(self, spread_sheet_id, checklist, auto_testcase, sub_auto_testcases, auto_status, sheet_name, duration)
+    return wrapper
+
+def measure_test_execution_time(func):
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        test_name = func.__name__
+        start_time = time.time()
+        
+        try:
+            result = func(self, *args, **kwargs)
+            
+            end_time = time.time()
+            execution_time = end_time - start_time
+            
+            duration = str(timedelta(seconds=int(execution_time)))
+            if '.' in duration:
+                duration = duration.split('.')[0]
+            
+            if test_name in _test_case_last_checklist:
+                last_info = _test_case_last_checklist[test_name]
+                
+                utils = None
+                
+                if hasattr(self, "utils"):
+                    utils = self.utils
+                elif hasattr(self, "check_data_referrers") and hasattr(self.check_data_referrers, "utils"):
+                    utils = self.check_data_referrers.utils
+                elif hasattr(self, "test_class") and hasattr(self.test_class, "utils"):
+                    utils = self.test_class.utils
+                
+                if utils is not None:
+                    if hasattr(utils, "update_duration_only"):
+                        utils.update_duration_only(
+                            last_info['spread_sheet_id'],
+                            test_name,
+                            duration,
+                            last_info['sheet_name']
+                        )
+                    else:
+                        utils.update_result_to_ggsheet(
+                            last_info['spread_sheet_id'],
+                            last_info['checklist'],
+                            test_name,
+                            "",
+                            "",
+                            last_info['sheet_name'],
+                            duration
+                        )
+                else:
+                    logger.warning(f"Cannot find utils object to update duration for test '{test_name}'")
+            
+            return result
+        except Exception as e:
+            end_time = time.time()
+            execution_time = end_time - start_time
+            
+            duration = str(timedelta(seconds=int(execution_time)))
+            if '.' in duration:
+                duration = duration.split('.')[0]
+            
+            try:
+                if test_name in _test_case_last_checklist:
+                    last_info = _test_case_last_checklist[test_name]
+                    
+                    utils = None
+                    if hasattr(self, "utils"):
+                        utils = self.utils
+                    elif hasattr(self, "check_data_referrers") and hasattr(self.check_data_referrers, "utils"):
+                        utils = self.check_data_referrers.utils
+                    elif hasattr(self, "test_class") and hasattr(self.test_class, "utils"):
+                        utils = self.test_class.utils
+                    
+                    if utils is not None:
+                        if hasattr(utils, "update_duration_only"):
+                            utils.update_duration_only(
+                                last_info['spread_sheet_id'],
+                                test_name,
+                                duration,
+                                last_info['sheet_name']
+                            )
+                        else:
+                            utils.update_result_to_ggsheet(
+                                last_info['spread_sheet_id'],
+                                last_info['checklist'],
+                                test_name,
+                                "",
+                                "",
+                                last_info['sheet_name'],
+                                duration
+                            )
+            except Exception as update_error:
+                logger.error(f"Failed to update duration for test '{test_name}': {str(update_error)}")
+            raise e
+            
+    return wrapper
 

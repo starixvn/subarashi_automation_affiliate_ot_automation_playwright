@@ -23,10 +23,6 @@ class MarketingPageElements:
     sel_language = "//select[@id='languageCode']"
     opt_all_languages = "//select[@id='languageCode']/option[@value='']"
     
-    # Helper method for language options
-    def get_language_option(self, value):
-        return f"//select[@id='languageCode']/option[@value='{value}']"
-    
     # Include Inactive checkbox
     div_include_inactive = "//div[@class='mr-sm-2 my-2 form-group'][4]"
     lbl_include_inactive = "//div[@class='mr-sm-2 my-2 form-group'][4]/label[@class='form-check-label']"
@@ -42,7 +38,7 @@ class MarketingPageElements:
     
     # Table
     div_table_container = "//div[@class='data-content marketing-statistics']//div[@class='table-responsive table-striped my-2']"
-    tbl_marketing = "//div[@class='data-content marketing-statistics']//table[@class='table']"
+    tbl_marketing = "//div[@class='data-content marketing-statistics']//div[@class='body-content']"
     
     # Table headers
     th_number = "//div[@class='data-content marketing-statistics']//th[@title='#']"
@@ -53,18 +49,10 @@ class MarketingPageElements:
     th_signups = "//div[@class='data-content marketing-statistics']//th[@title='Signups']"
     th_fdm = "//div[@class='data-content marketing-statistics']//th[@title='FDM']"
     
-    # Channel row with expansion control
-    def get_channel_row_by_name(self, channel_name):
-        return f"//td[@title='{channel_name}']/parent::tr"
-    
     div_channel_wrapper = "//div[@class='p-0 th-wrapper']"
     spn_channel_text = "//div[@class='p-0 th-wrapper']/strong"
     div_icon_container = "//div[@class='p-0 th-wrapper']/div[@class='icon-container']"
     spn_caret_expand = "//div[@class='icon-container']/span[@class='caret expand current']"
-    
-    # Expanded URL rows
-    def get_url_row_by_path(self, url_path):
-        return f"//td[@title='{url_path}']/parent::tr"
     
     # Helper methods for pagination
     div_pagination = "//div[@class='page-container center-align']"

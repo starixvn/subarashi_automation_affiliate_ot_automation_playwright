@@ -3,6 +3,12 @@ from googleapiclient import discovery
 import os
 from os.path import dirname as d
 from os.path import abspath
+from pathlib import Path
+from config.constants.settings import ENVIRONMENT
+environment = ENVIRONMENT
+
+from src.utils.core.logging import get_logger
+from src.utils.core.exceptions import FileException
 
 from src.utils.core import (
     get_logger,
@@ -14,16 +20,17 @@ from src.utils.core import (
 )
 from src.utils.services.utils.components.extract_testcase_failed import ExtractTestCaseFailed
 from datetime import datetime
+from src.utils.core.decorators import track_last_checklist
 
 logger = get_logger(__name__)
-root_dir = d(d(abspath(__file__)))
+project_root = str(Path(__file__).resolve().parents[5])
 
 class GoogleMethods(ExtractTestCaseFailed):
     @log_exceptions(log_level="DEBUG")
     def prepare_google_api(self):
         try:
             logger.debug("Preparing Google Sheets API client")
-            SERVICE_ACCOUNT_FILE_PATH = root_dir + os.sep + 'config' + os.sep + 'client_secret.json'
+            SERVICE_ACCOUNT_FILE_PATH = os.path.join(project_root, 'config', 'secrets', 'client_secret.json')
             
             if not os.path.exists(SERVICE_ACCOUNT_FILE_PATH):
                 logger.error(f"Service account file not found: {SERVICE_ACCOUNT_FILE_PATH}")
@@ -154,9 +161,10 @@ class GoogleMethods(ExtractTestCaseFailed):
             logger.error(f"Error finding column index: {str(e)}")
             return -1
             
+    @track_last_checklist
     @log_exceptions(log_level="INFO")
     @monitor_performance()
-    def update_result_to_ggsheet(self, spread_sheet_id, checklist, auto_testcase, sub_auto_testcases, auto_status, sheet_name="Checklist"):
+    def update_result_to_ggsheet(self, spread_sheet_id, checklist, auto_testcase, sub_auto_testcases, auto_status, sheet_name="Checklist", duration=None):
         try:
             validate_not_none(spread_sheet_id, "spread_sheet_id")
             validate_not_empty(spread_sheet_id, "spread_sheet_id")
@@ -188,32 +196,213 @@ class GoogleMethods(ExtractTestCaseFailed):
             logger.debug(f"Searching for matching checklist '{checklist}' and test case '{auto_testcase}'")
             match_found = False
             
-            for i in range(2, len(values)):
-                if len(values[i]) >= 11:
-                    if values[i][2] == checklist and values[i][11] == auto_testcase: 
-                        logger.debug(f"Match found at row {i+1}")
+            env_column_map = {
+                "local": "G",
+                "uat": "H",
+                "pro": "I"
+            }
+            sub_testcase_column = "F"
+            date_column = "J"
+            latest_env_run_column = "K"
+            
+            for i in range(1, len(values)):
+                if len(values[i]) >= 5: 
+                    if values[i][2] == checklist and values[i][4] == auto_testcase:
                         match_found = True
-                        rangeUpdateResult = f'{sheet_name}!M{str(i+1)}:O{str(i+1)}'
-                        dataUpdateResult = {
-                            'values': [
-                                        [sub_auto_testcases, auto_status, toDate]
-                                    ]
+                        
+                        sub_testcase_range = f'{sheet_name}!{sub_testcase_column}{str(i+1)}'
+                        sub_testcase_data = {
+                            'values': [[sub_auto_testcases]]
                         }
-                        update_response = service.spreadsheets().values().update(
+                        
+                        status_column = env_column_map[environment]
+                        status_range = f'{sheet_name}!{status_column}{str(i+1)}'
+                        status_data = {
+                            'values': [[auto_status]]
+                        }
+                        
+                        date_range = f'{sheet_name}!{date_column}{str(i+1)}'
+                        date_data = {
+                            'values': [[toDate]]
+                        }
+                        latest_env_run_range = f'{sheet_name}!{latest_env_run_column}{str(i+1)}'
+                        latest_env_run_data = {
+                            'values': [[environment.upper()]]
+                        }
+                        
+                        service.spreadsheets().values().update(
                             spreadsheetId=spread_sheet_id, 
-                            range=rangeUpdateResult,
+                            range=sub_testcase_range,
                             valueInputOption='USER_ENTERED', 
-                            body=dataUpdateResult
+                            body=sub_testcase_data
                         ).execute()
                         
-                        logger.info(f"Updated test result in Google Sheet at range: {rangeUpdateResult}")
+                        service.spreadsheets().values().update(
+                            spreadsheetId=spread_sheet_id, 
+                            range=status_range,
+                            valueInputOption='USER_ENTERED', 
+                            body=status_data
+                        ).execute()
+                        
+                        service.spreadsheets().values().update(
+                            spreadsheetId=spread_sheet_id, 
+                            range=date_range,
+                            valueInputOption='USER_ENTERED', 
+                            body=date_data
+                        ).execute()
+                        
+                        service.spreadsheets().values().update(
+                            spreadsheetId=spread_sheet_id, 
+                            range=latest_env_run_range,
+                            valueInputOption='USER_ENTERED', 
+                            body=latest_env_run_data
+                        ).execute()
                         break
                         
             if not match_found:
                 logger.warning(f"No matching checklist/test case found for '{checklist}' / '{auto_testcase}'")
                 
+            if duration is not None and match_found:
+                duration_column = "L"
+                duration_range = f'{sheet_name}!{duration_column}{str(i+1)}'
+                duration_data = {
+                    'values': [[duration]]
+                }
+                
+                service.spreadsheets().values().update(
+                    spreadsheetId=spread_sheet_id, 
+                    range=duration_range,
+                    valueInputOption='USER_ENTERED', 
+                    body=duration_data
+                ).execute()
+            
             return values
         except Exception as e:
             logger.error(f"Failed to update test result to Google Sheet: {str(e)}")
             print(e)  # Keep existing print behavior for compatibility
             return None
+
+    @log_exceptions(log_level="INFO")
+    @monitor_performance()
+    def update_duration_only(self, spread_sheet_id, auto_testcase, duration, sheet_name="Checklist"):
+        try:
+            validate_not_none(spread_sheet_id, "spread_sheet_id")
+            validate_not_empty(spread_sheet_id, "spread_sheet_id")
+            validate_not_none(auto_testcase, "auto_testcase")
+            validate_not_none(duration, "duration")
+            
+            logger.info(f"Updating duration for test case '{auto_testcase}': {duration}")
+            service = self.prepare_google_api()
+            if not service:
+                logger.error("Failed to initialize Google API service")
+                return
+            
+            request = service.spreadsheets().values().get(
+                spreadsheetId=spread_sheet_id, 
+                range=sheet_name, 
+                valueRenderOption='UNFORMATTED_VALUE'
+            )
+            values = request.execute().get('values', [])
+            
+            if not values:
+                logger.warning('No data found in sheet.')
+                return
+            
+            duration_column = "L"
+            auto_testcase_column_index = 4
+            
+            matching_rows = []
+            for i in range(1, len(values)):
+                if len(values[i]) > auto_testcase_column_index and values[i][auto_testcase_column_index] == auto_testcase:
+                    matching_rows.append(i + 1)
+            
+            if not matching_rows:
+                logger.warning(f"No rows found for test case '{auto_testcase}'")
+                return
+            
+            if len(matching_rows) == 1:
+                duration_range = f'{sheet_name}!{duration_column}{matching_rows[0]}'
+                duration_data = {
+                    'values': [[duration]]
+                }
+                service.spreadsheets().values().update(
+                    spreadsheetId=spread_sheet_id, 
+                    range=duration_range,
+                    valueInputOption='USER_ENTERED', 
+                    body=duration_data
+                ).execute()
+                logger.info(f"Updated duration for '{auto_testcase}' at row {matching_rows[0]}")
+            else:
+                first_row = min(matching_rows)
+                last_row = max(matching_rows)
+                
+                sheet_id = self.get_sheet_id_by_name(spread_sheet_id, sheet_name)
+                if sheet_id is None:
+                    logger.error(f"Could not find sheet ID for sheet name: {sheet_name}")
+                    return
+                
+                duration_range = f'{sheet_name}!{duration_column}{first_row}'
+                duration_data = {
+                    'values': [[duration]]
+                }
+                service.spreadsheets().values().update(
+                    spreadsheetId=spread_sheet_id, 
+                    range=duration_range,
+                    valueInputOption='USER_ENTERED', 
+                    body=duration_data
+                ).execute()
+                
+                col_index = self.column_letter_to_index(duration_column)
+                merge_request = {
+                    "requests": [
+                        {
+                            "mergeCells": {
+                                "range": {
+                                    "sheetId": sheet_id,
+                                    "startRowIndex": first_row - 1,
+                                    "endRowIndex": last_row,
+                                    "startColumnIndex": col_index,
+                                    "endColumnIndex": col_index + 1
+                                },
+                                "mergeType": "MERGE_ALL"
+                            }
+                        }
+                    ]
+                }
+                service.spreadsheets().batchUpdate(
+                    spreadsheetId=spread_sheet_id,
+                    body=merge_request
+                ).execute()
+                
+                logger.info(f"Updated and merged duration for '{auto_testcase}' from row {first_row} to {last_row}")
+            
+        except Exception as e:
+            logger.error(f"Failed to update duration to Google Sheet: {str(e)}")
+            print(e)
+
+    def get_sheet_id_by_name(self, spreadsheet_id, sheet_name):
+        try:
+            service = self.prepare_google_api()
+            if not service:
+                logger.error("Failed to initialize Google API service")
+                return None
+                
+            spreadsheet = service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
+            
+            for sheet in spreadsheet.get('sheets', []):
+                if sheet.get('properties', {}).get('title') == sheet_name:
+                    return sheet.get('properties', {}).get('sheetId')
+                    
+            logger.warning(f"Sheet '{sheet_name}' not found in spreadsheet")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error getting sheet ID: {str(e)}")
+            return None
+
+    def column_letter_to_index(self, column_letter):
+        
+        result = 0
+        for char in column_letter:
+            result = result * 26 + (ord(char.upper()) - ord('A') + 1)
+        return result - 1

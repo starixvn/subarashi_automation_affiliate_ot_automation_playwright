@@ -139,19 +139,3 @@ class LeftPanelElements:
     div_online_header_ip = "//div[@class='left-submenu'][3]/div[@class='content']/div[@class='mr-0 row'][1]/div[@class='text_bold text-center px-0 col-sm-5'][1]"
     div_online_header_checkin = "//div[@class='left-submenu'][3]/div[@class='content']/div[@class='mr-0 row'][1]/div[@class='text_bold text-center px-0 col-sm-5'][2]"
     
-    # Dynamic methods for online list entries
-    @staticmethod
-    def div_online_row_by_index(index):
-        return f"//div[@class='left-submenu'][3]/div[@class='content']/div[@class='mr-0 row'][{index + 1}]"
-    
-    @staticmethod
-    def div_online_number_by_index(index):
-        return f"//div[@class='left-submenu'][3]/div[@class='content']/div[@class='mr-0 row'][{index + 1}]/div[@class='text-center pr-0 col-sm-2']"
-    
-    @staticmethod
-    def lnk_online_ip_by_index(index):
-        return f"//div[@class='left-submenu'][3]/div[@class='content']/div[@class='mr-0 row'][{index + 1}]/div[@class='text-center px-0 col-sm-5'][1]/a"
-    
-    @staticmethod
-    def div_online_checkin_by_index(index):
-        return f"//div[@class='left-submenu'][3]/div[@class='content']/div[@class='mr-0 row'][{index + 1}]/div[@class='text-center px-0 col-sm-5'][2]" 
