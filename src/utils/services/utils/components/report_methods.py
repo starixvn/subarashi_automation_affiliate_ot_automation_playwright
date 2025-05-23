@@ -39,7 +39,7 @@ class ReportMethods(ExtractTestCaseFailed):
             txt += f"📅 Date: {timestamp}\n"
             
             txt += f"📋 Test Suite: {self.FuncName}\n"
-            txt += f"🌐 Environment: {self.env}\n"
+            txt += f"🌐 Environment: {self.env.upper()}\n"
             
             if bool(unique_failures):
                 failure_count = len(unique_failures)

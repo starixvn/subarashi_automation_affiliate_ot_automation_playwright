@@ -1,9 +1,7 @@
 from config.constants.settings import *
 env = ENVIRONMENT
-import time
 import random
 from datetime import datetime, timedelta
-import calendar
 
 from src.actions.common.get_data_on_function.get_data_customer import GetDataCustomer
 from src.test_data.common.data_common import *
@@ -112,6 +110,175 @@ class CompareDataReferrers(GetDataCustomer):
             return {"unique": 0, "total": 0}
         except Exception:
             return {"unique": 0, "total": 0}
+    
+    def _compare_referrers_with_page(self, period, device_type, page_type="landing"):
+        """
+        Compare Total Clicks between Referrers and Landing Pages/Marketing Pages
+        """
+        username = self._get_username()
+        date_range = self._get_date_range(period)
+        
+        data_referrers = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
+        
+        referrers_total_clicks = 0
+        if data_referrers.get("has_data", True):
+            for site_data in data_referrers["site_urls_data"]:
+                referrers_total_clicks += self.parse_int(site_data["total_click"])
+        
+        if page_type == "landing":
+            data_pages = self.get_data_landing_pages_in_customer(username, "All", "All", date_range["from_date"], date_range["to_date"], device_type)
+            pages_name = "Landing Pages"
+            
+            pages_total_clicks = 0
+            if data_pages.get("has_data", True):
+                for page in data_pages["pages_data"]:
+                    pages_total_clicks += self.parse_int(page["total_click"])
+        else:
+            data_pages = self.get_data_marketing_pages_in_customer(username, "All", date_range["from_date"], date_range["to_date"], device_type)
+            pages_name = "Marketing Pages"
+            
+            pages_total_clicks = 0
+            if data_pages.get("has_data", True):
+                for channel in data_pages["channels_data"]:
+                    pages_total_clicks += self.parse_int(channel["total_click"])
+        
+        has_data = data_referrers.get("has_data", True) and data_pages.get("has_data", True)
+        
+        result = ""
+        if has_data:
+            result += f"\n     + Username: {username}"
+            result += f"\n     + From Date: {date_range['from_date']}"
+            result += f"\n     + To Date: {date_range['to_date']}"
+            
+            if referrers_total_clicks == pages_total_clicks:
+                result += f"\n     + Total Clicks match: {referrers_total_clicks}"
+            else:
+                result += f"\n     + Total Clicks mismatch: Referrers={referrers_total_clicks}, {pages_name}={pages_total_clicks}"
+        else:
+            result += f"\n     + No data found for Total Clicks for Referrers or {pages_name}."
+        
+        return result
+
+    def _get_username(self):
+        if ENVIRONMENT == "local":
+            return "12BETAFF001"
+        else:
+            self.data_player = GetDataPlayer()
+            self.data_player.referUtils(self.utils)
+            top_100_data_player = self.data_player.get_top_100_data_player()
+            return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
+        
+    def _get_date_range(self, period):
+        today = datetime.now()
+        
+        if period == "last_month":
+            first_day_current_month = today.replace(day=1)
+            last_day_previous_month = first_day_current_month - timedelta(days=1)
+            first_day_previous_month = last_day_previous_month.replace(day=1)
+            from_date = first_day_previous_month.strftime("%m-%d-%Y")
+            to_date = last_day_previous_month.strftime("%m-%d-%Y")
+            month_date = last_day_previous_month.strftime("%m-%Y")
+        else:
+            first_day_current_month = today.replace(day=1)
+            from_date = first_day_current_month.strftime("%m-%d-%Y")
+            to_date = today.strftime("%m-%d-%Y")
+            month_date = today.strftime("%m-%Y")
+        
+        return {
+            "from_date": from_date,
+            "to_date": to_date,
+            "month_date": month_date
+        }
+
+    def _check_data_for_period_and_device(self, period, device_type):
+        username = self._get_username()
+        date_range = self._get_date_range(period)
+        
+        data_referrers = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
+        data_statistics = self.get_data_statistics_in_customer(username, date_range["month_date"])
+        
+        new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
+        statistics_signups = self.parse_int(new_signups_fdm[0])
+        statistics_fdm = self.parse_int(new_signups_fdm[1]) if len(new_signups_fdm) > 1 else 0
+        
+        pc_tracking = self.parse_fraction(data_statistics["tracking_pc_month"])
+        mobile_tracking = self.parse_fraction(data_statistics["tracking_mobile_month"])
+        
+        if device_type == "All":
+            statistics_total_clicks = pc_tracking["total"] + mobile_tracking["total"]
+            statistics_unique_clicks = pc_tracking["unique"] + mobile_tracking["unique"]
+        elif device_type == "Mobile":
+            statistics_total_clicks = mobile_tracking["total"]
+            statistics_unique_clicks = mobile_tracking["unique"]
+        else:
+            statistics_total_clicks = pc_tracking["total"]
+            statistics_unique_clicks = pc_tracking["unique"]
+        
+        referrers_total_clicks = 0
+        referrers_unique_clicks = 0
+        referrers_signups = 0
+        referrers_fdm = 0
+        
+        if data_referrers.get("has_data", True):
+            for site_data in data_referrers["site_urls_data"]:
+                referrers_total_clicks += self.parse_int(site_data["total_click"])
+                referrers_unique_clicks += self.parse_int(site_data["unique_click"])
+                referrers_signups += self.parse_int(site_data["signups"])
+                referrers_fdm += self.parse_int(site_data["fdm"])
+        
+        mismatches = []
+        
+        click_type = "Total Clicks"
+        if device_type == "Mobile":
+            click_type = "Mobile Total Clicks"
+        elif device_type == "PC / Laptop":
+            click_type = "Desktop Total Clicks"
+        
+        if referrers_total_clicks != statistics_total_clicks:
+            mismatches.append(f"{click_type} mismatch: Statistics={statistics_total_clicks}, Referrers={referrers_total_clicks}")
+        
+        if referrers_signups != statistics_signups:
+            mismatches.append(f"Signups mismatch: Statistics={statistics_signups}, Referrers={referrers_signups}")
+        
+        if referrers_fdm != statistics_fdm:
+            mismatches.append(f"FDM mismatch: Statistics={statistics_fdm}, Referrers={referrers_fdm}")
+        
+        if mismatches:
+            raise Exception("\n".join(mismatches))
+        
+        return {
+            "username": username,
+            "device_type": device_type,
+            "from_date": date_range["from_date"],
+            "to_date": date_range["to_date"],
+            "statistics_total_clicks": statistics_total_clicks,
+            "statistics_unique_clicks": statistics_unique_clicks,
+            "referrers_total_clicks": referrers_total_clicks,
+            "referrers_unique_clicks": referrers_unique_clicks,
+            "statistics_signups": statistics_signups,
+            "referrers_signups": referrers_signups,
+            "statistics_fdm": statistics_fdm,
+            "referrers_fdm": referrers_fdm,
+            "click_type": click_type
+        }
+
+    def _format_test_results(self, results, device_display_name):
+        formatted_result = ""
+        formatted_result += f"\n     + Username: {results['username']}"
+        formatted_result += f"\n     + Device Type: {results['device_type']}"
+        formatted_result += f"\n     + From Date: {results['from_date']}"
+        formatted_result += f"\n     + To Date: {results['to_date']}"
+        
+        if device_display_name == "All":
+            formatted_result += f"\n     + Total Clicks: Statistics={results['statistics_total_clicks']}, Referrers={results['referrers_total_clicks']}"
+            formatted_result += f"\n     + Unique Clicks: Statistics={results['statistics_unique_clicks']}, Referrers={results['referrers_unique_clicks']}"
+        else:
+            formatted_result += f"\n     + {device_display_name} Total Clicks: Statistics={results['statistics_total_clicks']}, Referrers={results['referrers_total_clicks']}"
+        
+        formatted_result += f"\n     + Signups: Statistics={results['statistics_signups']}, Referrers={results['referrers_signups']}"
+        formatted_result += f"\n     + FDM: Statistics={results['statistics_fdm']}, Referrers={results['referrers_fdm']}"
+        
+        return formatted_result
 
     def check_data_referrers_filter_by_date_and_device(self, testcase):
         subAutoTestCase = ''
@@ -349,14 +516,68 @@ class CompareDataReferrers(GetDataCustomer):
                     self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[i], testcase, "", Data["TestCase_Auto_Status"][2],sheet_name=Checklist_Sheet_Name)
             self.utils.page.extract_TestCaseFailed(e)
 
+    def preload_all_data(self):
+        periods = ["last_month", "last_week", "current_month"]
+        device_types = ["All", "PC / Laptop", "Mobile"]
+        stats_periods = ["last_month", "current_month"]
+        
+        cache = {
+            "referrers": {},
+            "landing_pages": {},
+            "marketing_pages": {},
+            "statistics": {}
+        }
+        
+        username = self._get_username()
+        print(f"Preloading data for username: {username}")
+        
+        for period in periods:
+            date_range = self._get_date_range(period)
+            cache[period] = {
+                "date_range": date_range
+            }
+            
+            print(f"Fetching data for period: {period}")
+            
+            data_marketing_pages = self.get_data_marketing_pages_in_customer(
+                username, "All", date_range["from_date"], date_range["to_date"], get_detail=False
+            )
+            
+            if period in stats_periods:
+                cache["statistics"][period] = self.get_data_statistics_in_customer(
+                    username, date_range["month_date"]
+                )
+            
+            for device_type in device_types:
+                key = f"{period}_{device_type}"
+                
+                data_referrers = self.get_data_referrers_in_customer(
+                    username, date_range["from_date"], date_range["to_date"], device_type, get_detail=False
+                )
+                cache["referrers"][key] = data_referrers
+                
+                data_landing_pages = self.get_data_landing_pages_in_customer(
+                    username, "All", "All", date_range["from_date"], date_range["to_date"], device_type, get_detail=False
+                )
+                cache["landing_pages"][key] = data_landing_pages
+
+                cache["marketing_pages"][key] = data_marketing_pages
+        
+        print("All data preloaded successfully!")
+        return cache, username
+
     def check_data_referrers_click_statistics_and_compare(self, testcase):
-        subAutoTestCase = ''
+
+        cache, username = self.preload_all_data()
+        
         mainChecklist = ["Verify that the Referrers data in the \"Click Statistics\" sub‑function matches the data in Statistics.",
                         "Verify that the Total Clicks for Referrers equal the Total Clicks for Landing Pages.",
                         "Verify that the Total Clicks for Referrers equal the Total Clicks for Marketing Pages."
                         ]
         indexChl = 0
+        
         try:
+            subAutoTestCase = ''
             time_periods = ["last_month", "current_month"]
             device_types = [
                 {"name": "All", "display_name": "All"},
@@ -370,7 +591,73 @@ class CompareDataReferrers(GetDataCustomer):
                         subAutoTestCase += '\n'
                     subAutoTestCase += f"- Verify that the data of Referrers {device['display_name'].lower()} in {period.replace('_', ' ')} must match the data of Statistics summary table"
                     
-                    results = self._check_data_for_period_and_device(period, device["name"])
+                    key = f"{period}_{device['name']}"
+                    data_referrers = cache["referrers"][key]
+                    data_statistics = cache["statistics"][period]
+                    
+                    new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
+                    statistics_signups = self.parse_int(new_signups_fdm[0])
+                    statistics_fdm = self.parse_int(new_signups_fdm[1]) if len(new_signups_fdm) > 1 else 0
+                    
+                    pc_tracking = self.parse_fraction(data_statistics["tracking_pc_month"])
+                    mobile_tracking = self.parse_fraction(data_statistics["tracking_mobile_month"])
+                    
+                    if device["name"] == "All":
+                        statistics_total_clicks = pc_tracking["total"] + mobile_tracking["total"]
+                        statistics_unique_clicks = pc_tracking["unique"] + mobile_tracking["unique"]
+                    elif device["name"] == "Mobile":
+                        statistics_total_clicks = mobile_tracking["total"]
+                        statistics_unique_clicks = mobile_tracking["unique"]
+                    else:
+                        statistics_total_clicks = pc_tracking["total"]
+                        statistics_unique_clicks = pc_tracking["unique"]
+                    
+                    referrers_total_clicks = 0
+                    referrers_unique_clicks = 0
+                    referrers_signups = 0
+                    referrers_fdm = 0
+                    
+                    if data_referrers.get("has_data", True):
+                        for site_data in data_referrers["site_urls_data"]:
+                            referrers_total_clicks += self.parse_int(site_data["total_click"])
+                            referrers_unique_clicks += self.parse_int(site_data["unique_click"])
+                            referrers_signups += self.parse_int(site_data["signups"])
+                            referrers_fdm += self.parse_int(site_data["fdm"])
+                    
+                    mismatches = []
+                    click_type = "Total Clicks"
+                    if device["name"] == "Mobile":
+                        click_type = "Mobile Total Clicks"
+                    elif device["name"] == "PC / Laptop":
+                        click_type = "Desktop Total Clicks"
+                    
+                    if referrers_total_clicks != statistics_total_clicks:
+                        mismatches.append(f"{click_type} mismatch: Statistics={statistics_total_clicks}, Referrers={referrers_total_clicks}")
+                    
+                    if referrers_signups != statistics_signups:
+                        mismatches.append(f"Signups mismatch: Statistics={statistics_signups}, Referrers={referrers_signups}")
+                    
+                    if referrers_fdm != statistics_fdm:
+                        mismatches.append(f"FDM mismatch: Statistics={statistics_fdm}, Referrers={referrers_fdm}")
+                    
+                    if mismatches:
+                        raise Exception("\n".join(mismatches))
+                    
+                    results = {
+                        "username": username,
+                        "device_type": device["name"],
+                        "from_date": cache[period]["date_range"]["from_date"],
+                        "to_date": cache[period]["date_range"]["to_date"],
+                        "statistics_total_clicks": statistics_total_clicks,
+                        "statistics_unique_clicks": statistics_unique_clicks,
+                        "referrers_total_clicks": referrers_total_clicks,
+                        "referrers_unique_clicks": referrers_unique_clicks,
+                        "statistics_signups": statistics_signups,
+                        "referrers_signups": referrers_signups,
+                        "statistics_fdm": statistics_fdm,
+                        "referrers_fdm": referrers_fdm,
+                        "click_type": click_type
+                    }
                     
                     subAutoTestCase += self._format_test_results(results, device["display_name"])
             
@@ -383,26 +670,107 @@ class CompareDataReferrers(GetDataCustomer):
                 sheet_name=Checklist_Sheet_Name
             )
             indexChl += 1
+            
             subAutoTestCase = ''
-
-            ##### Verify that the Total Clicks for Referrers equal the Total Clicks for Landing Pages.
-            subAutoTestCase += '- Verify that Total Clicks for Referrers last month are equal to Total Clicks for Landing Pages.'
-
-            subAutoTestCase += '- Verify that Total Clicks for Referrers last month by Desktop are equal to Total Clicks for Landing Pages.'
-
-            subAutoTestCase += '- Verify that Total Clicks for Referrers last month by Mobile are equal to Total Clicks for Landing Pages.'
-
-            subAutoTestCase += '- Verify that Total Clicks for Referrers last week are equal to Total Clicks for Landing Pages.'
-
-            subAutoTestCase += '- Verify that Total Clicks for Referrers last week by Desktop are equal to Total Clicks for Landing Pages.'
-
-            subAutoTestCase += '- Verify that Total Clicks for Referrers last week by Mobile are equal to Total Clicks for Landing Pages.'
-
-            subAutoTestCase += '- Verify that Total Clicks for Referrers current month are equal to Total Clicks for Landing Pages.'
-
-            subAutoTestCase += '- Verify that Total Clicks for Referrers current month by Desktop are equal to Total Clicks for Landing Pages.'
-
-            subAutoTestCase += '- Verify that Total Clicks for Referrers current month by Mobile are equal to Total Clicks for Landing Pages.'
+            periods = ["last_month", "last_week", "current_month"]
+            device_types = ["All", "PC / Laptop", "Mobile"]
+            
+            for period in periods:
+                for device_type in device_types:
+                    device_display = "Desktop" if device_type == "PC / Laptop" else device_type
+                    period_display = period.replace("_", " ")
+                    
+                    if subAutoTestCase:
+                        subAutoTestCase += '\n\n'
+                        
+                    subAutoTestCase += f"- Verify that Total Clicks for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display} are equal to Total Clicks for Landing Pages."
+                    
+                    key = f"{period}_{device_type}"
+                    data_referrers = cache["referrers"][key]
+                    data_landing_pages = cache["landing_pages"][key]
+                    
+                    referrers_total_clicks = 0
+                    if data_referrers.get("has_data", True):
+                        for site_data in data_referrers["site_urls_data"]:
+                            referrers_total_clicks += self.parse_int(site_data["total_click"])
+                    
+                    landing_pages_total_clicks = 0
+                    if data_landing_pages.get("has_data", True):
+                        for page in data_landing_pages["pages_data"]:
+                            landing_pages_total_clicks += self.parse_int(page["total_click"])
+                    
+                    has_data = data_referrers.get("has_data", True) and data_landing_pages.get("has_data", True)
+                    
+                    if has_data:
+                        subAutoTestCase += f"\n     + Username: {username}"
+                        subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                        subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
+                        
+                        if referrers_total_clicks == landing_pages_total_clicks:
+                            subAutoTestCase += f"\n     + Total Clicks match: {referrers_total_clicks}"
+                        else:
+                            subAutoTestCase += f"\n     + Total Clicks mismatch: Referrers={referrers_total_clicks}, Landing Pages={landing_pages_total_clicks}"
+                    else:
+                        subAutoTestCase += f"\n     + No data found for Total Clicks for Referrers or Landing Pages."
+            
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][0],
+                sheet_name=Checklist_Sheet_Name
+            )
+            indexChl += 1
+            
+            subAutoTestCase = ''
+            
+            for period in periods:
+                for device_type in device_types:
+                    device_display = "Desktop" if device_type == "PC / Laptop" else device_type
+                    period_display = period.replace("_", " ")
+                    
+                    if subAutoTestCase:
+                        subAutoTestCase += '\n\n'
+                        
+                    subAutoTestCase += f"- Verify that Total Clicks for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display} are equal to Total Clicks for Marketing Pages."
+                    
+                    key = f"{period}_{device_type}"
+                    data_referrers = cache["referrers"][key]
+                    data_marketing_pages = cache["marketing_pages"][key]
+                    
+                    referrers_total_clicks = 0
+                    if data_referrers.get("has_data", True):
+                        for site_data in data_referrers["site_urls_data"]:
+                            referrers_total_clicks += self.parse_int(site_data["total_click"])
+                    
+                    marketing_pages_total_clicks = 0
+                    if data_marketing_pages.get("has_data", True):
+                        for channel in data_marketing_pages["channels_data"]:
+                            marketing_pages_total_clicks += self.parse_int(channel["total_click"])
+                    
+                    has_data = data_referrers.get("has_data", True) and data_marketing_pages.get("has_data", True)
+                    
+                    if has_data:
+                        subAutoTestCase += f"\n     + Username: {username}"
+                        subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                        subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
+                        
+                        if referrers_total_clicks == marketing_pages_total_clicks:
+                            subAutoTestCase += f"\n     + Total Clicks match: {referrers_total_clicks}"
+                        else:
+                            subAutoTestCase += f"\n     + Total Clicks mismatch: Referrers={referrers_total_clicks}, Marketing Pages={marketing_pages_total_clicks}"
+                    else:
+                        subAutoTestCase += f"\n     + No data found for Total Clicks for Referrers or Marketing Pages."
+            
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][0],
+                sheet_name=Checklist_Sheet_Name
+            )
             
         except Exception as e:
             self.utils.update_result_to_ggsheet(
@@ -428,123 +796,105 @@ class CompareDataReferrers(GetDataCustomer):
                     )
             self.utils.page.extract_TestCaseFailed(e)
 
-    def _get_username(self):
-        if ENVIRONMENT == "local":
-            return "12BETAFF001"
-        else:
-            self.data_player = GetDataPlayer()
-            self.data_player.referUtils(self.utils)
-            top_100_data_player = self.data_player.get_top_100_data_player()
-            return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
+    def check_data_signups_and_fdm(self, testcase):
 
-    def _get_date_range(self, period):
-        today = datetime.now()
+        cache, username = self.preload_all_data()
         
-        if period == "last_month":
-            first_day_current_month = today.replace(day=1)
-            last_day_previous_month = first_day_current_month - timedelta(days=1)
-            first_day_previous_month = last_day_previous_month.replace(day=1)
-            from_date = first_day_previous_month.strftime("%m-%d-%Y")
-            to_date = last_day_previous_month.strftime("%m-%d-%Y")
-            month_date = last_day_previous_month.strftime("%m-%Y")
-        else:
-            first_day_current_month = today.replace(day=1)
-            from_date = first_day_current_month.strftime("%m-%d-%Y")
-            to_date = today.strftime("%m-%d-%Y")
-            month_date = today.strftime("%m-%Y")
+        mainChecklist = [
+            "Verify that the Signups for Referrers equal the Signups for Landing Pages.",
+            "Verify that the Signups for Referrers equal the Signups for Marketing Pages.",
+            "Verify that the FDM for Referrers equal the FDM for Landing Pages.",
+            "Verify that the FDM for Referrers equal the FDM for Marketing Pages."
+        ]
         
-        return {
-            "from_date": from_date,
-            "to_date": to_date,
-            "month_date": month_date
-        }
-
-    def _check_data_for_period_and_device(self, period, device_type):
-        username = self._get_username()
-        date_range = self._get_date_range(period)
-        
-        data_referrers = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
-        data_statistics = self.get_data_statistics_in_customer(username, date_range["month_date"])
-        
-        new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
-        statistics_signups = self.parse_int(new_signups_fdm[0])
-        statistics_fdm = self.parse_int(new_signups_fdm[1]) if len(new_signups_fdm) > 1 else 0
-        
-        pc_tracking = self.parse_fraction(data_statistics["tracking_pc_month"])
-        mobile_tracking = self.parse_fraction(data_statistics["tracking_mobile_month"])
-        
-        if device_type == "All":
-            statistics_total_clicks = pc_tracking["total"] + mobile_tracking["total"]
-            statistics_unique_clicks = pc_tracking["unique"] + mobile_tracking["unique"]
-        elif device_type == "Mobile":
-            statistics_total_clicks = mobile_tracking["total"]
-            statistics_unique_clicks = mobile_tracking["unique"]
-        else:
-            statistics_total_clicks = pc_tracking["total"]
-            statistics_unique_clicks = pc_tracking["unique"]
-        
-        referrers_total_clicks = 0
-        referrers_unique_clicks = 0
-        referrers_signups = 0
-        referrers_fdm = 0
-        
-        if data_referrers.get("has_data", True):
-            for site_data in data_referrers["site_urls_data"]:
-                referrers_total_clicks += self.parse_int(site_data["total_click"])
-                referrers_unique_clicks += self.parse_int(site_data["unique_click"])
-                referrers_signups += self.parse_int(site_data["signups"])
-                referrers_fdm += self.parse_int(site_data["fdm"])
-        
-        mismatches = []
-        
-        click_type = "Total Clicks"
-        if device_type == "Mobile":
-            click_type = "Mobile Total Clicks"
-        elif device_type == "PC / Laptop":
-            click_type = "Desktop Total Clicks"
-        
-        if referrers_total_clicks != statistics_total_clicks:
-            mismatches.append(f"{click_type} mismatch: Statistics={statistics_total_clicks}, Referrers={referrers_total_clicks}")
-        
-        if referrers_signups != statistics_signups:
-            mismatches.append(f"Signups mismatch: Statistics={statistics_signups}, Referrers={referrers_signups}")
-        
-        if referrers_fdm != statistics_fdm:
-            mismatches.append(f"FDM mismatch: Statistics={statistics_fdm}, Referrers={referrers_fdm}")
-        
-        if mismatches:
-            raise Exception("\n".join(mismatches))
-        
-        return {
-            "username": username,
-            "device_type": device_type,
-            "from_date": date_range["from_date"],
-            "to_date": date_range["to_date"],
-            "statistics_total_clicks": statistics_total_clicks,
-            "statistics_unique_clicks": statistics_unique_clicks,
-            "referrers_total_clicks": referrers_total_clicks,
-            "referrers_unique_clicks": referrers_unique_clicks,
-            "statistics_signups": statistics_signups,
-            "referrers_signups": referrers_signups,
-            "statistics_fdm": statistics_fdm,
-            "referrers_fdm": referrers_fdm,
-            "click_type": click_type
-        }
-
-    def _format_test_results(self, results, device_display_name):
-        formatted_result = ""
-        formatted_result += f"\n     + Username: {results['username']}"
-        formatted_result += f"\n     + Device Type: {results['device_type']}"
-        formatted_result += f"\n     + From Date: {results['from_date']}"
-        formatted_result += f"\n     + To Date: {results['to_date']}"
-        
-        if device_display_name == "All":
-            formatted_result += f"\n     + Total Clicks: Statistics={results['statistics_total_clicks']}, Referrers={results['referrers_total_clicks']}"
-            formatted_result += f"\n     + Unique Clicks: Statistics={results['statistics_unique_clicks']}, Referrers={results['referrers_unique_clicks']}"
-        else:
-            formatted_result += f"\n     + {device_display_name} Total Clicks: Statistics={results['statistics_total_clicks']}, Referrers={results['referrers_total_clicks']}"
-        
-        formatted_result += f"\n     + Signups: Statistics={results['statistics_signups']}, Referrers={results['referrers_signups']}"
-        formatted_result += f"\n     + FDM: Statistics={results['statistics_fdm']}, Referrers={results['referrers_fdm']}"
-        
-        return formatted_result
+        try:
+            for checklist_index, comparison_type in enumerate([
+                {"data_type": "signups", "compare_with": "landing_pages"},
+                {"data_type": "signups", "compare_with": "marketing_pages"},
+                {"data_type": "fdm", "compare_with": "landing_pages"},
+                {"data_type": "fdm", "compare_with": "marketing_pages"}
+            ]):
+                data_type = comparison_type["data_type"]
+                compare_with = comparison_type["compare_with"]
+                
+                data_type_display = data_type.capitalize()
+                compare_with_display = "Landing Pages" if compare_with == "landing_pages" else "Marketing Pages"
+                
+                subAutoTestCase = ''
+                periods = ["last_month", "last_week", "current_month"]
+                device_types = ["All", "PC / Laptop", "Mobile"]
+                
+                for period in periods:
+                    for device_type in device_types:
+                        device_display = "Desktop" if device_type == "PC / Laptop" else device_type
+                        period_display = period.replace("_", " ")
+                        
+                        if subAutoTestCase:
+                            subAutoTestCase += '\n\n'
+                            
+                        subAutoTestCase += f"- Verify that {data_type_display} for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display} are equal to {data_type_display} for {compare_with_display}."
+                        
+                        key = f"{period}_{device_type}"
+                        data_referrers = cache["referrers"][key]
+                        data_pages = cache[compare_with][key]
+                        
+                        referrers_value = 0
+                        if data_referrers.get("has_data", True):
+                            for site_data in data_referrers["site_urls_data"]:
+                                referrers_value += self.parse_int(site_data[data_type])
+                        
+                        pages_value = 0
+                        if data_pages.get("has_data", True):
+                            if compare_with == "landing_pages":
+                                for page in data_pages["pages_data"]:
+                                    pages_value += self.parse_int(page[data_type])
+                            else:
+                                for channel in data_pages["channels_data"]:
+                                    pages_value += self.parse_int(channel[data_type])
+                        
+                        has_data = data_referrers.get("has_data", True) and data_pages.get("has_data", True)
+                        
+                        if has_data:
+                            subAutoTestCase += f"\n     + Username: {username}"
+                            subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                            subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
+                            
+                            if referrers_value == pages_value:
+                                subAutoTestCase += f"\n     + {data_type_display} match: {referrers_value}"
+                            else:
+                                subAutoTestCase += f"\n     + {data_type_display} mismatch: Referrers={referrers_value}, {compare_with_display}={pages_value}"
+                        else:
+                            subAutoTestCase += f"\n     + No data found for {data_type_display} for Referrers or {compare_with_display}."
+                
+                self.utils.update_result_to_ggsheet(
+                    Data["TestCase_spread_sheet_id"], 
+                    mainChecklist[checklist_index], 
+                    testcase, 
+                    subAutoTestCase, 
+                    Data["TestCase_Auto_Status"][0],
+                    sheet_name=Checklist_Sheet_Name
+                )
+                
+        except Exception as e:
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[checklist_index], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][1],
+                sheet_name=Checklist_Sheet_Name
+            )
+            checklist_index += 1
+            if checklist_index < len(mainChecklist):
+                for i in range(checklist_index, len(mainChecklist)):
+                    if i >= len(mainChecklist):
+                        break
+                    self.utils.update_result_to_ggsheet(
+                        Data["TestCase_spread_sheet_id"], 
+                        mainChecklist[i], 
+                        testcase, 
+                        "", 
+                        Data["TestCase_Auto_Status"][2],
+                        sheet_name=Checklist_Sheet_Name
+                    )
+            self.utils.page.extract_TestCaseFailed(e)

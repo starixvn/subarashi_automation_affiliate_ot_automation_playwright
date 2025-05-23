@@ -1,3 +1,4 @@
+import time
 from src.utils.core import (
     get_logger,
     log_exceptions,
@@ -135,3 +136,57 @@ class ElementMethods(ExtractTestCaseFailed):
             return element.count()
         except Exception as e:
             self.extract_TestCaseFailed(e)
+
+    @log_exceptions(log_level="DEBUG")
+    def scroll_to_element(self, element):
+        try:
+            validate_not_none(element, "element")
+            logger.debug(f"Scrolling to element '{element}'")
+            self.page.locator(element).scroll_into_view_if_needed()
+            logger.debug("Scroll to element completed")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to scroll to element: {str(e)}")
+            self.extract_TestCaseFailed(e)
+            return False
+
+    @log_exceptions(log_level="DEBUG")
+    def click_with_retry(self, element, max_attempts=3, retry_interval=1.0):
+        try:
+            validate_not_none(element, "element")
+            
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    logger.debug(f"Clicking element '{element}' (attempt {attempt}/{max_attempts})")
+                    
+                    self.scroll_to_element(element)
+                    
+                    time.sleep(0.2)
+                    
+                    self.page.locator(element).click()
+                    logger.debug(f"Element '{element}' clicked successfully")
+                    return True
+                except Exception as click_error:
+                    if attempt == max_attempts:
+                        raise click_error
+                    logger.debug(f"Click attempt {attempt} failed: {str(click_error)}")
+                    time.sleep(retry_interval)
+            
+            return False
+        except Exception as e:
+            logger.error(f"Failed to click element '{element}' after {max_attempts} attempts: {str(e)}")
+            self.extract_TestCaseFailed(e)
+            return False
+
+    @log_exceptions(log_level="DEBUG")
+    def hover(self, element):
+        try:
+            validate_not_none(element, "element")
+            logger.debug(f"Hovering over element '{element}'")
+            self.page.locator(element).hover()
+            logger.debug(f"Successfully hovered over '{element}'")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to hover over element '{element}': {str(e)}")
+            self.extract_TestCaseFailed(e)
+            return False

@@ -15,23 +15,22 @@ from src.interfaces.admin.customer.edit.edit_elements import EditElements as elm
 
 class GetDataCustomer(Common):
     
-    def get_data_referrers_in_customer(self, user_name, from_date=None, to_date=None, device_type="All"):
+    def get_data_referrers_in_customer(self, user_name, from_date=None, to_date=None, device_type="All", get_detail=True):
         try:
             super().selectMenu("Customer")
             self.utils.page.input(elm_left_panel.inp_aff_name, user_name)
             self.utils.page.click(elm_left_panel.btn_search)
-            self.utils.page.wait_load_page()
-            time.sleep(1)
-            self.utils.page.click(elm_submenu.click_statistics)
-            self.utils.page.wait_load_page()
-            time.sleep(1)
-            self.utils.page.click(elm_submenu_click_statistics.li_referrers)
+            self.utils.page.wait_for_element_ready(elm_submenu.click_statistics, visible=True, enabled=True)
+            time.sleep(2)
+            self.utils.page.click_with_retry(elm_submenu.click_statistics)
+            self.utils.page.wait_for_element_ready(elm_submenu_click_statistics.li_referrers, visible=True, enabled=True)
+            self.utils.page.click_with_retry(elm_submenu_click_statistics.li_referrers)
+            self.utils.page.wait_for_element_ready(elm_referrers.div_from_date, visible=True, enabled=True)
             super().select_date_picker(elm_referrers.div_from_date, from_date)
             super().select_date_picker(elm_referrers.div_to_date, to_date)
             self.utils.page.select_options(elm_referrers.sel_device, device_type)
             self.utils.page.click(elm_referrers.btn_search)
-            self.utils.page.wait_load_page()
-            time.sleep(3)
+            self.utils.page.wait_for_element_ready(elm_referrers.div_table_first, visible=True, enabled=True)
             
             result = {
                 "site_urls_data": [],
@@ -44,9 +43,15 @@ class GetDataCustomer(Common):
                 result["has_data"] = False
                 return result
             
+            self.utils.page.wait_for_network_idle()
+            self.utils.page.wait_for_element_ready(elm_referrers.div_table_first, visible=True, enabled=True)
+            
             number_of_rows = self.utils.page.count_element("", f"{elm_referrers.div_table_first}//tbody/tr[not(contains(@class, 'first-row'))]")
             for i in range(1, number_of_rows + 1):
                 row_selector = f"{elm_referrers.div_table_first}//tbody/tr[not(contains(@class, 'first-row'))][{i}]"
+                
+                self.utils.page.wait_for_element_ready(f"{row_selector}//td[1]", timeout=10)
+                
                 site_url = self.utils.page.get_text(f"{row_selector}//td[1]")
                 total_click = self.utils.page.get_text(f"{row_selector}//td[2]")
                 unique_click = self.utils.page.get_text(f"{row_selector}//td[3]")
@@ -62,61 +67,71 @@ class GetDataCustomer(Common):
                 }
                 result["site_urls_data"].append(site_data)
                 
-                if site_url.lower() != "none":
-                    try:
-                        self.utils.page.click(f"{row_selector}//button")
-                        self.utils.page.wait_load_page()
-                        time.sleep(1)
-                        
-                        website_urls = []
-                        url_rows = self.utils.page.count_element("", f"{elm_referrers.tbl_website_url}//tbody/tr[not(contains(@class, 'first-row'))]")
-                        
-                        for j in range(1, url_rows + 1):
-                            url_row_selector = f"{elm_referrers.tbl_website_url}//tbody/tr[not(contains(@class, 'first-row'))][{j}]"
-                            website_url = self.utils.page.get_text(f"{url_row_selector}//td[1]")
-                            total_clicks = self.utils.page.get_text(f"{url_row_selector}//td[2]")
-                            unique_clicks = self.utils.page.get_text(f"{url_row_selector}//td[3]")
-                            sign_up = self.utils.page.get_text(f"{url_row_selector}//td[4]")
-                            url_fdm = self.utils.page.get_text(f"{url_row_selector}//td[5]")
+                if get_detail and site_url.lower() != "none":
+                    detail_button = f"{row_selector}//button"
+                    if self.utils.page.does_element_exist(detail_button):
+                        try:
+                            self.utils.page.click_with_retry(detail_button, max_attempts=3)
                             
-                            url_data = {
-                                "website_url": website_url,
-                                "total_clicks": total_clicks,
-                                "unique_clicks": unique_clicks,
-                                "sign_up": sign_up,
-                                "fdm": url_fdm
-                            }
-                            website_urls.append(url_data)
-                        
-                        result["website_urls_data"][site_url] = website_urls
-                        
-                        self.utils.page.click(f"{row_selector}//td[1]")
-                        self.utils.page.wait_load_page()
-                        time.sleep(1)
-                    except Exception as click_error:
-                        self.utils.page.extract_TestCaseFailed(f"Warning: Cannot get detail data for site {site_url}: {str(click_error)}")
+                            self.utils.page.wait_for_element_ready(elm_referrers.tbl_website_url, timeout=10)
+                            time.sleep(2)
+                            
+                            website_urls = []
+                            url_rows = self.utils.page.count_element("", f"{elm_referrers.tbl_website_url}//tbody/tr[not(contains(@class, 'first-row'))]")
+                            
+                            for j in range(1, url_rows + 1):
+                                url_row_selector = f"{elm_referrers.tbl_website_url}//tbody/tr[not(contains(@class, 'first-row'))][{j}]"
+                                
+                                self.utils.page.wait_for_element_ready(f"{url_row_selector}//td[1]", timeout=5)
+                                
+                                website_url = self.utils.page.get_text(f"{url_row_selector}//td[1]")
+                                time.sleep(0.2)
+                                total_clicks = self.utils.page.get_text(f"{url_row_selector}//td[2]")
+                                time.sleep(0.2)
+                                unique_clicks = self.utils.page.get_text(f"{url_row_selector}//td[3]")
+                                time.sleep(0.2)
+                                sign_up = self.utils.page.get_text(f"{url_row_selector}//td[4]")
+                                time.sleep(0.2)
+                                url_fdm = self.utils.page.get_text(f"{url_row_selector}//td[5]")
+                                
+                                url_data = {
+                                    "website_url": website_url,
+                                    "total_clicks": total_clicks,
+                                    "unique_clicks": unique_clicks,
+                                    "sign_up": sign_up,
+                                    "fdm": url_fdm
+                                }
+                                website_urls.append(url_data)
+                            
+                            result["website_urls_data"][site_url] = website_urls
+                            
+                            self.utils.page.click_with_retry(f"{row_selector}//td[1]")
+                            
+                        except Exception as click_error:
+                            self.utils.page.extract_TestCaseFailed(f"Warning: Cannot get detail data for site {site_url}: {str(click_error)}")
             
             return result
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
 
-    def get_data_landing_pages_in_customer(self, user_name, page_name="All", language="All", from_date=None, to_date=None, device_type="All"):
+    def get_data_landing_pages_in_customer(self, user_name, page_name="All", language="All", from_date=None, to_date=None, device_type="All", get_detail=True):
         try:
             super().selectMenu("Customer")
             self.utils.page.input(elm_left_panel.inp_aff_name, user_name)
             self.utils.page.click(elm_left_panel.btn_search)
-            self.utils.page.wait_load_page()
-            self.utils.page.click(elm_submenu.click_statistics)
-            self.utils.page.wait_load_page()
-            self.utils.page.click(elm_submenu_click_statistics.li_landing_pages)
+            time.sleep(2)
+            self.utils.page.wait_for_element_ready(elm_submenu.click_statistics, visible=True, enabled=True)
+            self.utils.page.click_with_retry(elm_submenu.click_statistics)
+            time.sleep(2)
+            self.utils.page.wait_for_element_ready(elm_submenu_click_statistics.li_landing_pages, visible=True, enabled=True)
+            self.utils.page.click_with_retry(elm_submenu_click_statistics.li_landing_pages)
+            self.utils.page.wait_for_element_ready(elm_landing_pages.sel_page, visible=True, enabled=True)
             self.utils.page.select_options(elm_landing_pages.sel_page, page_name)
             self.utils.page.select_options(elm_landing_pages.sel_language, language)
             super().select_date_picker(elm_landing_pages.div_from_date, from_date)
             super().select_date_picker(elm_landing_pages.div_to_date, to_date)
             self.utils.page.select_options(elm_landing_pages.sel_device, device_type)
             self.utils.page.click(elm_landing_pages.btn_search)
-            self.utils.page.wait_load_page()
-            time.sleep(3)
             
             result = {
                 "pages_data": [],
@@ -129,14 +144,21 @@ class GetDataCustomer(Common):
                 result["has_data"] = False
                 return result
             
+            self.utils.page.wait_for_network_idle()
+            
             number_of_rows = self.utils.page.count_element("", f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))]")
             for i in range(1, number_of_rows + 1):
                 row_selector = f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))][{i}]"
                 page_name = self.utils.page.get_text(f"{row_selector}//td[1]")
+                time.sleep(0.2)
                 language = self.utils.page.get_text(f"{row_selector}//td[2]")
+                time.sleep(0.2)
                 total_click = self.utils.page.get_text(f"{row_selector}//td[3]")
+                time.sleep(0.2)
                 unique_click = self.utils.page.get_text(f"{row_selector}//td[4]")
+                time.sleep(0.2)
                 signups = self.utils.page.get_text(f"{row_selector}//td[5]")
+                time.sleep(0.2)
                 fdm = self.utils.page.get_text(f"{row_selector}//td[6]")
                 
                 page_data = {
@@ -149,11 +171,11 @@ class GetDataCustomer(Common):
                 }
                 result["pages_data"].append(page_data)
                 
-                if page_name.lower() != "none":
+                if get_detail and page_name.lower() != "none":
                     try:
                         self.utils.page.click(f"{row_selector}//button")
                         self.utils.page.wait_load_page()
-                        time.sleep(1)
+                        time.sleep(2)
                         
                         website_urls = []
                         url_rows = self.utils.page.count_element("", f"{elm_landing_pages.tbl_website_url}//tbody/tr[not(contains(@class, 'first-row'))]")
@@ -180,24 +202,27 @@ class GetDataCustomer(Common):
                         
                         self.utils.page.click(f"{row_selector}//td[1]")
                         self.utils.page.wait_load_page()
-                        time.sleep(1)
+                        time.sleep(2)
                     except Exception as click_error:
                         self.utils.page.extract_TestCaseFailed(f"Warning: Cannot get detail data for page {page_name}: {str(click_error)}")
-                
+            
             return result
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
 
-    def get_data_marketing_pages_in_customer(self, user_name, language="All", from_date=None, to_date=None, include_inactive_tracking=False):
+    def get_data_marketing_pages_in_customer(self, user_name, language="All", from_date=None, to_date=None, include_inactive_tracking=False, get_detail=True):
         try:
             super().selectMenu("Customer")
             self.utils.page.input(elm_left_panel.inp_aff_name, user_name)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_load_page()
+            time.sleep(3)
             self.utils.page.click(elm_submenu.click_statistics)
             self.utils.page.wait_load_page()
+            time.sleep(2.5)
             self.utils.page.click(elm_submenu_click_statistics.li_marketing_page)
-
+            self.utils.page.wait_load_page()
+            time.sleep(3)
             super().select_date_picker(elm_marketing_page.div_from_date, from_date)
             super().select_date_picker(elm_marketing_page.div_to_date, to_date)
             self.utils.page.select_options(elm_marketing_page.sel_language, language)
@@ -231,10 +256,15 @@ class GetDataCustomer(Common):
                 if first_cell.isdigit():
                     channel_row_number = first_cell
                     channel_name = self.utils.page.get_text(f"{row_selector}/td[2]").strip()
+                    time.sleep(0.2)
                     language = self.utils.page.get_text(f"{row_selector}/td[3]").strip()
+                    time.sleep(0.2)
                     total_click = self.utils.page.get_text(f"{row_selector}/td[4]").strip()
+                    time.sleep(0.2)
                     unique_click = self.utils.page.get_text(f"{row_selector}/td[5]").strip()
+                    time.sleep(0.2)
                     signups = self.utils.page.get_text(f"{row_selector}/td[6]").strip()
+                    time.sleep(0.2)
                     fdm = self.utils.page.get_text(f"{row_selector}/td[7]").strip()
                     
                     channel_key = f"{channel_row_number} - {channel_name}"
@@ -251,11 +281,11 @@ class GetDataCustomer(Common):
                     
                     can_expand = self.utils.page.count_element("", f"{row_selector}/td[2]//*[contains(@class, 'caret')]") > 0
                     
-                    if can_expand:
+                    if get_detail and can_expand:
                         try:
                             self.utils.page.click(f"{row_selector}/td[2]")
                             self.utils.page.wait_load_page()
-                            time.sleep(1)
+                            time.sleep(3)
                             
                             new_rows = self.utils.page.count_element("", f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))]")
                             details_count = new_rows - rows
@@ -266,10 +296,15 @@ class GetDataCustomer(Common):
                                 detail_row_selector = f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i + j}]"
                                 
                                 url = self.utils.page.get_text(f"{detail_row_selector}/td[1]").strip()
+                                time.sleep(0.2)
                                 url_language = self.utils.page.get_text(f"{detail_row_selector}/td[2]").strip()
+                                time.sleep(0.2)
                                 url_total_clicks = self.utils.page.get_text(f"{detail_row_selector}/td[3]").strip()
+                                time.sleep(0.2)
                                 url_unique_clicks = self.utils.page.get_text(f"{detail_row_selector}/td[4]").strip()
+                                time.sleep(0.2)
                                 url_signups = self.utils.page.get_text(f"{detail_row_selector}/td[5]").strip()
+                                time.sleep(0.2)
                                 url_fdm = self.utils.page.get_text(f"{detail_row_selector}/td[6]").strip()
                                 
                                 url_data = {
@@ -286,15 +321,13 @@ class GetDataCustomer(Common):
                             
                             self.utils.page.click(f"{row_selector}/td[2]")
                             self.utils.page.wait_load_page()
-                            time.sleep(1)
+                            time.sleep(3)
                             
                             rows = self.utils.page.count_element("", f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))]")
                         
                         except Exception as click_error:
                             self.utils.page.extract_TestCaseFailed(f"Warning: Cannot get detail data for channel {channel_name}: {str(click_error)}")
-                    
                     i += 1
-                    
                 else:
                     i += 1
             
@@ -308,10 +341,11 @@ class GetDataCustomer(Common):
             self.utils.page.input(elm_left_panel.inp_aff_name, user_name)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_load_page()
+            self.playwright.wait_for_load_state("domcontentloaded")
             time.sleep(3)
             super().select_month_picker(elm_statistics.inp_month, month_date)
             self.utils.page.wait_load_page()
-            time.sleep(2)
+            time.sleep(3)
             
             new_signups_month = self.utils.page.get_text(elm_statistics.td_new_signups_month)
             new_signups_total = self.utils.page.get_text(elm_statistics.td_new_signups_total)
@@ -367,7 +401,7 @@ class GetDataCustomer(Common):
             self.utils.page.input(elm_left_panel.inp_aff_name, user_name)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_load_page()
-            
+            time.sleep(3)
             data = {
                 "parent_affiliate": self.utils.page.get_text(elm_left_panel.btn_parent_affiliate),
                 "affiliate": self.utils.page.get_text(elm_left_panel.lnk_affiliate),
@@ -398,9 +432,10 @@ class GetDataCustomer(Common):
             self.utils.page.input(elm_left_panel.inp_aff_name, user_name)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_load_page()
+            time.sleep(3)
             self.utils.page.click(elm_submenu.statement_history)
             self.utils.page.wait_load_page()
-            
+            time.sleep(3)
             super().select_date_picker(elm_statement_history.div_from_group, from_date)
             super().select_date_picker(elm_statement_history.div_to_group, to_date)
             
@@ -409,7 +444,7 @@ class GetDataCustomer(Common):
             
             self.utils.page.click(elm_statement_history.btn_search)
             self.utils.page.wait_load_page()
-            
+            time.sleep(3)
             hierarchical_data = []
             flat_data = []
             
@@ -481,8 +516,10 @@ class GetDataCustomer(Common):
             self.utils.page.input(elm_left_panel.inp_aff_name, username)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_load_page()
+            time.sleep(3)
             self.utils.page.click(elm_submenu.edit)
             self.utils.page.wait_load_page()
+            time.sleep(3)
             data = {
                 "user_name": self.utils.page.get_text(elm_edit_customer.txt_username),
                 "first_name": self.utils.page.get_text(elm_edit_customer.inp_first_name),
@@ -501,6 +538,7 @@ class GetDataCustomer(Common):
             self.utils.page.input(elm_left_panel.inp_aff_name, username)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_load_page()
+            time.sleep(3)
             self.utils.page.click(elm_submenu.edit)
             self.utils.page.wait_load_page()
             data = {
@@ -522,6 +560,7 @@ class GetDataCustomer(Common):
             self.utils.page.input(elm_left_panel.inp_aff_name, username)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_load_page()
+            time.sleep(3)
             data = {
                 "email_format": self.utils.page.get_text(elm_edit_customer.sel_email_format),
             }
@@ -535,6 +574,7 @@ class GetDataCustomer(Common):
             self.utils.page.input(elm_left_panel.inp_aff_name, username)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_load_page()
+            time.sleep(3)
             data = {
                 "website_url": self.utils.page.get_text(elm_edit_customer.txt_website_url),
                 "no_site_description": self.utils.page.get_text(elm_edit_customer.txt_no_site_description),
@@ -549,6 +589,7 @@ class GetDataCustomer(Common):
             self.utils.page.input(elm_left_panel.inp_aff_name, username)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_load_page()
+            time.sleep(3)
             data = {
                 "preferred_payment": self.utils.page.get_text(elm_edit_customer.sel_preferred_payment),
                 "player_username": self.utils.page.get_text(elm_edit_customer.inp_player_username),
