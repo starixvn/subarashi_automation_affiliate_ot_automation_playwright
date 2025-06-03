@@ -74,8 +74,9 @@ class utilities(BrowserMethods, AssertionMethods, FileMethods, GoogleMethods, Re
     def destroy(self):
         try:
             logger.info("Cleaning up resources and sending reports")
-            self.send_message_to_team()  
-            self.send_message_to_telegram()
+            # self.send_message_to_team()  
+            # self.send_message_to_telegram()
+            self.send_message_to_slack()
             if ENABLE_BROWSER:
                 if ENABLE_TRACE:
                     logger.debug(f"Stopping tracing and saving to {TRACE_PATH}")

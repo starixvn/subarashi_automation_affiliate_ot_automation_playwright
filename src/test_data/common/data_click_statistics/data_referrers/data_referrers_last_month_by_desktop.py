@@ -1,9 +1,9 @@
-# get data baseline referrers last month at 2025-05-21 15:22:54 +0800 (GMT+8)
+# get data baseline referrers last month at 2025-05-27 15:56:25 +0800 (GMT+8)
 
 class DataReferrersLastMonthByDesktop:
     data_referrers_last_month_by_desktop = {
     "metadata": {
-        "collected_at": "2025-05-21 15:22:54 +0800",
+        "collected_at": "2025-05-27 15:56:25 +0800",
         "period": {
             "from_date": "04-01-2025",
             "to_date": "04-30-2025"
