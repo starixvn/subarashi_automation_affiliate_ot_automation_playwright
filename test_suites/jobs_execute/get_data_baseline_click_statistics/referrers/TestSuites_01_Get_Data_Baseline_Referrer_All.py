@@ -25,7 +25,3 @@ class TestSuites_Get_Data_Baseline_Referrer_All(unittest.TestCase):
 
     def TestCase_01_Get_Data_Baseline_Referrer_All(self):
         self.get_data_baseline_referrer_all.get_all_referrer_data()
-
-
-if __name__ == "__main__":
-    unittest.main() 

@@ -26,7 +26,3 @@ class TestSuites_Get_Data_Baseline_Landing_Page_All(unittest.TestCase):
     
     def TestCase_01_Get_Data_Baseline_Landing_Page_All(self):
         self.get_data_baseline_landing_page_all.get_all_landing_page_data()
-
-
-if __name__ == "__main__":
-    unittest.main() 

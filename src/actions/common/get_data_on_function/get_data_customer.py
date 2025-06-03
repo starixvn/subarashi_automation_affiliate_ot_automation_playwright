@@ -17,6 +17,7 @@ from src.interfaces.admin.customer.edit.edit_elements import EditElements as elm
 from test_data.admin.customer.click_statistics.landing_pages.landing_pages import LANDING_PAGE_STATISTICS_API, LANDING_PAGE_DETAILS_API, DEVICE_TYPE_MAPPING, REQUIRED_HEADERS, REQUEST_BODY_TEMPLATE, DETAILS_REQUEST_BODY_TEMPLATE
 from test_data.admin.customer.affiliate_info import AFFILIATE_INFO_API, AFFILIATE_INFO_HEADERS, AFFILIATE_INFO_REQUEST_TEMPLATE
 from test_data.admin.customer.click_statistics.referrers.referrers import REFERRERS_API, REFERRERS_DETAILS_API, REFERRERS_REQUIRED_HEADERS, REFERRERS_REQUEST_BODY_TEMPLATE, REFERRERS_DETAILS_REQUEST_BODY_TEMPLATE
+from test_data.admin.customer.click_statistics.marketing_page.marketing_pages import MARKETING_PAGES_API, MARKETING_PAGES_REQUIRED_HEADERS, MARKETING_PAGES_REQUEST_BODY_TEMPLATE
 
 class GetDataCustomer(Common):
     
@@ -873,6 +874,124 @@ class GetDataCustomer(Common):
                                     "fdm": str(url_item.get("Fdm", 0))
                                 }
                                 result["website_urls_data"][referrer_url].append(url_data)
+            
+            return result
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)
+
+    def get_data_marketing_pages_via_api(self, user_name, language="All", from_date=None, to_date=None, include_inactive_tracking=False):
+        """
+        Get marketing pages data via API instead of UI interaction
+        
+        Args:
+            user_name (str): Affiliate username
+            language (str): Language filter
+            from_date (str): Start date in MM/DD/YYYY format
+            to_date (str): End date in MM/DD/YYYY format
+            include_inactive_tracking (bool): Whether to include inactive tracking links
+            
+        Returns:
+            dict: Formatted marketing pages data including channels_data and channel_details_data
+        """
+        try:
+            if not hasattr(self, 'utils') or not hasattr(self.utils, 'api'):
+                self.utils.page.extract_TestCaseFailed("API client not initialized. Please ensure login_admin() was called first.")
+            
+            aff_id = self._get_affiliate_id(user_name)
+            if not aff_id:
+                self.utils.page.extract_TestCaseFailed(f"Could not find affiliate ID for username: {user_name}")
+            
+            current_url = self.utils.page.get_current_url()
+            base_url = re.match(r'(https?://[^/]+)', current_url).group(1)
+            
+            api_url = f"{base_url}{MARKETING_PAGES_API}"
+            
+            csrf_token = self._get_csrf_token()
+            headers = MARKETING_PAGES_REQUIRED_HEADERS.copy()
+            headers["X-Requested-With"] = "XMLHttpRequest"
+            if csrf_token:
+                headers["__RequestVerificationToken"] = csrf_token
+            
+            # Prepare language code parameter
+            language_code = "" if language == "All" else language
+            
+            request_body = MARKETING_PAGES_REQUEST_BODY_TEMPLATE.copy()
+            request_body.update({
+                "affId": aff_id,
+                "fromDate": from_date,
+                "toDate": to_date,
+                "languageCodes": language_code,
+                "includedInActive": include_inactive_tracking
+            })
+            
+            response = self.utils.api.post(
+                url=api_url,
+                data=request_body,
+                header=headers
+            )
+            
+            if response.status != 200:
+                self.utils.page.extract_TestCaseFailed(f"API request failed with status code: {response.status}")
+            
+            response_data = self.utils.api.extract_response_json(response)
+            
+            result = {
+                "channels_data": [],
+                "channel_details_data": {},
+                "has_data": True
+            }
+            
+            if not response_data or not isinstance(response_data, list) or len(response_data) == 0:
+                result["has_data"] = False
+                return result
+            
+            # Process the response data
+            # The API response is an array of arrays, where each sub-array contains data for one channel
+            channel_number = 0
+            for channel_group in response_data:
+                if not channel_group or len(channel_group) == 0:
+                    continue
+                
+                channel_number += 1
+                
+                # Get the channel name from the first item in the group
+                first_item = channel_group[0]
+                channel_name = first_item.get("ChannelName", "")
+                
+                # Calculate total stats for this channel
+                total_click = sum(item.get("TotalClick", 0) for item in channel_group)
+                unique_click = sum(item.get("UniqueClick", 0) for item in channel_group)
+                signups = sum(item.get("Signups", 0) for item in channel_group)
+                fdm = sum(item.get("Fdm", 0) for item in channel_group)
+                
+                # Find the language - get from the first item that has a MarketName
+                language = next((item.get("MarketName", "") for item in channel_group if item.get("MarketName")), "")
+                
+                # Add the channel to channels_data
+                channel_data = {
+                    "channel_name": channel_name,
+                    "language": language,
+                    "total_click": str(total_click),
+                    "unique_click": str(unique_click),
+                    "signups": str(signups),
+                    "fdm": str(fdm)
+                }
+                result["channels_data"].append(channel_data)
+                
+                # Add the channel details to channel_details_data
+                channel_key = f"{channel_number} - {channel_name}"
+                result["channel_details_data"][channel_key] = []
+                
+                for url_item in channel_group:
+                    url_data = {
+                        "url": url_item.get("WebsiteUrl", ""),
+                        "language": url_item.get("MarketName", ""),
+                        "total_clicks": str(url_item.get("TotalClick", 0)),
+                        "unique_clicks": str(url_item.get("UniqueClick", 0)),
+                        "signups": str(url_item.get("Signups", 0)),
+                        "fdm": str(url_item.get("Fdm", 0))
+                    }
+                    result["channel_details_data"][channel_key].append(url_data)
             
             return result
         except Exception as e:
