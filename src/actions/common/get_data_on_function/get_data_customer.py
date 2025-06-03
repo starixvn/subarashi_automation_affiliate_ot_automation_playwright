@@ -16,6 +16,7 @@ from src.interfaces.admin.customer.adjustment.adjustment_elements import Adjustm
 from src.interfaces.admin.customer.edit.edit_elements import EditElements as elm_edit_customer
 from test_data.admin.customer.click_statistics.landing_pages.landing_pages import LANDING_PAGE_STATISTICS_API, LANDING_PAGE_DETAILS_API, DEVICE_TYPE_MAPPING, REQUIRED_HEADERS, REQUEST_BODY_TEMPLATE, DETAILS_REQUEST_BODY_TEMPLATE
 from test_data.admin.customer.affiliate_info import AFFILIATE_INFO_API, AFFILIATE_INFO_HEADERS, AFFILIATE_INFO_REQUEST_TEMPLATE
+from test_data.admin.customer.click_statistics.referrers.referrers import REFERRERS_API, REFERRERS_DETAILS_API, REFERRERS_REQUIRED_HEADERS, REFERRERS_REQUEST_BODY_TEMPLATE, REFERRERS_DETAILS_REQUEST_BODY_TEMPLATE
 
 class GetDataCustomer(Common):
     
@@ -762,3 +763,117 @@ class GetDataCustomer(Common):
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(f"Failed to get CSRF token: {str(e)}")
             return None
+
+    def get_data_referrers_via_api(self, user_name, from_date=None, to_date=None, device_type="All"):
+        """
+        Get referrers data via API instead of UI interaction
+        
+        Args:
+            user_name (str): Affiliate username
+            from_date (str): Start date in MM/DD/YYYY format
+            to_date (str): End date in MM/DD/YYYY format
+            device_type (str): Device type filter ('All', 'PC / Laptop', or 'Mobile')
+            
+        Returns:
+            dict: Formatted referrers data including site_urls_data and website_urls_data
+        """
+        try:
+            if not hasattr(self, 'utils') or not hasattr(self.utils, 'api'):
+                self.utils.page.extract_TestCaseFailed("API client not initialized. Please ensure login_admin() was called first.")
+            
+            aff_id = self._get_affiliate_id(user_name)
+            if not aff_id:
+                self.utils.page.extract_TestCaseFailed(f"Could not find affiliate ID for username: {user_name}")
+            
+            current_url = self.utils.page.get_current_url()
+            base_url = re.match(r'(https?://[^/]+)', current_url).group(1)
+            
+            list_api_url = f"{base_url}{REFERRERS_API}"
+            details_api_url = f"{base_url}{REFERRERS_DETAILS_API}"
+            
+            csrf_token = self._get_csrf_token()
+            headers = REFERRERS_REQUIRED_HEADERS.copy()
+            headers["X-Requested-With"] = "XMLHttpRequest"
+            if csrf_token:
+                headers["__RequestVerificationToken"] = csrf_token
+            
+            device_type_value = DEVICE_TYPE_MAPPING.get(device_type, -1)
+            
+            list_request_body = REFERRERS_REQUEST_BODY_TEMPLATE.copy()
+            list_request_body.update({
+                "deviceType": device_type_value,
+                "fromDate": from_date,
+                "toDate": to_date,
+                "affId": aff_id
+            })
+            
+            list_response = self.utils.api.post(
+                url=list_api_url,
+                data=list_request_body,
+                header=headers
+            )
+            
+            if list_response.status != 200:
+                self.utils.page.extract_TestCaseFailed(f"API request failed with status code: {list_response.status}")
+            
+            list_data = self.utils.api.extract_response_json(list_response)
+            
+            result = {
+                "site_urls_data": [],
+                "website_urls_data": {},
+                "has_data": True
+            }
+            
+            if not list_data or not isinstance(list_data, list) or len(list_data) == 0:
+                result["has_data"] = False
+                return result
+            
+            for site_item in list_data:
+                site_data = {
+                    "site_url": site_item.get("ReferrerUrl", ""),
+                    "total_click": str(site_item.get("TotalClick", 0)),
+                    "unique_click": str(site_item.get("UniqueClick", 0)),
+                    "signups": str(site_item.get("Signups", 0)),
+                    "fdm": str(site_item.get("Fdm", 0))
+                }
+                result["site_urls_data"].append(site_data)
+                
+                if site_data["site_url"] and site_data["site_url"].lower() != "none":
+                    referrer_url = site_data["site_url"]
+                    
+                    details_request_body = REFERRERS_DETAILS_REQUEST_BODY_TEMPLATE.copy()
+                    details_request_body.update({
+                        "deviceType": device_type_value,
+                        "fromDate": from_date,
+                        "toDate": to_date,
+                        "referrerUrl": referrer_url,
+                        "affId": aff_id,
+                        "pageIndex": 1,
+                        "pageSize": 20
+                    })
+
+                    details_response = self.utils.api.post(
+                        url=details_api_url,
+                        data=details_request_body,
+                        header=headers
+                    )
+                    
+                    if details_response.status == 200:
+                        details_data = self.utils.api.extract_response_json(details_response)
+                        
+                        if details_data and "MainData" in details_data:
+                            result["website_urls_data"][referrer_url] = []
+                            
+                            for url_item in details_data["MainData"]:
+                                url_data = {
+                                    "website_url": url_item.get("WebsiteUrl", ""),
+                                    "total_clicks": str(url_item.get("TotalClick", 0)),
+                                    "unique_clicks": str(url_item.get("UniqueClick", 0)),
+                                    "sign_up": str(url_item.get("Signups", 0)),
+                                    "fdm": str(url_item.get("Fdm", 0))
+                                }
+                                result["website_urls_data"][referrer_url].append(url_data)
+            
+            return result
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)

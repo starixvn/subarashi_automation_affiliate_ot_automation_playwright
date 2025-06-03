@@ -1,9 +1,9 @@
-# get data baseline landing page yesterday at 2025-06-03 16:53:35 +0800 (GMT+8)
+# get data baseline landing page yesterday at 2025-06-03 16:58:18 +0800 (GMT+8)
 
 class DataLandingPagesYesterday:
     data_landing_pages_yesterday = {
     "metadata": {
-        "collected_at": "2025-06-03 16:53:35 +0800",
+        "collected_at": "2025-06-03 16:58:18 +0800",
         "period": {
             "from_date": "06/02/2025",
             "to_date": "06/02/2025"
