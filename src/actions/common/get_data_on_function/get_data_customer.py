@@ -880,19 +880,6 @@ class GetDataCustomer(Common):
             self.utils.page.extract_TestCaseFailed(e)
 
     def get_data_marketing_pages_via_api(self, user_name, language="All", from_date=None, to_date=None, include_inactive_tracking=False):
-        """
-        Get marketing pages data via API instead of UI interaction
-        
-        Args:
-            user_name (str): Affiliate username
-            language (str): Language filter
-            from_date (str): Start date in MM/DD/YYYY format
-            to_date (str): End date in MM/DD/YYYY format
-            include_inactive_tracking (bool): Whether to include inactive tracking links
-            
-        Returns:
-            dict: Formatted marketing pages data including channels_data and channel_details_data
-        """
         try:
             if not hasattr(self, 'utils') or not hasattr(self.utils, 'api'):
                 self.utils.page.extract_TestCaseFailed("API client not initialized. Please ensure login_admin() was called first.")
@@ -912,7 +899,6 @@ class GetDataCustomer(Common):
             if csrf_token:
                 headers["__RequestVerificationToken"] = csrf_token
             
-            # Prepare language code parameter
             language_code = "" if language == "All" else language
             
             request_body = MARKETING_PAGES_REQUEST_BODY_TEMPLATE.copy()
@@ -945,8 +931,6 @@ class GetDataCustomer(Common):
                 result["has_data"] = False
                 return result
             
-            # Process the response data
-            # The API response is an array of arrays, where each sub-array contains data for one channel
             channel_number = 0
             for channel_group in response_data:
                 if not channel_group or len(channel_group) == 0:
@@ -954,20 +938,16 @@ class GetDataCustomer(Common):
                 
                 channel_number += 1
                 
-                # Get the channel name from the first item in the group
                 first_item = channel_group[0]
                 channel_name = first_item.get("ChannelName", "")
                 
-                # Calculate total stats for this channel
                 total_click = sum(item.get("TotalClick", 0) for item in channel_group)
                 unique_click = sum(item.get("UniqueClick", 0) for item in channel_group)
                 signups = sum(item.get("Signups", 0) for item in channel_group)
                 fdm = sum(item.get("Fdm", 0) for item in channel_group)
                 
-                # Find the language - get from the first item that has a MarketName
                 language = next((item.get("MarketName", "") for item in channel_group if item.get("MarketName")), "")
                 
-                # Add the channel to channels_data
                 channel_data = {
                     "channel_name": channel_name,
                     "language": language,
@@ -978,7 +958,6 @@ class GetDataCustomer(Common):
                 }
                 result["channels_data"].append(channel_data)
                 
-                # Add the channel details to channel_details_data
                 channel_key = f"{channel_number} - {channel_name}"
                 result["channel_details_data"][channel_key] = []
                 

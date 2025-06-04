@@ -146,7 +146,7 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
             
             if period == "yesterday":
                 yesterday = today - timedelta(days=1)
-                from_date = yesterday.strftime("%m/%d/%Y")
+                from_date = yesterday.strftime("%m-%d-%Y")
                 to_date = from_date
             elif period == "last_week":
                 current_weekday = today.weekday()
@@ -157,14 +157,14 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
                 monday_last_week = monday_this_week - timedelta(days=7)
                 sunday_last_week = monday_this_week - timedelta(days=1)
                 
-                from_date = monday_last_week.strftime("%m/%d/%Y")
-                to_date = sunday_last_week.strftime("%m/%d/%Y")
+                from_date = monday_last_week.strftime("%m-%d-%Y")
+                to_date = sunday_last_week.strftime("%m-%d-%Y")
             elif period == "last_month":
                 first_day_current_month = today.replace(day=1)
                 last_day_previous_month = first_day_current_month - timedelta(days=1)
                 first_day_previous_month = last_day_previous_month.replace(day=1)
-                from_date = first_day_previous_month.strftime("%m/%d/%Y")
-                to_date = last_day_previous_month.strftime("%m/%d/%Y")
+                from_date = first_day_previous_month.strftime("%m-%d-%Y")
+                to_date = last_day_previous_month.strftime("%m-%d-%Y")
             else:
                 raise ValueError(f"Invalid period: {period}")
             

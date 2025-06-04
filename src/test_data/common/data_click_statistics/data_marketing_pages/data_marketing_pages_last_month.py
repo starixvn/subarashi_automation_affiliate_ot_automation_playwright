@@ -1,17 +1,17 @@
-# get data baseline marketing page last_month at 2025-06-03 17:35:33 +0800 (GMT+8)
+# get data baseline marketing page last_month at 2025-06-04 16:07:24 +0800 (GMT+8)
 
 class DataMarketingPagesLastMonth:
     data_marketing_pages_last_month = {
     "metadata": {
-        "collected_at": "2025-06-03 17:35:33 +0800",
+        "collected_at": "2025-06-04 16:07:24 +0800",
         "period": {
-            "from_date": "05/01/2025",
-            "to_date": "05/31/2025"
+            "from_date": "05-01-2025",
+            "to_date": "05-31-2025"
         },
         "filters": {
             "username": "12BETAFF001",
             "language": "All",
-            "include_inactive_tracking": false
+            "include_inactive_tracking": False
         },
         "has_data": True
     },
@@ -85,7 +85,7 @@ class DataMarketingPagesLastMonth:
             },
             {
                 "url": "https://aff-12b.nexdev.net/Go/block_code/10000/bn/abc/index.html",
-                "language": null,
+                "language": None,
                 "total_clicks": 8,
                 "unique_clicks": 1,
                 "signups": 0,
@@ -93,7 +93,7 @@ class DataMarketingPagesLastMonth:
             },
             {
                 "url": "https://aff-12bet.nexdev.net/12BetGo/block_code/10000/bn/abc/index.html",
-                "language": null,
+                "language": None,
                 "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
@@ -111,7 +111,7 @@ class DataMarketingPagesLastMonth:
         "2 - channeltest": [
             {
                 "url": "https://aff-12b.nexdev.net/Go/block_code/10000/bn/channeltest/index.html",
-                "language": null,
+                "language": None,
                 "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
@@ -165,7 +165,7 @@ class DataMarketingPagesLastMonth:
         "5 - Others": [
             {
                 "url": "aff-12b.nexdev.net/Go/block_code/10000/bn/index.html",
-                "language": null,
+                "language": None,
                 "total_clicks": 2,
                 "unique_clicks": 1,
                 "signups": 0,
@@ -173,7 +173,7 @@ class DataMarketingPagesLastMonth:
             },
             {
                 "url": "aff-12b.nexdev.net/Go/joinccccccccc/10000/bn/index.html",
-                "language": null,
+                "language": None,
                 "total_clicks": 18,
                 "unique_clicks": 1,
                 "signups": 0,
@@ -255,7 +255,7 @@ class DataMarketingPagesLastMonth:
             },
             {
                 "url": "aff-12bet.nexdev.net/12BetGo/join/10000/eneuro/tiktok/index.html",
-                "language": null,
+                "language": None,
                 "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,

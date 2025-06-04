@@ -1,9 +1,9 @@
-# get data baseline landing page last_month at 2025-06-03 16:58:20 +0800 (GMT+8)
+# get data baseline landing page last_month at 2025-06-04 12:01:09 +0800 (GMT+8)
 
 class DataLandingPagesLastMonth:
     data_landing_pages_last_month = {
     "metadata": {
-        "collected_at": "2025-06-03 16:58:20 +0800",
+        "collected_at": "2025-06-04 12:01:09 +0800",
         "period": {
             "from_date": "05/01/2025",
             "to_date": "05/31/2025"
