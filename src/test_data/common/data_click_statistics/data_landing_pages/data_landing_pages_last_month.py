@@ -1,12 +1,12 @@
-# get data baseline landing page last month at 2025-05-21 15:18:01 +0800 (GMT+8)
+# get data baseline landing page last_month at 2025-06-04 12:01:09 +0800 (GMT+8)
 
 class DataLandingPagesLastMonth:
     data_landing_pages_last_month = {
     "metadata": {
-        "collected_at": "2025-05-21 15:18:01 +0800",
+        "collected_at": "2025-06-04 12:01:09 +0800",
         "period": {
-            "from_date": "04-01-2025",
-            "to_date": "04-30-2025"
+            "from_date": "05/01/2025",
+            "to_date": "05/31/2025"
         },
         "filters": {
             "username": "12BETAFF001",
@@ -17,42 +17,34 @@ class DataLandingPagesLastMonth:
         "has_data": True
     },
     "pages_data": {
-        "blocked - en-US": {
-            "page_name": "blocked",
-            "language": "en-US",
-            "total_clicks": 1,
-            "unique_clicks": 1,
-            "signups": 0,
-            "fdm": 0
-        },
-        "eSport - en-US": {
-            "page_name": "eSport",
-            "language": "en-US",
-            "total_clicks": 1,
-            "unique_clicks": 1,
-            "signups": 0,
-            "fdm": 0
-        },
-        "home - en-US": {
-            "page_name": "home",
-            "language": "en-US",
-            "total_clicks": 5,
-            "unique_clicks": 1,
-            "signups": 0,
-            "fdm": 0
-        },
-        "inr-12join - en-IN": {
-            "page_name": "inr-12join",
+        "block_code - en-IN": {
+            "page_name": "block_code",
             "language": "en-IN",
-            "total_clicks": 9,
+            "total_clicks": 1,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "inr-12join - te-IN": {
-            "page_name": "inr-12join",
-            "language": "te-IN",
+        "block_code - en-US": {
+            "page_name": "block_code",
+            "language": "en-US",
             "total_clicks": 14,
+            "unique_clicks": 1,
+            "signups": 0,
+            "fdm": 0
+        },
+        "INR-12join - en-IN": {
+            "page_name": "INR-12join",
+            "language": "en-IN",
+            "total_clicks": 8,
+            "unique_clicks": 1,
+            "signups": 0,
+            "fdm": 0
+        },
+        "join - en-IN": {
+            "page_name": "join",
+            "language": "en-IN",
+            "total_clicks": 28,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
@@ -60,38 +52,70 @@ class DataLandingPagesLastMonth:
         "join - en-US": {
             "page_name": "join",
             "language": "en-US",
-            "total_clicks": 89,
+            "total_clicks": 29,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "join - ko-KR": {
+        "join - te-IN": {
             "page_name": "join",
-            "language": "ko-KR",
-            "total_clicks": 21,
+            "language": "te-IN",
+            "total_clicks": 2,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         },
-        "join - zh-CN": {
-            "page_name": "join",
-            "language": "zh-CN",
-            "total_clicks": 50,
-            "unique_clicks": 1,
-            "signups": 0,
-            "fdm": 0
-        },
-        "slots - en-US": {
-            "page_name": "slots",
+        "joinc - en-US": {
+            "page_name": "joinc",
             "language": "en-US",
             "total_clicks": 14,
+            "unique_clicks": 1,
+            "signups": 0,
+            "fdm": 0
+        },
+        "joinccc - en-US": {
+            "page_name": "joinccc",
+            "language": "en-US",
+            "total_clicks": 1,
+            "unique_clicks": 1,
+            "signups": 0,
+            "fdm": 0
+        },
+        "joinccccccccc - en-US": {
+            "page_name": "joinccccccccc",
+            "language": "en-US",
+            "total_clicks": 2,
+            "unique_clicks": 1,
+            "signups": 0,
+            "fdm": 0
+        },
+        "joincccccccccccccccccccccccccccc - en-US": {
+            "page_name": "joincccccccccccccccccccccccccccc",
+            "language": "en-US",
+            "total_clicks": 1,
+            "unique_clicks": 1,
+            "signups": 0,
+            "fdm": 0
+        },
+        "myr-12join - en-US": {
+            "page_name": "myr-12join",
+            "language": "en-US",
+            "total_clicks": 8,
+            "unique_clicks": 1,
+            "signups": 0,
+            "fdm": 0
+        },
+        "myr-12join - zh-CN": {
+            "page_name": "myr-12join",
+            "language": "zh-CN",
+            "total_clicks": 3,
             "unique_clicks": 1,
             "signups": 0,
             "fdm": 0
         }
     },
     "website_urls_data": {
-        "blocked - en-US": [
+        "block_code - en-IN": [
             {
                 "website_url": "none",
                 "total_clicks": 1,
@@ -100,51 +124,28 @@ class DataLandingPagesLastMonth:
                 "fdm": 0
             }
         ],
-        "eSport - en-US": [
+        "block_code - en-US": [
             {
                 "website_url": "none",
-                "total_clicks": 1,
+                "total_clicks": 14,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             }
         ],
-        "home - en-US": [
+        "INR-12join - en-IN": [
             {
                 "website_url": "none",
-                "total_clicks": 5,
+                "total_clicks": 8,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             }
         ],
-        "inr-12join - en-IN": [
+        "join - en-IN": [
             {
                 "website_url": "none",
-                "total_clicks": 5,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "none",
-                "total_clicks": 4,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "inr-12join - te-IN": [
-            {
-                "website_url": "none",
-                "total_clicks": 11,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "none",
-                "total_clicks": 3,
+                "total_clicks": 28,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
@@ -152,63 +153,71 @@ class DataLandingPagesLastMonth:
         ],
         "join - en-US": [
             {
-                "website_url": "https://aff-12b.nexdev.net/",
+                "website_url": "none",
+                "total_clicks": 29,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            }
+        ],
+        "join - te-IN": [
+            {
+                "website_url": "none",
+                "total_clicks": 2,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            }
+        ],
+        "joinc - en-US": [
+            {
+                "website_url": "none",
+                "total_clicks": 14,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            }
+        ],
+        "joinccc - en-US": [
+            {
+                "website_url": "none",
                 "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
-            },
+            }
+        ],
+        "joinccccccccc - en-US": [
             {
-                "website_url": "https://aff-12b.nexdev.net/UserAsian/en/UserPanel/Main/",
+                "website_url": "none",
+                "total_clicks": 2,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            }
+        ],
+        "joincccccccccccccccccccccccccccc - en-US": [
+            {
+                "website_url": "none",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            }
+        ],
+        "myr-12join - en-US": [
+            {
+                "website_url": "none",
+                "total_clicks": 8,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            }
+        ],
+        "myr-12join - zh-CN": [
+            {
+                "website_url": "none",
                 "total_clicks": 3,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://aff-12b.nexdev.net/UserEuro/en/UserPanel/Main/",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://www.google.com/",
-                "total_clicks": 14,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "none",
-                "total_clicks": 70,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "join - ko-KR": [
-            {
-                "website_url": "none",
-                "total_clicks": 21,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "join - zh-CN": [
-            {
-                "website_url": "none",
-                "total_clicks": 50,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "slots - en-US": [
-            {
-                "website_url": "none",
-                "total_clicks": 14,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0

@@ -13,7 +13,7 @@ unittest.TestLoader.sortTestMethodsUsing = None
 from actions.common.compare_data.click_statictis_referrers.compare_data_referrers import CompareDataReferrers
 from src.utils.core.decorators import measure_test_execution_time
 
-class TestSuites_01_Check_Data_Click_Statistics(unittest.TestCase):
+class TestSuites_01_Check_Data_Click_Statistics_Referrers(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.check_data_referrers = CompareDataReferrers()
@@ -35,3 +35,15 @@ class TestSuites_01_Check_Data_Click_Statistics(unittest.TestCase):
     @measure_test_execution_time
     def TestCase_03_Check_Data_Referrers_Signups_And_FDM(self):
         self.check_data_referrers.check_data_signups_and_fdm(inspect.currentframe().f_code.co_name)
+
+    @measure_test_execution_time
+    def TestCase_04_Check_Data_Referrers_SubTable_Display_And_Match(self):
+        self.check_data_referrers.verify_site_url_website_url_match(inspect.currentframe().f_code.co_name)
+    
+    @measure_test_execution_time
+    def TestCase_05_Check_Data_Referrers_Monthly_Total_Validation(self):
+        self.check_data_referrers.verify_signups_fdm_statistics_match(inspect.currentframe().f_code.co_name)
+
+    @measure_test_execution_time
+    def TestCase_06_Check_Data_Referrers_Click_Unique_Validation(self):
+        self.check_data_referrers.verify_total_clicks_has_unique_clicks(inspect.currentframe().f_code.co_name)

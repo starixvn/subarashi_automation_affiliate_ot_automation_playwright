@@ -39,30 +39,31 @@ class CompareDataReferrers(GetDataCustomer):
         self.get_data_customer = GetDataCustomer()
 
     def _compare_site_urls(self, baseline_site_urls, current_site_urls):
-        """So sánh site URLs giữa baseline và dữ liệu hiện tại"""
+        """compare site URLs between baseline and current data"""
         if len(baseline_site_urls) != len(current_site_urls):
             raise Exception(f"Number of site URLs mismatch. Baseline: {len(baseline_site_urls)}, Current: {len(current_site_urls)}")
         
-        for site_url, baseline_site_data in baseline_site_urls.items():
+        for baseline_site_data in baseline_site_urls:
+            site_url = baseline_site_data["site_url"]
             site_found = False
             for current_site in current_site_urls:
-                if current_site["site_url"] == site_url:
+                if current_site["site_url"].lower() == site_url.lower():
                     site_found = True
-                    if int(current_site["total_click"]) != baseline_site_data["total_clicks"]:
-                        raise Exception(f"Total clicks mismatch for site {site_url}. Baseline: {baseline_site_data['total_clicks']}, Current: {current_site['total_click']}")
-                    if int(current_site["unique_click"]) != baseline_site_data["unique_clicks"]:
-                        raise Exception(f"Unique clicks mismatch for site {site_url}. Baseline: {baseline_site_data['unique_clicks']}, Current: {current_site['unique_click']}")
+                    if int(current_site["total_click"]) != baseline_site_data["total_click"]:
+                        raise Exception(f"Total clicks mismatch for site {site_url}. Baseline: {baseline_site_data['total_click']}, Current: {current_site['total_click']}")
+                    if int(current_site["unique_click"]) != baseline_site_data["unique_click"]:
+                        raise Exception(f"Unique clicks mismatch for site {site_url}. Baseline: {baseline_site_data['unique_click']}, Current: {current_site['unique_click']}")
                     if int(current_site["signups"]) != baseline_site_data["signups"]:
                         raise Exception(f"Signups mismatch for site {site_url}. Baseline: {baseline_site_data['signups']}, Current: {current_site['signups']}")
                     if int(current_site["fdm"]) != baseline_site_data["fdm"]:
                         raise Exception(f"FDM mismatch for site {site_url}. Baseline: {baseline_site_data['fdm']}, Current: {current_site['fdm']}")
                     break
             
-            if not site_found and site_url.lower() != "none":
+            if not site_found and site_url.lower() != "none" and site_url.strip() != "":
                 raise Exception(f"Site URL '{site_url}' not found in current data")
     
     def _compare_website_urls(self, baseline_website_urls_data, current_website_urls_data):
-        """So sánh website URLs giữa baseline và dữ liệu hiện tại"""
+        """compare website URLs between baseline and current data"""
         for site_url, baseline_website_urls in baseline_website_urls_data.items():
             if site_url.lower() == "none":
                 continue
@@ -897,4 +898,404 @@ class CompareDataReferrers(GetDataCustomer):
                         Data["TestCase_Auto_Status"][2],
                         sheet_name=Checklist_Sheet_Name
                     )
+            self.utils.page.extract_TestCaseFailed(e)
+    
+    def verify_site_url_website_url_match(self, testcase):
+        username = self._get_username()
+        periods = ["last_month", "last_week", "current_month"]
+        device_types = ["All", "PC / Laptop", "Mobile"]
+        
+        mainChecklist = [
+            "Verify that when clicking on a Page (if not None), the sub‑data table is displayed.",
+            "Verify that the values in the sub‑data table match the corresponding row in the main table."
+        ]
+        
+        subAutoTestCase = ''
+        indexChl = 0
+        
+        try:
+            for period in periods:
+                date_range = self._get_date_range(period)
+                period_display = period.replace("_", " ")
+                
+                for device_type in device_types:
+                    device_display = "Desktop" if device_type == "PC / Laptop" else device_type
+                    
+                    if subAutoTestCase:
+                        subAutoTestCase += '\n\n'
+                    
+                    subAutoTestCase += f"- Verify that for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display}, clicking on a Site URL shows the Website URLs sub-table"
+                    
+                    data_referrers = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
+                    
+                    has_site_urls = False
+                    has_sub_tables = False
+                    
+                    if data_referrers.get("has_data", True):
+                        for site_data in data_referrers["site_urls_data"]:
+                            site_url = site_data["site_url"]
+                            if site_url.lower() != "none" and site_url.strip() != "":
+                                has_site_urls = True
+                                if site_url in data_referrers["website_urls_data"]:
+                                    has_sub_tables = True
+                                    break
+                    
+                    subAutoTestCase += f"\n     + Username: {username}"
+                    subAutoTestCase += f"\n     + From Date: {date_range['from_date']}"
+                    subAutoTestCase += f"\n     + To Date: {date_range['to_date']}"
+                    
+                    if not data_referrers.get("has_data", True):
+                        subAutoTestCase += f"\n     + No data found for Referrers."
+                    elif not has_site_urls:
+                        subAutoTestCase += f"\n     + No valid Site URLs found (all are 'none' or empty)."
+                    elif has_sub_tables:
+                        subAutoTestCase += f"\n     + Verified: Sub-data table is displayed when clicking on Site URLs."
+                    else:
+                        subAutoTestCase += f"\n     + Failed: No sub-data tables found for any Site URL."
+            
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][0],
+                sheet_name=Checklist_Sheet_Name
+            )
+            indexChl += 1
+            
+            subAutoTestCase = ''
+            
+            for period in periods:
+                date_range = self._get_date_range(period)
+                period_display = period.replace("_", " ")
+                
+                for device_type in device_types:
+                    device_display = "Desktop" if device_type == "PC / Laptop" else device_type
+                    
+                    if subAutoTestCase:
+                        subAutoTestCase += '\n\n'
+                    
+                    subAutoTestCase += f"- Verify that for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display}, the sum of Website URL values match the Site URL values"
+                    
+                    data_referrers = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
+                    
+                    subAutoTestCase += f"\n     + Username: {username}"
+                    subAutoTestCase += f"\n     + From Date: {date_range['from_date']}"
+                    subAutoTestCase += f"\n     + To Date: {date_range['to_date']}"
+                    
+                    if not data_referrers.get("has_data", True):
+                        subAutoTestCase += f"\n     + No data found for Referrers."
+                        continue
+                    
+                    mismatches = []
+                    for site_data in data_referrers["site_urls_data"]:
+                        site_url = site_data["site_url"]
+                        if site_url.lower() == "none" or site_url.strip() == "":
+                            continue
+                        
+                        if site_url not in data_referrers["website_urls_data"]:
+                            mismatches.append(f"No website URLs data found for site '{site_url}'")
+                            continue
+                        
+                        website_urls = data_referrers["website_urls_data"][site_url]
+                        
+                        website_total_clicks = 0
+                        website_unique_clicks = 0
+                        website_signups = 0
+                        website_fdm = 0
+                        
+                        for website_data in website_urls:
+                            website_total_clicks += self.parse_int(website_data["total_clicks"])
+                            website_unique_clicks += self.parse_int(website_data["unique_clicks"])
+                            website_signups += self.parse_int(website_data["sign_up"])
+                            website_fdm += self.parse_int(website_data["fdm"])
+                        
+                        site_total_click = self.parse_int(site_data["total_click"])
+                        site_unique_click = self.parse_int(site_data["unique_click"])
+                        site_signups = self.parse_int(site_data["signups"])
+                        site_fdm = self.parse_int(site_data["fdm"])
+                        
+                        if website_total_clicks != site_total_click:
+                            mismatches.append(f"Total clicks mismatch for site '{site_url}': Site value={site_total_click}, Sum of website values={website_total_clicks}")
+                        
+                        if website_unique_clicks != site_unique_click:
+                            mismatches.append(f"Unique clicks mismatch for site '{site_url}': Site value={site_unique_click}, Sum of website values={website_unique_clicks}")
+                        
+                        if website_signups != site_signups:
+                            mismatches.append(f"Signups mismatch for site '{site_url}': Site value={site_signups}, Sum of website values={website_signups}")
+                        
+                        if website_fdm != site_fdm:
+                            mismatches.append(f"FDM mismatch for site '{site_url}': Site value={site_fdm}, Sum of website values={website_fdm}")
+                    
+                    if mismatches:
+                        subAutoTestCase += f"\n     + Failed: {len(mismatches)} mismatches found:"
+                        for mismatch in mismatches[:3]:  # Show first 3 mismatches to avoid too large report
+                            subAutoTestCase += f"\n       - {mismatch}"
+                        if len(mismatches) > 3:
+                            subAutoTestCase += f"\n       - ... and {len(mismatches) - 3} more"
+                    else:
+                        subAutoTestCase += f"\n     + Verified: All Website URL sums match their corresponding Site URL values."
+            
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][0],
+                sheet_name=Checklist_Sheet_Name
+            )
+        
+        except Exception as e:
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][1],
+                sheet_name=Checklist_Sheet_Name
+            )
+            indexChl += 1
+            if indexChl < len(mainChecklist):
+                for i in range(indexChl, len(mainChecklist)):
+                    if i >= len(mainChecklist):
+                        break
+                    self.utils.update_result_to_ggsheet(
+                        Data["TestCase_spread_sheet_id"], 
+                        mainChecklist[i], 
+                        testcase, 
+                        "", 
+                        Data["TestCase_Auto_Status"][2],
+                        sheet_name=Checklist_Sheet_Name
+                    )
+            self.utils.page.extract_TestCaseFailed(e)
+
+    def verify_signups_fdm_statistics_match(self, testcase):
+        cache, username = self.preload_all_data()
+        
+        mainChecklist = [
+            "Verify that the total Signups for the month equal the total Signups in the Statistics data table.",
+            "Verify that the total FDM for the month equals the total FDM in the Statistics data table Referrers report."
+        ]
+        
+        indexChl = 0
+        
+        try:
+            subAutoTestCase = ''
+            time_periods = ["last_month", "current_month"]
+            
+            for period in time_periods:
+                period_display = period.replace("_", " ")
+                
+                if subAutoTestCase:
+                    subAutoTestCase += '\n\n'
+                
+                subAutoTestCase += f"- Verify that total Signups for Referrers in {period_display} match the Statistics data table"
+                
+                data_statistics = cache["statistics"][period]
+                
+                all_referrers_signups = 0
+                device_signups = {}
+                
+                for device_type in ["All", "PC / Laptop", "Mobile"]:
+                    key = f"{period}_{device_type}"
+                    data_referrers = cache["referrers"][key]
+                    
+                    referrers_signups = 0
+                    if data_referrers.get("has_data", True):
+                        for site_data in data_referrers["site_urls_data"]:
+                            referrers_signups += self.parse_int(site_data["signups"])
+                    
+                    device_signups[device_type] = referrers_signups
+                    
+                    if device_type == "All":
+                        all_referrers_signups = referrers_signups
+                
+                new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
+                statistics_signups = self.parse_int(new_signups_fdm[0])
+                
+                subAutoTestCase += f"\n     + Username: {username}"
+                subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
+                
+                if all_referrers_signups == statistics_signups:
+                    subAutoTestCase += f"\n     + Signups match: Statistics={statistics_signups}, Referrers (All)={all_referrers_signups}"
+                else:
+                    subAutoTestCase += f"\n     + Signups mismatch: Statistics={statistics_signups}, Referrers (All)={all_referrers_signups}"
+                    subAutoTestCase += f"\n     + Referrers by device: PC / Laptop={device_signups['PC / Laptop']}, Mobile={device_signups['Mobile']}"
+            
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][0],
+                sheet_name=Checklist_Sheet_Name
+            )
+            indexChl += 1
+            
+            subAutoTestCase = ''
+            
+            for period in time_periods:
+                period_display = period.replace("_", " ")
+                
+                if subAutoTestCase:
+                    subAutoTestCase += '\n\n'
+                
+                subAutoTestCase += f"- Verify that total FDM for Referrers in {period_display} match the Statistics data table"
+                
+                data_statistics = cache["statistics"][period]
+                
+                all_referrers_fdm = 0
+                device_fdm = {}
+                
+                for device_type in ["All", "PC / Laptop", "Mobile"]:
+                    key = f"{period}_{device_type}"
+                    data_referrers = cache["referrers"][key]
+                    
+                    referrers_fdm = 0
+                    if data_referrers.get("has_data", True):
+                        for site_data in data_referrers["site_urls_data"]:
+                            referrers_fdm += self.parse_int(site_data["fdm"])
+                    
+                    device_fdm[device_type] = referrers_fdm
+                    
+                    if device_type == "All":
+                        all_referrers_fdm = referrers_fdm
+                
+                new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
+                statistics_fdm = self.parse_int(new_signups_fdm[1]) if len(new_signups_fdm) > 1 else 0
+                
+                subAutoTestCase += f"\n     + Username: {username}"
+                subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
+                
+                if all_referrers_fdm == statistics_fdm:
+                    subAutoTestCase += f"\n     + FDM match: Statistics={statistics_fdm}, Referrers (All)={all_referrers_fdm}"
+                else:
+                    subAutoTestCase += f"\n     + FDM mismatch: Statistics={statistics_fdm}, Referrers (All)={all_referrers_fdm}"
+                    subAutoTestCase += f"\n     + Referrers by device: PC / Laptop={device_fdm['PC / Laptop']}, Mobile={device_fdm['Mobile']}"
+            
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][0],
+                sheet_name=Checklist_Sheet_Name
+            )
+        
+        except Exception as e:
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][1],
+                sheet_name=Checklist_Sheet_Name
+            )
+            indexChl += 1
+            if indexChl < len(mainChecklist):
+                for i in range(indexChl, len(mainChecklist)):
+                    if i >= len(mainChecklist):
+                        break
+                    self.utils.update_result_to_ggsheet(
+                        Data["TestCase_spread_sheet_id"], 
+                        mainChecklist[i], 
+                        testcase, 
+                        "", 
+                        Data["TestCase_Auto_Status"][2],
+                        sheet_name=Checklist_Sheet_Name
+                    )
+            self.utils.page.extract_TestCaseFailed(e)
+
+    def verify_total_clicks_has_unique_clicks(self, testcase):
+        cache, username = self.preload_all_data()
+        
+        mainChecklist = [
+            "Verify that if there is data in the Total Clicks column, then the Unique Click column also contains data."
+        ]
+        
+        indexChl = 0
+        subAutoTestCase = ''
+        
+        try:
+            periods = ["last_month", "last_week", "current_month"]
+            device_types = ["All", "PC / Laptop", "Mobile"]
+            
+            for period in periods:
+                period_display = period.replace("_", " ")
+                
+                for device_type in device_types:
+                    device_display = "Desktop" if device_type == "PC / Laptop" else device_type
+                    
+                    if subAutoTestCase:
+                        subAutoTestCase += '\n\n'
+                    
+                    subAutoTestCase += f"- Verify that for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display}, if Total Clicks has data, then Unique Clicks also has data"
+                    
+                    key = f"{period}_{device_type}"
+                    data_referrers = cache["referrers"][key]
+                    
+                    subAutoTestCase += f"\n     + Username: {username}"
+                    subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                    subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
+                    
+                    if not data_referrers.get("has_data", True):
+                        subAutoTestCase += f"\n     + No data found for Referrers."
+                        continue
+                    
+                    violations = []
+                    total_sites = 0
+                    sites_with_total_clicks = 0
+                    
+                    for site_data in data_referrers["site_urls_data"]:
+                        site_url = site_data["site_url"]
+                        total_clicks = self.parse_int(site_data["total_click"])
+                        unique_clicks = self.parse_int(site_data["unique_click"])
+                        
+                        total_sites += 1
+                        
+                        if total_clicks > 0:
+                            sites_with_total_clicks += 1
+                            if unique_clicks == 0:
+                                violations.append(f"Site URL '{site_url}' has Total Clicks ({total_clicks}) but no Unique Clicks")
+                    
+                    for site_url, website_urls in data_referrers["website_urls_data"].items():
+                        for website_data in website_urls:
+                            website_url = website_data["website_url"]
+                            total_clicks = self.parse_int(website_data["total_clicks"])
+                            unique_clicks = self.parse_int(website_data["unique_clicks"])
+                            
+                            if total_clicks > 0 and unique_clicks == 0:
+                                violations.append(f"Website URL '{website_url}' under Site '{site_url}' has Total Clicks ({total_clicks}) but no Unique Clicks")
+                    
+                    if not sites_with_total_clicks:
+                        subAutoTestCase += f"\n     + No sites with Total Clicks data found."
+                    elif violations:
+                        subAutoTestCase += f"\n     + Failed: {len(violations)} sites/websites have Total Clicks but no Unique Clicks:"
+                        for violation in violations[:3]:
+                            subAutoTestCase += f"\n       - {violation}"
+                        if len(violations) > 3:
+                            subAutoTestCase += f"\n       - ... and {len(violations) - 3} more"
+                    else:
+                        subAutoTestCase += f"\n     + Verified: All {sites_with_total_clicks} sites/websites with Total Clicks also have Unique Clicks data."
+            
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][0],
+                sheet_name=Checklist_Sheet_Name
+            )
+        
+        except Exception as e:
+            self.utils.update_result_to_ggsheet(
+                Data["TestCase_spread_sheet_id"], 
+                mainChecklist[indexChl], 
+                testcase, 
+                subAutoTestCase, 
+                Data["TestCase_Auto_Status"][1],
+                sheet_name=Checklist_Sheet_Name
+            )
             self.utils.page.extract_TestCaseFailed(e)

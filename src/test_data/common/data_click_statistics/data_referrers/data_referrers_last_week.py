@@ -1,27 +1,19 @@
-# get data baseline referrers last week at 2025-05-21 15:30:28 +0800 (GMT+8)
+# get data baseline referrer last_week at 2025-06-04 12:01:24 +0800 (GMT+8)
 
 class DataReferrersLastWeek:
     data_referrers_last_week = {
     "metadata": {
-        "collected_at": "2025-05-21 15:30:11 +0800",
+        "collected_at": "2025-06-04 12:01:24 +0800",
         "period": {
-            "from_date": "05-12-2025",
-            "to_date": "05-18-2025"
+            "from_date": "05-26-2025",
+            "to_date": "06-01-2025"
         },
         "filters": {
             "username": "12BETAFF001",
             "device_type": "All"
         },
-        "has_data": True
+        "has_data": False
     },
-    "site_urls_data": {
-        "none": {
-            "site_url": "none",
-            "total_clicks": 57,
-            "unique_clicks": 1,
-            "signups": 0,
-            "fdm": 0
-        }
-    },
+    "site_urls_data": [],
     "website_urls_data": {}
 }

@@ -1,7 +1,9 @@
 from config.constants.settings import (
     TELEGRAM_BOT_TOKEN,
     TELEGRAM_CHAT_IDS,
-    TEAMS_CONVERSATION_IDS
+    TEAMS_CONVERSATION_IDS,
+    SLACK_CHANNEL_ID,
+    SLACK_BOT_TOKEN
 )
 from src.utils.core import (
     get_logger,
@@ -10,6 +12,7 @@ from src.utils.core import (
     NotificationException
 )
 from src.utils.services.utils.components.extract_testcase_failed import ExtractTestCaseFailed, TC_NAME
+from slack_sdk import WebClient
 
 logger = get_logger(__name__)
 
@@ -34,7 +37,7 @@ class ReportMethods(ExtractTestCaseFailed):
             now = datetime.now()
             timestamp = now.strftime("%d-%m-%Y %H:%M:%S")
             
-            txt = f"🤖 AFFILIATE 12BET AUTOMATION REPORT 🤖\n"
+            txt = f"AFFILIATE 12BET AUTOMATION REPORT\n"
             txt += f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             txt += f"📅 Date: {timestamp}\n"
             
@@ -53,8 +56,6 @@ class ReportMethods(ExtractTestCaseFailed):
                 txt += f"✅ Status: PASSED (All test cases)\n"
             
             txt += f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            txt += f"🔄 Automated Test Report - 12BET Affiliate"
-            
             return txt
         except Exception as e:
             logger.error(f"Error preparing message: {str(e)}")
@@ -121,5 +122,37 @@ class ReportMethods(ExtractTestCaseFailed):
             raise NotificationException(
                 message="Failed to send message to MS Teams",
                 channel="MS Teams",
+                details=str(e)
+            )
+
+    @log_exceptions(log_level="INFO")
+    def send_message_to_slack(self):
+        try:
+            channel_id = SLACK_CHANNEL_ID
+            if not channel_id:
+                logger.debug("Slack channel ID not set, skipping message")
+                return
+            
+            logger.info("Sending test report to Slack")
+            bot_message = self.prepare_message()
+
+            client = WebClient(token=SLACK_BOT_TOKEN)
+            send_count = 0
+
+            for id in channel_id:
+                try:
+                    logger.debug(f"Sending message to Slack channel {id}")
+                    client.chat_postMessage(channel=id, text=bot_message)
+                    send_count += 1
+                except Exception as e:
+                    logger.error(f"Failed to send message to Slack channel {id}: {str(e)}")
+                    
+            logger.info(f"Test report sent to {send_count} Slack channels")
+
+        except Exception as e:
+            logger.error(f"Failed to send message to Slack: {str(e)}")
+            raise NotificationException(
+                message="Failed to send message to Slack",
+                channel="Slack",
                 details=str(e)
             )
