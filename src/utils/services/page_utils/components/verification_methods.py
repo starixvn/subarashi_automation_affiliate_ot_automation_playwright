@@ -176,7 +176,7 @@ class VerificationMethods(ExtractTestCaseFailed):
                 except Exception as e:
                     logger.debug(f"Exception while checking element readiness: {str(e)}")
                     time.sleep(retry_interval)
-                    retry_interval = min(retry_interval * 1.5, 2.0)  # Backoff
+                    retry_interval = min(retry_interval * 1.5, 2.0)
             
             logger.error(f"Element '{selector}' not ready after {timeout} seconds")
             return False

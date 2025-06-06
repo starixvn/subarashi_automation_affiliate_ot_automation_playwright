@@ -1,9 +1,9 @@
-# get data baseline marketing page last_week at 2025-06-04 16:07:23 +0800 (GMT+8)
+# get data baseline marketing page last_week at 2025-06-05 14:12:37 +0800 (GMT+8)
 
 class DataMarketingPagesLastWeek:
     data_marketing_pages_last_week = {
     "metadata": {
-        "collected_at": "2025-06-04 16:07:23 +0800",
+        "collected_at": "2025-06-05 14:12:37 +0800",
         "period": {
             "from_date": "05-26-2025",
             "to_date": "06-01-2025"

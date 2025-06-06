@@ -9,10 +9,6 @@ from src.actions.common.get_data_on_function.get_data_player import GetDataPlaye
 
 
 class GetDataBaselineLandingPageAll(GetDataCustomer):
-    """
-    A consolidated class that combines all landing page data collection methods.
-    This replaces 9 separate files with a single file while maintaining the same functionality.
-    """
     
     def __init__(self):
         super().__init__()
@@ -27,7 +23,6 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
             self.data_player.referUtils(self.utils)
     
     def _get_username(self):
-        """Get username based on environment"""
         self._initialize_data_player()
         if ENVIRONMENT == "local":
             return "12BETAFF001"
@@ -36,7 +31,6 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
             return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
     
     def _parse_int(self, text):
-        """Convert string to int"""
         try:
             return int(str(text).replace(',', '').strip() or 0)
         except (ValueError, AttributeError):
@@ -45,7 +39,6 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def _map_device_type(self, device_type):
-        """Map device type to API expected value"""
         device_map = {
             "desktop": "PC / Laptop",
             "mobile": "Mobile",
@@ -54,11 +47,9 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
         return device_map.get(device_type.lower(), device_type)
     
     def _save_data(self, data, period, device_type):
-        """Save data to appropriate file based on period and device type"""
         try:
             os.makedirs(self.data_directory, exist_ok=True)
             
-            # Format the filename based on period and device type
             filename_parts = ["data_landing_pages"]
             if period == "yesterday":
                 filename_parts.append("yesterday")
@@ -73,7 +64,6 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
             filename = "_".join(filename_parts) + ".py"
             py_file = os.path.join(self.data_directory, filename)
             
-            # Format the class name based on period and device type
             class_name_parts = ["DataLandingPages"]
             if period == "yesterday":
                 class_name_parts.append("Yesterday")
@@ -89,7 +79,6 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
             
             class_name = "".join(class_name_parts)
             
-            # Format the variable name based on period and device type
             var_name_parts = ["data_landing_pages"]
             if period == "yesterday":
                 var_name_parts.append("yesterday")
@@ -105,16 +94,13 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
             
             var_name = "_".join(var_name_parts)
             
-            # Generate description based on period and device type
             description = f"get data baseline landing page {period}"
             if device_type.lower() != "all":
                 description += f" by {device_type.lower()}"
             
-            # Convert data to Python-compatible string
             json_str = json.dumps(data, indent=4, ensure_ascii=False)
             python_str = json_str.replace('"has_data": true', '"has_data": True').replace('"has_data": false', '"has_data": False')
             
-            # Write to file
             current_time_gmt8 = datetime.now(self.timezone).strftime("%Y-%m-%d %H:%M:%S %z")
             with open(py_file, "w", encoding="utf-8") as f:
                 f.write(f"# {description} at {current_time_gmt8} (GMT+8)\n\n")
@@ -128,16 +114,6 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def _get_landing_page_data(self, period, device_type="all"):
-        """
-        Generic method to get landing page data for different periods and device types
-        
-        Args:
-            period (str): 'yesterday', 'last_week', or 'last_month'
-            device_type (str): 'all', 'desktop', or 'mobile'
-        
-        Returns:
-            dict: Collected data
-        """
         try:
             username = self._get_username()
             page_name = "All"
@@ -148,7 +124,7 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
             
             if period == "yesterday":
                 yesterday = today - timedelta(days=1)
-                from_date = yesterday.strftime("%m/%d/%Y")
+                from_date = yesterday.strftime("%m-%d-%Y")
                 to_date = from_date
             elif period == "last_week":
                 current_weekday = today.weekday()
@@ -159,14 +135,14 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
                 monday_last_week = monday_this_week - timedelta(days=7)
                 sunday_last_week = monday_this_week - timedelta(days=1)
                 
-                from_date = monday_last_week.strftime("%m/%d/%Y")
-                to_date = sunday_last_week.strftime("%m/%d/%Y")
+                from_date = monday_last_week.strftime("%m-%d-%Y")
+                to_date = sunday_last_week.strftime("%m-%d-%Y")
             elif period == "last_month":
                 first_day_current_month = today.replace(day=1)
                 last_day_previous_month = first_day_current_month - timedelta(days=1)
                 first_day_previous_month = last_day_previous_month.replace(day=1)
-                from_date = first_day_previous_month.strftime("%m/%d/%Y")
-                to_date = last_day_previous_month.strftime("%m/%d/%Y")
+                from_date = first_day_previous_month.strftime("%m-%d-%Y")
+                to_date = last_day_previous_month.strftime("%m-%d-%Y")
             else:
                 raise ValueError(f"Invalid period: {period}")
             
@@ -187,7 +163,7 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
                     },
                     "has_data": True
                 },
-                "pages_data": {},
+                "pages_data": [],
                 "website_urls_data": {}
             }
             
@@ -201,25 +177,25 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
                 language = page_data["language"]
                 key = f"{page_name} - {language}"
                 
-                collected_data["pages_data"][key] = {
+                collected_data["pages_data"].append({
                     "page_name": page_name,
                     "language": language,
-                    "total_clicks": self._parse_int(page_data["total_click"]),
-                    "unique_clicks": self._parse_int(page_data["unique_click"]),
-                    "signups": self._parse_int(page_data["signups"]),
-                    "fdm": self._parse_int(page_data["fdm"])
-                }
-            
-            for page_key, urls_data in raw_data["website_urls_data"].items():
-                collected_data["website_urls_data"][page_key] = []
-                for url_data in urls_data:
-                    collected_data["website_urls_data"][page_key].append({
-                        "website_url": url_data["website_url"],
-                        "total_clicks": self._parse_int(url_data["total_clicks"]),
-                        "unique_clicks": self._parse_int(url_data["unique_clicks"]),
-                        "signups": self._parse_int(url_data["sign_up"]),
-                        "fdm": self._parse_int(url_data["fdm"])
-                    })
+                    "total_click": str(page_data["total_click"]),
+                    "unique_click": str(page_data["unique_click"]),
+                    "signups": str(page_data["signups"]),
+                    "fdm": str(page_data["fdm"])
+                })
+                
+                if key in raw_data["website_urls_data"]:
+                    collected_data["website_urls_data"][key] = []
+                    for url_data in raw_data["website_urls_data"][key]:
+                        collected_data["website_urls_data"][key].append({
+                            "website_url": url_data["website_url"],
+                            "total_clicks": self._parse_int(url_data["total_clicks"]),
+                            "unique_clicks": self._parse_int(url_data["unique_clicks"]),
+                            "signups": self._parse_int(url_data["sign_up"]),
+                            "fdm": self._parse_int(url_data["fdm"])
+                        })
             
             self._save_data(collected_data, period, device_type)
             return collected_data
@@ -227,43 +203,33 @@ class GetDataBaselineLandingPageAll(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def get_data_landing_page_yesterday(self):
-        """Get landing page data for yesterday with all device types"""
         return self._get_landing_page_data("yesterday", "all")
     
     def get_data_landing_page_yesterday_by_desktop(self):
-        """Get landing page data for yesterday with desktop device type"""
         return self._get_landing_page_data("yesterday", "desktop")
     
     def get_data_landing_page_yesterday_by_mobile(self):
-        """Get landing page data for yesterday with mobile device type"""
         return self._get_landing_page_data("yesterday", "mobile")
     
     def get_data_landing_page_last_week(self):
-        """Get landing page data for last week with all device types"""
         return self._get_landing_page_data("last_week", "all")
     
     def get_data_landing_page_last_week_by_desktop(self):
-        """Get landing page data for last week with desktop device type"""
         return self._get_landing_page_data("last_week", "desktop")
     
     def get_data_landing_page_last_week_by_mobile(self):
-        """Get landing page data for last week with mobile device type"""
         return self._get_landing_page_data("last_week", "mobile")
     
     def get_data_landing_page_last_month(self):
-        """Get landing page data for last month with all device types"""
         return self._get_landing_page_data("last_month", "all")
     
     def get_data_landing_page_last_month_by_desktop(self):
-        """Get landing page data for last month with desktop device type"""
         return self._get_landing_page_data("last_month", "desktop")
     
     def get_data_landing_page_last_month_by_mobile(self):
-        """Get landing page data for last month with mobile device type"""
         return self._get_landing_page_data("last_month", "mobile")
     
     def get_all_landing_page_data(self):
-        """Run all landing page data collection methods"""
         results = {}
         
         # Yesterday data

@@ -78,4 +78,3 @@ class FileMethods(ExtractTestCaseFailed):
             logger.error(f"Failed to upload files: {str(e)}")
             self.extract_TestCaseFailed(e)
     
-    # Các phương thức file khác

@@ -25,18 +25,10 @@ from src.utils.services.api_utils.components.extract_testcase_failed import TC_N
 logger = get_logger(__name__)
 
 class api(RequestMethods, AssertionMethods, ExtractionMethods):
-    """
-    API client kế thừa từ tất cả các component.
-    Giữ nguyên interface như file api_utils.py gốc.
-    """
     TcName = TC_NAME
     api: APIRequestContext
     
     def __init__(self, api: APIRequestContext):
-        """
-        Phương thức khởi tạo với đúng tham số như API cũ
-        Quan trọng: Phải giữ biến TcName là class variable
-        """
         try:
             validate_not_none(api, "api")
             validate_type(api, APIRequestContext, "api")

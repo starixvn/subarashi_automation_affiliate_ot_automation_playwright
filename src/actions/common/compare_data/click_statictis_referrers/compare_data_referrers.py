@@ -34,12 +34,19 @@ Checklist_Sheet_Name = "Compare_Data_Clickstatistics"
 
 
 class CompareDataReferrers(GetDataCustomer):
+    _cache_data = None
+    _cache_username = None
+    
     def __init__(self):
         super().__init__()
         self.get_data_customer = GetDataCustomer()
 
+    @staticmethod
+    def clear_cache():
+        CompareDataReferrers._cache_data = None
+        CompareDataReferrers._cache_username = None
+
     def _compare_site_urls(self, baseline_site_urls, current_site_urls):
-        """compare site URLs between baseline and current data"""
         if len(baseline_site_urls) != len(current_site_urls):
             raise Exception(f"Number of site URLs mismatch. Baseline: {len(baseline_site_urls)}, Current: {len(current_site_urls)}")
         
@@ -63,7 +70,6 @@ class CompareDataReferrers(GetDataCustomer):
                 raise Exception(f"Site URL '{site_url}' not found in current data")
     
     def _compare_website_urls(self, baseline_website_urls_data, current_website_urls_data):
-        """compare website URLs between baseline and current data"""
         for site_url, baseline_website_urls in baseline_website_urls_data.items():
             if site_url.lower() == "none":
                 continue
@@ -112,14 +118,10 @@ class CompareDataReferrers(GetDataCustomer):
         except Exception:
             return {"unique": 0, "total": 0}
     
-    def _compare_referrers_with_page(self, period, device_type, page_type="landing"):
-        """
-        Compare Total Clicks between Referrers and Landing Pages/Marketing Pages
-        """
-        username = self._get_username()
-        date_range = self._get_date_range(period)
+    def _compare_referrers_with_page(self, cache, username, period, device_type, page_type="landing"):
+        key = f"{period}_{device_type}"
         
-        data_referrers = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
+        data_referrers = cache["referrers"][key]
         
         referrers_total_clicks = 0
         if data_referrers.get("has_data", True):
@@ -127,7 +129,7 @@ class CompareDataReferrers(GetDataCustomer):
                 referrers_total_clicks += self.parse_int(site_data["total_click"])
         
         if page_type == "landing":
-            data_pages = self.get_data_landing_pages_in_customer(username, "All", "All", date_range["from_date"], date_range["to_date"], device_type)
+            data_pages = cache["landing_pages"][key]
             pages_name = "Landing Pages"
             
             pages_total_clicks = 0
@@ -135,7 +137,7 @@ class CompareDataReferrers(GetDataCustomer):
                 for page in data_pages["pages_data"]:
                     pages_total_clicks += self.parse_int(page["total_click"])
         else:
-            data_pages = self.get_data_marketing_pages_in_customer(username, "All", date_range["from_date"], date_range["to_date"], device_type)
+            data_pages = cache["marketing_pages"][key]
             pages_name = "Marketing Pages"
             
             pages_total_clicks = 0
@@ -148,8 +150,8 @@ class CompareDataReferrers(GetDataCustomer):
         result = ""
         if has_data:
             result += f"\n     + Username: {username}"
-            result += f"\n     + From Date: {date_range['from_date']}"
-            result += f"\n     + To Date: {date_range['to_date']}"
+            result += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+            result += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
             
             if referrers_total_clicks == pages_total_clicks:
                 result += f"\n     + Total Clicks match: {referrers_total_clicks}"
@@ -179,7 +181,16 @@ class CompareDataReferrers(GetDataCustomer):
             from_date = first_day_previous_month.strftime("%m-%d-%Y")
             to_date = last_day_previous_month.strftime("%m-%d-%Y")
             month_date = last_day_previous_month.strftime("%m-%Y")
-        else:
+        elif period == "last_week":
+            to_date = (today - timedelta(days=today.weekday() + 1)).strftime("%m-%d-%Y")  # Last Sunday
+            from_date = (today - timedelta(days=today.weekday() + 7)).strftime("%m-%d-%Y")  # Previous Monday
+            month_date = today.strftime("%m-%Y")
+        elif period == "yesterday":
+            yesterday = today - timedelta(days=1)
+            from_date = yesterday.strftime("%m-%d-%Y")
+            to_date = yesterday.strftime("%m-%d-%Y")
+            month_date = yesterday.strftime("%m-%Y")
+        else:  # current_month
             first_day_current_month = today.replace(day=1)
             from_date = first_day_current_month.strftime("%m-%d-%Y")
             to_date = today.strftime("%m-%d-%Y")
@@ -282,243 +293,110 @@ class CompareDataReferrers(GetDataCustomer):
         return formatted_result
 
     def check_data_referrers_filter_by_date_and_device(self, testcase):
+        cache, username = self.preload_all_data()
+        
         subAutoTestCase = ''
         mainChecklist = ["Verify that the Referrers data displayed is correct according to the date picker.",
                         "Verify that the Referrers data displayed is correct by device."
                         ]
         indexChl = 0
+        
+        baseline_to_cache_mapping = {
+            "Referres_Last_Month": "last_month_All",
+            "Referres_Last_Week": "last_week_All", 
+            "Referres_Yesterday": "yesterday_All",
+            "Referres_Last_Month_By_Desktop": "last_month_PC / Laptop",
+            "Referres_Last_Week_By_Desktop": "last_week_PC / Laptop",
+            "Referres_Yesterday_By_Desktop": "yesterday_PC / Laptop", 
+            "Referres_Last_Month_By_Mobile": "last_month_Mobile",
+            "Referres_Last_Week_By_Mobile": "last_week_Mobile",
+            "Referres_Yesterday_By_Mobile": "yesterday_Mobile"
+        }
+        
         try:
             if "Referres_Last_Month" not in Data or not Data["Referres_Last_Month"]:
                 raise Exception("Baseline data not found. Please run the job to collect baseline data first.")
+            
+            subAutoTestCase = '- Verify that the data displayed is correct according to the date picker'
+            
+            date_tests = [
+                ("Last Month", "Referres_Last_Month"),
+                ("Last Week", "Referres_Last_Week"), 
+                ("Yesterday", "Referres_Yesterday")
+            ]
+            
+            for period_name, baseline_key in date_tests:
+                baseline_data = Data[baseline_key]
+                cache_key = baseline_to_cache_mapping[baseline_key]
                 
-            # LAST MONTH
-            baseline_data_last_month = Data["Referres_Last_Month"]
-            subAutoTestCase = subAutoTestCase + '- Verify that the data displayed is correct according to the last month'
-            
-            username = baseline_data_last_month["metadata"]["filters"]["username"]
-            device_type = baseline_data_last_month["metadata"]["filters"]["device_type"]
-            from_date = baseline_data_last_month["metadata"]["period"]["from_date"]
-            to_date = baseline_data_last_month["metadata"]["period"]["to_date"]
-            
-            current_data = self.get_data_referrers_in_customer(username, from_date, to_date, device_type)
-            
-            baseline_has_data = baseline_data_last_month["metadata"].get("has_data", True)
-            current_has_data = current_data.get("has_data", True)
-            
-            if not baseline_has_data and not current_has_data:
-                subAutoTestCase = subAutoTestCase + " (No data expected - verified no data is present)"
-            elif not baseline_has_data and current_has_data:
-                raise Exception(f"Baseline data has no results but current query returned data. This suggests a data inconsistency.")
-            elif baseline_has_data and not current_has_data:
-                raise Exception(f"No current data found for user {username} from {from_date} to {to_date} with device type {device_type}, but baseline data exists")
-            else:
-                self._compare_site_urls(baseline_data_last_month["site_urls_data"], current_data["site_urls_data"])
-                self._compare_website_urls(baseline_data_last_month["website_urls_data"], current_data["website_urls_data"])
-
-            # LAST WEEK
-            subAutoTestCase = subAutoTestCase + '\n- Verify that the data displayed is correct according to the last week'
-            baseline_data_last_week = Data["Referres_Last_Week"]
-            username = baseline_data_last_week["metadata"]["filters"]["username"]
-            device_type = baseline_data_last_week["metadata"]["filters"]["device_type"]
-            from_date = baseline_data_last_week["metadata"]["period"]["from_date"]
-            to_date = baseline_data_last_week["metadata"]["period"]["to_date"]
-            current_data = self.get_data_referrers_in_customer(username, from_date, to_date, device_type)
-            
-            baseline_has_data = baseline_data_last_week["metadata"].get("has_data", True)
-            current_has_data = current_data.get("has_data", True)
-
-            if not baseline_has_data and not current_has_data:
-                subAutoTestCase = subAutoTestCase + " (No data expected - verified no data is present)"
-            elif not baseline_has_data and current_has_data:
-                raise Exception(f"Baseline data has no results but current query returned data. This suggests a data inconsistency.")
-            elif baseline_has_data and not current_has_data:
-                raise Exception(f"No current data found for user {username} from {from_date} to {to_date} with device type {device_type}, but baseline data exists")
-            else:
-                self._compare_site_urls(baseline_data_last_week["site_urls_data"], current_data["site_urls_data"])
-                self._compare_website_urls(baseline_data_last_week["website_urls_data"], current_data["website_urls_data"])
-
-            # YESTERDAY
-            subAutoTestCase = subAutoTestCase + '\n- Verify that the data displayed is correct according to the yesterday'
-            baseline_data_yesterday = Data["Referres_Yesterday"]
-            username = baseline_data_yesterday["metadata"]["filters"]["username"]
-            device_type = baseline_data_yesterday["metadata"]["filters"]["device_type"]
-            from_date = baseline_data_yesterday["metadata"]["period"]["from_date"]
-            to_date = baseline_data_yesterday["metadata"]["period"]["to_date"]
-            
-            current_data = self.get_data_referrers_in_customer(username, from_date, to_date, device_type)
-            
-            baseline_has_data = baseline_data_yesterday["metadata"].get("has_data", True)
-            current_has_data = current_data.get("has_data", True)
-
-            if not baseline_has_data and not current_has_data:
-                subAutoTestCase = subAutoTestCase + " (No data expected - verified no data is present)"
-            elif not baseline_has_data and current_has_data:
-                raise Exception(f"Baseline data has no results but current query returned data. This suggests a data inconsistency.")
-            elif baseline_has_data and not current_has_data:
-                raise Exception(f"No current data found for user {username} from {from_date} to {to_date} with device type {device_type}, but baseline data exists")
-            else:
-                self._compare_site_urls(baseline_data_yesterday["site_urls_data"], current_data["site_urls_data"])
-                self._compare_website_urls(baseline_data_yesterday["website_urls_data"], current_data["website_urls_data"])
+                current_data = cache["referrers"][cache_key]
+                
+                baseline_has_data = baseline_data["metadata"].get("has_data", True)
+                current_has_data = current_data.get("has_data", True)
+                
+                if not baseline_has_data and not current_has_data:
+                    subAutoTestCase += f"\n     + {period_name}: No data expected - verified no data is present"
+                elif not baseline_has_data and current_has_data:
+                    raise Exception(f"{period_name}: Baseline data has no results but current query returned data. This suggests a data inconsistency.")
+                elif baseline_has_data and not current_has_data:
+                    raise Exception(f"{period_name}: No current data found but baseline data exists")
+                else:
+                    self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
+                    self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
+                    subAutoTestCase += f"\n     + {period_name}: Successfully verified data"
             
             self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0], sheet_name=Checklist_Sheet_Name)
-            indexChl = indexChl + 1 
-            subAutoTestCase = ""
-
-            # LAST MONTH BY DESKTOP
-            subAutoTestCase = subAutoTestCase + '- Verify that the data displayed is correct according to the last month by desktop'
-            baseline_data_last_month_by_desktop = Data["Referres_Last_Month_By_Desktop"]
-            username = baseline_data_last_month_by_desktop["metadata"]["filters"]["username"]
-            device_type = baseline_data_last_month_by_desktop["metadata"]["filters"]["device_type"]
-            from_date = baseline_data_last_month_by_desktop["metadata"]["period"]["from_date"]
-            to_date = baseline_data_last_month_by_desktop["metadata"]["period"]["to_date"]
-            
-            current_data = self.get_data_referrers_in_customer(username, from_date, to_date, device_type)
-            
-            baseline_has_data = baseline_data_last_month_by_desktop["metadata"].get("has_data", True)
-            current_has_data = current_data.get("has_data", True)
-
-            if not baseline_has_data and not current_has_data:
-                subAutoTestCase = subAutoTestCase + " (No data expected - verified no data is present)"
-            elif not baseline_has_data and current_has_data:
-                raise Exception(f"Baseline data has no results but current query returned data. This suggests a data inconsistency.")
-            elif baseline_has_data and not current_has_data:
-                raise Exception(f"No current data found for user {username} from {from_date} to {to_date} with device type {device_type}, but baseline data exists")
-            else:
-                self._compare_site_urls(baseline_data_last_month_by_desktop["site_urls_data"], current_data["site_urls_data"])
-                self._compare_website_urls(baseline_data_last_month_by_desktop["website_urls_data"], current_data["website_urls_data"])
-
-            # LAST WEEK BY DESKTOP
-            subAutoTestCase = subAutoTestCase + '\n- Verify that the data displayed is correct according to the last week by desktop'
-            baseline_data_last_week_by_desktop = Data["Referres_Last_Week_By_Desktop"]
-            username = baseline_data_last_week_by_desktop["metadata"]["filters"]["username"]
-            device_type = baseline_data_last_week_by_desktop["metadata"]["filters"]["device_type"]
-            from_date = baseline_data_last_week_by_desktop["metadata"]["period"]["from_date"]
-            to_date = baseline_data_last_week_by_desktop["metadata"]["period"]["to_date"]
-            
-            current_data = self.get_data_referrers_in_customer(username, from_date, to_date, device_type)
-            
-            baseline_has_data = baseline_data_last_week_by_desktop["metadata"].get("has_data", True)
-            current_has_data = current_data.get("has_data", True)
-            
-            if not baseline_has_data and not current_has_data:
-                subAutoTestCase = subAutoTestCase + " (No data expected - verified no data is present)"
-            elif not baseline_has_data and current_has_data:
-                raise Exception(f"Baseline data has no results but current query returned data. This suggests a data inconsistency.")
-            elif baseline_has_data and not current_has_data:
-                raise Exception(f"No current data found for user {username} from {from_date} to {to_date} with device type {device_type}, but baseline data exists")
-            else:
-                self._compare_site_urls(baseline_data_last_week_by_desktop["site_urls_data"], current_data["site_urls_data"])
-                self._compare_website_urls(baseline_data_last_week_by_desktop["website_urls_data"], current_data["website_urls_data"])
-
-            # YESTERDAY BY DESKTOP
-            subAutoTestCase = subAutoTestCase + '\n- Verify that the data displayed is correct according to the yesterday by desktop'
-            
-            baseline_data_yesterday_by_desktop = Data["Referres_Yesterday_By_Desktop"]
-            username = baseline_data_yesterday_by_desktop["metadata"]["filters"]["username"]
-            device_type = baseline_data_yesterday_by_desktop["metadata"]["filters"]["device_type"]
-            from_date = baseline_data_yesterday_by_desktop["metadata"]["period"]["from_date"]
-            to_date = baseline_data_yesterday_by_desktop["metadata"]["period"]["to_date"]
-            
-            current_data = self.get_data_referrers_in_customer(username, from_date, to_date, device_type)
-            
-            baseline_has_data = baseline_data_yesterday_by_desktop["metadata"].get("has_data", True)
-            current_has_data = current_data.get("has_data", True)
-            
-            if not baseline_has_data and not current_has_data:
-                subAutoTestCase = subAutoTestCase + " (No data expected - verified no data is present)"
-            elif not baseline_has_data and current_has_data:
-                raise Exception(f"Baseline data has no results but current query returned data. This suggests a data inconsistency.")
-            elif baseline_has_data and not current_has_data:
-                raise Exception(f"No current data found for user {username} from {from_date} to {to_date} with device type {device_type}, but baseline data exists")
-            else:
-                self._compare_site_urls(baseline_data_yesterday_by_desktop["site_urls_data"], current_data["site_urls_data"])
-                self._compare_website_urls(baseline_data_yesterday_by_desktop["website_urls_data"], current_data["website_urls_data"])
-
-            # LAST MONTH BY MOBILE
-            subAutoTestCase = subAutoTestCase + '\n- Verify that the data displayed is correct according to the last month by mobile'
-            baseline_data_last_month_by_mobile = Data["Referres_Last_Month_By_Mobile"]
-            username = baseline_data_last_month_by_mobile["metadata"]["filters"]["username"]
-            device_type = baseline_data_last_month_by_mobile["metadata"]["filters"]["device_type"]
-            from_date = baseline_data_last_month_by_mobile["metadata"]["period"]["from_date"]
-            to_date = baseline_data_last_month_by_mobile["metadata"]["period"]["to_date"]
-            
-            current_data = self.get_data_referrers_in_customer(username, from_date, to_date, device_type)
-            
-            baseline_has_data = baseline_data_last_month_by_mobile["metadata"].get("has_data", True)
-            current_has_data = current_data.get("has_data", True)
-            
-            if not baseline_has_data and not current_has_data:
-                subAutoTestCase = subAutoTestCase + " (No data expected - verified no data is present)"
-            elif not baseline_has_data and current_has_data:
-                raise Exception(f"Baseline data has no results but current query returned data. This suggests a data inconsistency.")
-            elif baseline_has_data and not current_has_data:
-                raise Exception(f"No current data found for user {username} from {from_date} to {to_date} with device type {device_type}, but baseline data exists")
-            else:
-                self._compare_site_urls(baseline_data_last_month_by_mobile["site_urls_data"], current_data["site_urls_data"])
-                self._compare_website_urls(baseline_data_last_month_by_mobile["website_urls_data"], current_data["website_urls_data"])
-
-            # LAST WEEK BY MOBILE
-            subAutoTestCase = subAutoTestCase + '\n- Verify that the data displayed is correct according to the last week by mobile'
-            baseline_data_last_week_by_mobile = Data["Referres_Last_Week_By_Mobile"]
-            username = baseline_data_last_week_by_mobile["metadata"]["filters"]["username"]
-            device_type = baseline_data_last_week_by_mobile["metadata"]["filters"]["device_type"]
-            from_date = baseline_data_last_week_by_mobile["metadata"]["period"]["from_date"]
-            to_date = baseline_data_last_week_by_mobile["metadata"]["period"]["to_date"]
-            
-            current_data = self.get_data_referrers_in_customer(username, from_date, to_date, device_type)
-            
-            baseline_has_data = baseline_data_last_week_by_mobile["metadata"].get("has_data", True)
-            current_has_data = current_data.get("has_data", True)
-            
-            if not baseline_has_data and not current_has_data:
-                subAutoTestCase = subAutoTestCase + " (No data expected - verified no data is present)"
-            elif not baseline_has_data and current_has_data:
-                raise Exception(f"Baseline data has no results but current query returned data. This suggests a data inconsistency.")
-            elif baseline_has_data and not current_has_data:
-                raise Exception(f"No current data found for user {username} from {from_date} to {to_date} with device type {device_type}, but baseline data exists")
-            else:
-                self._compare_site_urls(baseline_data_last_week_by_mobile["site_urls_data"], current_data["site_urls_data"])
-                self._compare_website_urls(baseline_data_last_week_by_mobile["website_urls_data"], current_data["website_urls_data"])
-
-            # YESTERDAY BY MOBILE
-            subAutoTestCase = subAutoTestCase + '\n- Verify that the data displayed is correct according to the yesterday by mobile'
-            baseline_data_yesterday_by_mobile = Data["Referres_Yesterday_By_Mobile"]
-            username = baseline_data_yesterday_by_mobile["metadata"]["filters"]["username"]
-            device_type = baseline_data_yesterday_by_mobile["metadata"]["filters"]["device_type"]
-            from_date = baseline_data_yesterday_by_mobile["metadata"]["period"]["from_date"]
-            to_date = baseline_data_yesterday_by_mobile["metadata"]["period"]["to_date"]
-
-            current_data = self.get_data_referrers_in_customer(username, from_date, to_date, device_type)
-            
-            baseline_has_data = baseline_data_yesterday_by_mobile["metadata"].get("has_data", True)
-            current_has_data = current_data.get("has_data", True)
-            
-            if not baseline_has_data and not current_has_data:
-                subAutoTestCase = subAutoTestCase + " (No data expected - verified no data is present)"
-            elif not baseline_has_data and current_has_data:
-                raise Exception(f"Baseline data has no results but current query returned data. This suggests a data inconsistency.")
-            elif baseline_has_data and not current_has_data:
-                raise Exception(f"No current data found for user {username} from {from_date} to {to_date} with device type {device_type}, but baseline data exists")
-            else:
-                self._compare_site_urls(baseline_data_yesterday_by_mobile["site_urls_data"], current_data["site_urls_data"])
-                self._compare_website_urls(baseline_data_yesterday_by_mobile["website_urls_data"], current_data["website_urls_data"])
-            
-            self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0],sheet_name=Checklist_Sheet_Name)
-            indexChl = indexChl + 1
+            indexChl += 1
             subAutoTestCase = ''
-
+            subAutoTestCase = '- Verify that the data displayed is correct by device'
+            
+            device_tests = [
+                ("Desktop - Last Month", "Referres_Last_Month_By_Desktop"),
+                ("Desktop - Last Week", "Referres_Last_Week_By_Desktop"),
+                ("Desktop - Yesterday", "Referres_Yesterday_By_Desktop"),
+                ("Mobile - Last Month", "Referres_Last_Month_By_Mobile"), 
+                ("Mobile - Last Week", "Referres_Last_Week_By_Mobile"),
+                ("Mobile - Yesterday", "Referres_Yesterday_By_Mobile")
+            ]
+            
+            for device_period_name, baseline_key in device_tests:
+                baseline_data = Data[baseline_key]
+                cache_key = baseline_to_cache_mapping[baseline_key]
+                
+                current_data = cache["referrers"][cache_key]
+                
+                baseline_has_data = baseline_data["metadata"].get("has_data", True)
+                current_has_data = current_data.get("has_data", True)
+                
+                if not baseline_has_data and not current_has_data:
+                    subAutoTestCase += f"\n     + {device_period_name}: No data expected - verified no data is present"
+                elif not baseline_has_data and current_has_data:
+                    raise Exception(f"{device_period_name}: Baseline data has no results but current query returned data. This suggests a data inconsistency.")
+                elif baseline_has_data and not current_has_data:
+                    raise Exception(f"{device_period_name}: No current data found but baseline data exists")
+                else:
+                    self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
+                    self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
+                    subAutoTestCase += f"\n     + {device_period_name}: Successfully verified data"
+            
+            self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0], sheet_name=Checklist_Sheet_Name)
+            
         except Exception as e:
-            self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][1],sheet_name=Checklist_Sheet_Name)
-            indexChl = indexChl + 1
+            self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][1], sheet_name=Checklist_Sheet_Name)
+            indexChl += 1
             if indexChl < len(mainChecklist):
                 for i in range(indexChl, len(mainChecklist)):
                     if i >= len(mainChecklist):
                         break
-                    self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[i], testcase, "", Data["TestCase_Auto_Status"][2],sheet_name=Checklist_Sheet_Name)
+                    self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[i], testcase, "", Data["TestCase_Auto_Status"][2], sheet_name=Checklist_Sheet_Name)
             self.utils.page.extract_TestCaseFailed(e)
 
     def preload_all_data(self):
-        periods = ["last_month", "last_week", "current_month"]
+        if CompareDataReferrers._cache_data is not None:
+            print("Using cached data from previous load!")
+            return CompareDataReferrers._cache_data, CompareDataReferrers._cache_username
+            
+        periods = ["last_month", "last_week", "yesterday", "current_month"]
         device_types = ["All", "PC / Laptop", "Mobile"]
         stats_periods = ["last_month", "current_month"]
         
@@ -530,19 +408,12 @@ class CompareDataReferrers(GetDataCustomer):
         }
         
         username = self._get_username()
-        print(f"Preloading data for username: {username}")
         
         for period in periods:
             date_range = self._get_date_range(period)
             cache[period] = {
                 "date_range": date_range
             }
-            
-            print(f"Fetching data for period: {period}")
-            
-            data_marketing_pages = self.get_data_marketing_pages_in_customer(
-                username, "All", date_range["from_date"], date_range["to_date"], get_detail=False
-            )
             
             if period in stats_periods:
                 cache["statistics"][period] = self.get_data_statistics_in_customer(
@@ -562,15 +433,19 @@ class CompareDataReferrers(GetDataCustomer):
                 )
                 cache["landing_pages"][key] = data_landing_pages
 
+                data_marketing_pages = self.get_data_marketing_pages_in_customer(
+                    username, "All", date_range["from_date"], date_range["to_date"], get_detail=False
+                )
                 cache["marketing_pages"][key] = data_marketing_pages
         
-        print("All data preloaded successfully!")
+        CompareDataReferrers._cache_data = cache
+        CompareDataReferrers._cache_username = username
+        
         return cache, username
 
     def check_data_referrers_click_statistics_and_compare(self, testcase):
 
         cache, username = self.preload_all_data()
-        
         mainChecklist = ["Verify that the Referrers data in the \"Click Statistics\" sub‑function matches the data in Statistics.",
                         "Verify that the Total Clicks for Referrers equal the Total Clicks for Landing Pages.",
                         "Verify that the Total Clicks for Referrers equal the Total Clicks for Marketing Pages."
@@ -901,7 +776,8 @@ class CompareDataReferrers(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def verify_site_url_website_url_match(self, testcase):
-        username = self._get_username()
+        cache, username = self.preload_all_data()
+        
         periods = ["last_month", "last_week", "current_month"]
         device_types = ["All", "PC / Laptop", "Mobile"]
         
@@ -915,7 +791,6 @@ class CompareDataReferrers(GetDataCustomer):
         
         try:
             for period in periods:
-                date_range = self._get_date_range(period)
                 period_display = period.replace("_", " ")
                 
                 for device_type in device_types:
@@ -926,7 +801,8 @@ class CompareDataReferrers(GetDataCustomer):
                     
                     subAutoTestCase += f"- Verify that for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display}, clicking on a Site URL shows the Website URLs sub-table"
                     
-                    data_referrers = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
+                    key = f"{period}_{device_type}"
+                    data_referrers = cache["referrers"][key]
                     
                     has_site_urls = False
                     has_sub_tables = False
@@ -939,10 +815,10 @@ class CompareDataReferrers(GetDataCustomer):
                                 if site_url in data_referrers["website_urls_data"]:
                                     has_sub_tables = True
                                     break
-                    
+                
                     subAutoTestCase += f"\n     + Username: {username}"
-                    subAutoTestCase += f"\n     + From Date: {date_range['from_date']}"
-                    subAutoTestCase += f"\n     + To Date: {date_range['to_date']}"
+                    subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                    subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     
                     if not data_referrers.get("has_data", True):
                         subAutoTestCase += f"\n     + No data found for Referrers."
@@ -966,7 +842,6 @@ class CompareDataReferrers(GetDataCustomer):
             subAutoTestCase = ''
             
             for period in periods:
-                date_range = self._get_date_range(period)
                 period_display = period.replace("_", " ")
                 
                 for device_type in device_types:
@@ -977,11 +852,12 @@ class CompareDataReferrers(GetDataCustomer):
                     
                     subAutoTestCase += f"- Verify that for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display}, the sum of Website URL values match the Site URL values"
                     
-                    data_referrers = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
+                    key = f"{period}_{device_type}"
+                    data_referrers = cache["referrers"][key]
                     
                     subAutoTestCase += f"\n     + Username: {username}"
-                    subAutoTestCase += f"\n     + From Date: {date_range['from_date']}"
-                    subAutoTestCase += f"\n     + To Date: {date_range['to_date']}"
+                    subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                    subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     
                     if not data_referrers.get("has_data", True):
                         subAutoTestCase += f"\n     + No data found for Referrers."
@@ -1029,7 +905,7 @@ class CompareDataReferrers(GetDataCustomer):
                     
                     if mismatches:
                         subAutoTestCase += f"\n     + Failed: {len(mismatches)} mismatches found:"
-                        for mismatch in mismatches[:3]:  # Show first 3 mismatches to avoid too large report
+                        for mismatch in mismatches[:3]:
                             subAutoTestCase += f"\n       - {mismatch}"
                         if len(mismatches) > 3:
                             subAutoTestCase += f"\n       - ... and {len(mismatches) - 3} more"

@@ -41,9 +41,6 @@ from src.utils.services.utils.components.extract_testcase_failed import TC_NAME
 logger = get_logger(__name__)
 
 class utilities(BrowserMethods, AssertionMethods, FileMethods, GoogleMethods, ReportMethods):
-    """
-    Core utilities class that combines all utility components.
-    """
     tcsF = TC_NAME
     FuncName = None
     

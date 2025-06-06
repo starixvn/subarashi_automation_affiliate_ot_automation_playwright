@@ -9,11 +9,6 @@ from src.actions.common.get_data_on_function.get_data_player import GetDataPlaye
 
 
 class GetDataBaselineReferrerAll(GetDataCustomer):
-    """
-    A consolidated class that combines all referrer data collection methods.
-    This replaces multiple separate files with a single file while maintaining the same functionality.
-    """
-    
     def __init__(self):
         super().__init__()
         self.data_directory = os.path.join("src", "test_data", "common", "data_click_statistics", "data_referrers")
@@ -21,13 +16,11 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
         self.data_player = None
     
     def _initialize_data_player(self):
-        """Initialize the data player if not already done"""
         if self.data_player is None:
             self.data_player = GetDataPlayer()
             self.data_player.referUtils(self.utils)
     
     def _get_username(self):
-        """Get username based on environment"""
         self._initialize_data_player()
         if ENVIRONMENT == "local":
             return "12BETAFF001"
@@ -36,7 +29,6 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
             return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
     
     def _parse_int(self, text):
-        """Convert string to int"""
         try:
             return int(str(text).replace(',', '').strip() or 0)
         except (ValueError, AttributeError):
@@ -45,7 +37,6 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def _map_device_type(self, device_type):
-        """Map device type to API expected value"""
         device_map = {
             "desktop": "PC / Laptop",
             "mobile": "Mobile",
@@ -54,11 +45,9 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
         return device_map.get(device_type.lower(), device_type)
     
     def _save_data(self, data, period, device_type):
-        """Save data to appropriate file based on period and device type"""
         try:
             os.makedirs(self.data_directory, exist_ok=True)
             
-            # Format the filename based on period and device type
             filename_parts = ["data_referrers"]
             if period == "yesterday":
                 filename_parts.append("yesterday")
@@ -73,7 +62,6 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
             filename = "_".join(filename_parts) + ".py"
             py_file = os.path.join(self.data_directory, filename)
             
-            # Format the class name based on period and device type
             class_name_parts = ["DataReferrers"]
             if period == "yesterday":
                 class_name_parts.append("Yesterday")
@@ -89,7 +77,6 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
             
             class_name = "".join(class_name_parts)
             
-            # Format the variable name based on period and device type
             var_name_parts = ["data_referrers"]
             if period == "yesterday":
                 var_name_parts.append("yesterday")
@@ -105,16 +92,13 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
             
             var_name = "_".join(var_name_parts)
             
-            # Generate description based on period and device type
             description = f"get data baseline referrer {period}"
             if device_type.lower() != "all":
                 description += f" by {device_type.lower()}"
             
-            # Convert data to Python-compatible string
             json_str = json.dumps(data, indent=4, ensure_ascii=False)
             python_str = json_str.replace('"has_data": true', '"has_data": True').replace('"has_data": false', '"has_data": False')
             
-            # Write to file
             current_time_gmt8 = datetime.now(self.timezone).strftime("%Y-%m-%d %H:%M:%S %z")
             with open(py_file, "w", encoding="utf-8") as f:
                 f.write(f"# {description} at {current_time_gmt8} (GMT+8)\n\n")
@@ -128,16 +112,6 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def _get_referrer_data(self, period, device_type="all"):
-        """
-        Generic method to get referrer data for different periods and device types
-        
-        Args:
-            period (str): 'yesterday', 'last_week', or 'last_month'
-            device_type (str): 'all', 'desktop', or 'mobile'
-        
-        Returns:
-            dict: Collected data
-        """
         try:
             username = self._get_username()
             device_type_api = self._map_device_type(device_type)
@@ -220,56 +194,43 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def get_data_referrer_yesterday(self):
-        """Get referrer data for yesterday with all device types"""
         return self._get_referrer_data("yesterday", "all")
     
     def get_data_referrer_yesterday_by_desktop(self):
-        """Get referrer data for yesterday with desktop device type"""
         return self._get_referrer_data("yesterday", "desktop")
     
     def get_data_referrer_yesterday_by_mobile(self):
-        """Get referrer data for yesterday with mobile device type"""
         return self._get_referrer_data("yesterday", "mobile")
     
     def get_data_referrer_last_week(self):
-        """Get referrer data for last week with all device types"""
         return self._get_referrer_data("last_week", "all")
     
     def get_data_referrer_last_week_by_desktop(self):
-        """Get referrer data for last week with desktop device type"""
         return self._get_referrer_data("last_week", "desktop")
     
     def get_data_referrer_last_week_by_mobile(self):
-        """Get referrer data for last week with mobile device type"""
         return self._get_referrer_data("last_week", "mobile")
     
     def get_data_referrer_last_month(self):
-        """Get referrer data for last month with all device types"""
         return self._get_referrer_data("last_month", "all")
     
     def get_data_referrer_last_month_by_desktop(self):
-        """Get referrer data for last month with desktop device type"""
         return self._get_referrer_data("last_month", "desktop")
     
     def get_data_referrer_last_month_by_mobile(self):
-        """Get referrer data for last month with mobile device type"""
         return self._get_referrer_data("last_month", "mobile")
     
     def get_all_referrer_data(self):
-        """Run all referrer data collection methods"""
         results = {}
         
-        # Yesterday data
         results["yesterday"] = self.get_data_referrer_yesterday()
         results["yesterday_desktop"] = self.get_data_referrer_yesterday_by_desktop()
         results["yesterday_mobile"] = self.get_data_referrer_yesterday_by_mobile()
         
-        # Last week data
         results["last_week"] = self.get_data_referrer_last_week()
         results["last_week_desktop"] = self.get_data_referrer_last_week_by_desktop()
         results["last_week_mobile"] = self.get_data_referrer_last_week_by_mobile()
         
-        # Last month data
         results["last_month"] = self.get_data_referrer_last_month()
         results["last_month_desktop"] = self.get_data_referrer_last_month_by_desktop()
         results["last_month_mobile"] = self.get_data_referrer_last_month_by_mobile()

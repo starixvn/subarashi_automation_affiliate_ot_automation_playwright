@@ -9,11 +9,6 @@ from src.actions.common.get_data_on_function.get_data_player import GetDataPlaye
 
 
 class GetDataBaselineMarketingPageAll(GetDataCustomer):
-    """
-    A consolidated class that combines all marketing page data collection methods.
-    This replaces multiple separate files with a single file while maintaining the same functionality.
-    """
-    
     def __init__(self):
         super().__init__()
         self.data_directory = os.path.join("src", "test_data", "common", "data_click_statistics", "data_marketing_pages")
@@ -21,13 +16,11 @@ class GetDataBaselineMarketingPageAll(GetDataCustomer):
         self.data_player = None
     
     def _initialize_data_player(self):
-        """Initialize the data player if not already done"""
         if self.data_player is None:
             self.data_player = GetDataPlayer()
             self.data_player.referUtils(self.utils)
     
     def _get_username(self):
-        """Get username based on environment"""
         self._initialize_data_player()
         if ENVIRONMENT == "local":
             return "12BETAFF001"
@@ -36,7 +29,6 @@ class GetDataBaselineMarketingPageAll(GetDataCustomer):
             return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
     
     def _parse_int(self, text):
-        """Convert string to int"""
         try:
             return int(str(text).replace(',', '').strip() or 0)
         except (ValueError, AttributeError):
@@ -45,7 +37,6 @@ class GetDataBaselineMarketingPageAll(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def _save_data(self, data, period, include_inactive=False):
-        """Save data to appropriate file based on period and include_inactive flag"""
         try:
             os.makedirs(self.data_directory, exist_ok=True)
             
@@ -115,17 +106,6 @@ class GetDataBaselineMarketingPageAll(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def _get_marketing_page_data(self, period, language="All", include_inactive=False):
-        """
-        Generic method to get marketing page data for different periods
-        
-        Args:
-            period (str): 'yesterday', 'last_week', or 'last_month'
-            language (str): Language filter
-            include_inactive (bool): Whether to include inactive tracking links
-        
-        Returns:
-            dict: Collected data
-        """
         try:
             username = self._get_username()
             
@@ -214,28 +194,21 @@ class GetDataBaselineMarketingPageAll(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
     
     def get_data_marketing_page_yesterday(self, include_inactive=False):
-        """Get marketing page data for yesterday"""
         return self._get_marketing_page_data("yesterday", include_inactive=include_inactive)
     
     def get_data_marketing_page_last_week(self, include_inactive=False):
-        """Get marketing page data for last week"""
         return self._get_marketing_page_data("last_week", include_inactive=include_inactive)
     
     def get_data_marketing_page_last_month(self, include_inactive=False):
-        """Get marketing page data for last month"""
         return self._get_marketing_page_data("last_month", include_inactive=include_inactive)
     
     def get_all_marketing_page_data(self, include_inactive=False):
-        """Run all marketing page data collection methods"""
         results = {}
         
-        # Yesterday data
         results["yesterday"] = self.get_data_marketing_page_yesterday(include_inactive)
         
-        # Last week data
         results["last_week"] = self.get_data_marketing_page_last_week(include_inactive)
         
-        # Last month data
         results["last_month"] = self.get_data_marketing_page_last_month(include_inactive)
         
         return results 

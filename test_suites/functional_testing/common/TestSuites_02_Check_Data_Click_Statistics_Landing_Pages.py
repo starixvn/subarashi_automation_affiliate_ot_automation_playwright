@@ -16,12 +16,15 @@ from src.utils.core.decorators import measure_test_execution_time
 class TestSuites_02_Check_Data_Click_Statistics_Landing_Pages(unittest.TestCase):
     @classmethod
     def setUpClass(self):
+        CompareDataLandingPage.clear_cache()
         self.check_data_landing_page = CompareDataLandingPage()
         self.check_data_landing_page.setup()
         self.utils = self.check_data_landing_page.utils
+        self.check_data_landing_page.preload_all_data()
 
     @classmethod
     def tearDownClass(self):
+        CompareDataLandingPage.clear_cache()
         self.check_data_landing_page.tearDown()
 
     @measure_test_execution_time

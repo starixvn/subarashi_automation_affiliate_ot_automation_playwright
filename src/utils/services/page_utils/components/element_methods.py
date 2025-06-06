@@ -51,7 +51,6 @@ class ElementMethods(ExtractTestCaseFailed):
             
     @log_exceptions(log_level="DEBUG")
     def select_options(self, element, values):
-        """ value = text , label or multiple items"""
         try:
             validate_not_none(element, "element")
             validate_not_none(values, "values")
