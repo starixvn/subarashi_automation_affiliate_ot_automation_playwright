@@ -753,7 +753,6 @@ class GetDataCustomer(Common):
         try:
             form_token = self.utils.page.page.evaluate("""
                 () => {
-                    // Tìm input token trong form
                     const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
                     if (tokenInput && tokenInput.value) return tokenInput.value;
                     return null;
@@ -766,18 +765,6 @@ class GetDataCustomer(Common):
             return None
 
     def get_data_referrers_via_api(self, user_name, from_date=None, to_date=None, device_type="All"):
-        """
-        Get referrers data via API instead of UI interaction
-        
-        Args:
-            user_name (str): Affiliate username
-            from_date (str): Start date in MM/DD/YYYY format
-            to_date (str): End date in MM/DD/YYYY format
-            device_type (str): Device type filter ('All', 'PC / Laptop', or 'Mobile')
-            
-        Returns:
-            dict: Formatted referrers data including site_urls_data and website_urls_data
-        """
         try:
             if not hasattr(self, 'utils') or not hasattr(self.utils, 'api'):
                 self.utils.page.extract_TestCaseFailed("API client not initialized. Please ensure login_admin() was called first.")

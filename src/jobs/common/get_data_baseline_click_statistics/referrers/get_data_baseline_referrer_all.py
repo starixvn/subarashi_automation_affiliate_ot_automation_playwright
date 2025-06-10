@@ -9,6 +9,8 @@ from src.actions.common.get_data_on_function.get_data_player import GetDataPlaye
 
 
 class GetDataBaselineReferrerAll(GetDataCustomer):
+    _cached_username = None
+    
     def __init__(self):
         super().__init__()
         self.data_directory = os.path.join("src", "test_data", "common", "data_click_statistics", "data_referrers")
@@ -21,12 +23,19 @@ class GetDataBaselineReferrerAll(GetDataCustomer):
             self.data_player.referUtils(self.utils)
     
     def _get_username(self):
+        if GetDataBaselineReferrerAll._cached_username is not None:
+            return GetDataBaselineReferrerAll._cached_username
+            
         self._initialize_data_player()
         if ENVIRONMENT == "local":
-            return "12BETAFF001"
+            username = "12BETAFF001"
         else:
-            top_100_data_player = self.data_player.get_top_100_data_player()
-            return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
+            player_data_api = self.data_player.get_data_player_via_api()
+            username = player_data_api["players_data"][random.randint(0, len(player_data_api["players_data"]) - 1)]["affiliate_name"]
+        
+        GetDataBaselineReferrerAll._cached_username = username
+        print(f"Selected username for all baseline data: {username}")
+        return username
     
     def _parse_int(self, text):
         try:

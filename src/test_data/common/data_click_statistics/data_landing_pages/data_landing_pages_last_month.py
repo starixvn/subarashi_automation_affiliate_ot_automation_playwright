@@ -1,15 +1,15 @@
-# get data baseline landing page last_month at 2025-06-05 14:12:27 +0800 (GMT+8)
+# get data baseline landing page last_month at 2025-06-10 19:37:17 +0800 (GMT+8)
 
 class DataLandingPagesLastMonth:
     data_landing_pages_last_month = {
     "metadata": {
-        "collected_at": "2025-06-05 14:12:27 +0800",
+        "collected_at": "2025-06-10 19:37:17 +0800",
         "period": {
             "from_date": "05-01-2025",
             "to_date": "05-31-2025"
         },
         "filters": {
-            "username": "12BETAFF001",
+            "username": "12BETAFF16502",
             "page_name": "All",
             "language": "All",
             "device_type": "All"
@@ -18,209 +18,172 @@ class DataLandingPagesLastMonth:
     },
     "pages_data": [
         {
-            "page_name": "block_code",
-            "language": "en-IN",
-            "total_click": "1",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
-            "page_name": "block_code",
-            "language": "en-US",
-            "total_click": "14",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
-            "page_name": "INR-12join",
-            "language": "en-IN",
-            "total_click": "8",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
             "page_name": "join",
-            "language": "en-IN",
-            "total_click": "28",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
+            "language": "th-TH",
+            "total_click": "376383",
+            "unique_click": "195190",
+            "signups": "7782",
+            "fdm": "576"
         },
         {
-            "page_name": "join",
-            "language": "en-US",
-            "total_click": "29",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
-            "page_name": "join",
-            "language": "te-IN",
-            "total_click": "2",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
-            "page_name": "joinc",
-            "language": "en-US",
-            "total_click": "14",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
-            "page_name": "joinccc",
-            "language": "en-US",
-            "total_click": "1",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
-            "page_name": "joinccccccccc",
-            "language": "en-US",
-            "total_click": "2",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
-            "page_name": "joincccccccccccccccccccccccccccc",
-            "language": "en-US",
-            "total_click": "1",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
-            "page_name": "myr-12join",
-            "language": "en-US",
-            "total_click": "8",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
-        },
-        {
-            "page_name": "myr-12join",
-            "language": "zh-CN",
-            "total_click": "3",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
+            "page_name": "none",
+            "language": "none",
+            "total_click": "0",
+            "unique_click": "0",
+            "signups": "8",
+            "fdm": "1"
         }
     ],
     "website_urls_data": {
-        "block_code - en-IN": [
+        "join - th-TH": [
             {
-                "website_url": "none",
+                "website_url": "android-app://com.google.android.googlequicksearchbox/",
+                "total_clicks": 10,
+                "unique_clicks": 2,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "android-app://m.facebook.com/",
+                "total_clicks": 91,
+                "unique_clicks": 80,
+                "signups": 32,
+                "fdm": 1
+            },
+            {
+                "website_url": "http://instagram.com/",
+                "total_clicks": 5,
+                "unique_clicks": 5,
+                "signups": 2,
+                "fdm": 0
+            },
+            {
+                "website_url": "http://instagram.com/",
+                "total_clicks": 1257,
+                "unique_clicks": 1084,
+                "signups": 275,
+                "fdm": 12
+            },
+            {
+                "website_url": "http://m.facebook.com/",
+                "total_clicks": 82,
+                "unique_clicks": 72,
+                "signups": 23,
+                "fdm": 0
+            },
+            {
+                "website_url": "http://m.facebook.com/",
+                "total_clicks": 21458,
+                "unique_clicks": 18151,
+                "signups": 5124,
+                "fdm": 332
+            },
+            {
+                "website_url": "https://12techworld.com/",
+                "total_clicks": 5,
+                "unique_clicks": 4,
+                "signups": 2,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://app.adjust.com/1mm1dkyz?redirect=https%3A%2F%2Fgoto.12bmylink1.com%2Fjoin%2F95200%2Fth%2Fmktsoybean%2Findex.html",
                 "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
-            }
-        ],
-        "block_code - en-US": [
+            },
             {
-                "website_url": "none",
-                "total_clicks": 14,
+                "website_url": "https://c.lazada.co.th/",
+                "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
-            }
-        ],
-        "INR-12join - en-IN": [
+            },
             {
-                "website_url": "none",
+                "website_url": "https://facebook.com/",
+                "total_clicks": 15,
+                "unique_clicks": 15,
+                "signups": 3,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://google.com/",
+                "total_clicks": 12,
+                "unique_clicks": 11,
+                "signups": 2,
+                "fdm": 1
+            },
+            {
+                "website_url": "https://goto.12bmylink1.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://goto.12bmylink1.com/",
+                "total_clicks": 7,
+                "unique_clicks": 5,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://goto.12bmylink1.com/join/95200/th/mktsbdsp/index.html",
                 "total_clicks": 8,
+                "unique_clicks": 6,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://help.x.com/",
+                "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
-            }
-        ],
-        "join - en-IN": [
+            },
             {
-                "website_url": "none",
-                "total_clicks": 28,
+                "website_url": "https://instagram.com/",
+                "total_clicks": 12,
+                "unique_clicks": 12,
+                "signups": 1,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://l.facebook.com/",
+                "total_clicks": 150,
+                "unique_clicks": 128,
+                "signups": 29,
+                "fdm": 2
+            },
+            {
+                "website_url": "https://l.facebook.com/",
+                "total_clicks": 1947,
+                "unique_clicks": 1586,
+                "signups": 361,
+                "fdm": 52
+            },
+            {
+                "website_url": "https://l.facebook.com/l.php?u=https://12techworld.com/site/?uro8qpih&utm_medium=paid&utm_source=fb&utm_id=120223399628780302&utm_content=120223399628790302&utm_term=120223399628830302&utm_campaign=120223399628780302&fbclid=IwZXh0bgNhZW0BMABhZGlkAasei4go6i5icmlkETFhVnBxUlNXR0N6SmtYUnhZAR6ANBK1iO1R41",
+                "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
-            }
-        ],
-        "join - en-US": [
+            },
             {
-                "website_url": "none",
-                "total_clicks": 29,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "join - te-IN": [
-            {
-                "website_url": "none",
-                "total_clicks": 2,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "joinc - en-US": [
-            {
-                "website_url": "none",
-                "total_clicks": 14,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "joinccc - en-US": [
-            {
-                "website_url": "none",
+                "website_url": "https://l.facebook.com/l.php?u=https://12techworld.com/site/?uro8qpih&utm_medium=paid&utm_source=fb&utm_id=120223399628780302&utm_content=120223399628810302&utm_term=120223399628770302&utm_campaign=120223399628780302&fbclid=IwZXh0bgNhZW0BMABhZGlkAasei4gFNY5icmlkETE1Z2hqZ3lZbDdwV0s1eVVwAR63w4N3PnUgnE",
                 "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             }
         ],
-        "joinccccccccc - en-US": [
+        "none - none": [
             {
                 "website_url": "none",
-                "total_clicks": 2,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "joincccccccccccccccccccccccccccc - en-US": [
-            {
-                "website_url": "none",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "myr-12join - en-US": [
-            {
-                "website_url": "none",
-                "total_clicks": 8,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "myr-12join - zh-CN": [
-            {
-                "website_url": "none",
-                "total_clicks": 3,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
+                "total_clicks": 0,
+                "unique_clicks": 0,
+                "signups": 8,
+                "fdm": 1
             }
         ]
     }

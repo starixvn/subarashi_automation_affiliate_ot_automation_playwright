@@ -9,6 +9,8 @@ from src.actions.common.get_data_on_function.get_data_player import GetDataPlaye
 
 
 class GetDataBaselineMarketingPageAll(GetDataCustomer):
+    _cached_username = None
+    
     def __init__(self):
         super().__init__()
         self.data_directory = os.path.join("src", "test_data", "common", "data_click_statistics", "data_marketing_pages")
@@ -21,12 +23,19 @@ class GetDataBaselineMarketingPageAll(GetDataCustomer):
             self.data_player.referUtils(self.utils)
     
     def _get_username(self):
+        if GetDataBaselineMarketingPageAll._cached_username is not None:
+            return GetDataBaselineMarketingPageAll._cached_username
+            
         self._initialize_data_player()
         if ENVIRONMENT == "local":
-            return "12BETAFF001"
+            username = "12BETAFF001"
         else:
-            top_100_data_player = self.data_player.get_top_100_data_player()
-            return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
+            player_data_api = self.data_player.get_data_player_via_api()
+            username = player_data_api["players_data"][random.randint(0, len(player_data_api["players_data"]) - 1)]["affiliate_name"]
+        
+        GetDataBaselineMarketingPageAll._cached_username = username
+        print(f"Selected username for all baseline data: {username}")
+        return username
     
     def _parse_int(self, text):
         try:
@@ -169,7 +178,7 @@ class GetDataBaselineMarketingPageAll(GetDataCustomer):
             for channel_data in raw_data["channels_data"]:
                 collected_data["channels_data"].append({
                     "channel_name": channel_data["channel_name"],
-                    "language": channel_data["language"],
+                    "language": "-",
                     "total_click": self._parse_int(channel_data["total_click"]),
                     "unique_click": self._parse_int(channel_data["unique_click"]),
                     "signups": self._parse_int(channel_data["signups"]),

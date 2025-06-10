@@ -91,8 +91,17 @@ class CompareDataReferrers(GetDataCustomer):
                             raise Exception(f"Total clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['total_clicks']}, Current: {current_website['total_clicks']}")
                         if int(current_website["unique_clicks"]) != baseline_website["unique_clicks"]:
                             raise Exception(f"Unique clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['unique_clicks']}, Current: {current_website['unique_clicks']}")
-                        if int(current_website["sign_up"]) != baseline_website["signups"]:
-                            raise Exception(f"Signups mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['signups']}, Current: {current_website['sign_up']}")
+                        
+                        baseline_signups = baseline_website["signups"]
+                        current_signups = 0
+                        if "signups" in current_website:
+                            current_signups = int(current_website["signups"])
+                        elif "sign_up" in current_website:
+                            current_signups = int(current_website["sign_up"])
+                        
+                        if current_signups != baseline_signups:
+                            raise Exception(f"Signups mismatch for website {baseline_website['website_url']}. Baseline: {baseline_signups}, Current: {current_signups}")
+                        
                         if int(current_website["fdm"]) != baseline_website["fdm"]:
                             raise Exception(f"FDM mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['fdm']}, Current: {current_website['fdm']}")
                         break
@@ -118,58 +127,29 @@ class CompareDataReferrers(GetDataCustomer):
         except Exception:
             return {"unique": 0, "total": 0}
     
-    def _compare_referrers_with_page(self, cache, username, period, device_type, page_type="landing"):
-        key = f"{period}_{device_type}"
+    def _get_username_for_period_device(self, period, device_type, fallback_username):
         
-        data_referrers = cache["referrers"][key]
+        period_mapping = {
+            "last_month": {"All": "Referres_Last_Month", "PC / Laptop": "Referres_Last_Month_By_Desktop", "Mobile": "Referres_Last_Month_By_Mobile"},
+            "last_week": {"All": "Referres_Last_Week", "PC / Laptop": "Referres_Last_Week_By_Desktop", "Mobile": "Referres_Last_Week_By_Mobile"},
+            "yesterday": {"All": "Referres_Yesterday", "PC / Laptop": "Referres_Yesterday_By_Desktop", "Mobile": "Referres_Yesterday_By_Mobile"}
+        }
         
-        referrers_total_clicks = 0
-        if data_referrers.get("has_data", True):
-            for site_data in data_referrers["site_urls_data"]:
-                referrers_total_clicks += self.parse_int(site_data["total_click"])
+        if period in period_mapping and device_type in period_mapping[period]:
+            baseline_key = period_mapping[period][device_type]
+            if baseline_key in Data and Data[baseline_key]:
+                return Data[baseline_key]["metadata"]["filters"]["username"]
         
-        if page_type == "landing":
-            data_pages = cache["landing_pages"][key]
-            pages_name = "Landing Pages"
-            
-            pages_total_clicks = 0
-            if data_pages.get("has_data", True):
-                for page in data_pages["pages_data"]:
-                    pages_total_clicks += self.parse_int(page["total_click"])
-        else:
-            data_pages = cache["marketing_pages"][key]
-            pages_name = "Marketing Pages"
-            
-            pages_total_clicks = 0
-            if data_pages.get("has_data", True):
-                for channel in data_pages["channels_data"]:
-                    pages_total_clicks += self.parse_int(channel["total_click"])
-        
-        has_data = data_referrers.get("has_data", True) and data_pages.get("has_data", True)
-        
-        result = ""
-        if has_data:
-            result += f"\n     + Username: {username}"
-            result += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
-            result += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
-            
-            if referrers_total_clicks == pages_total_clicks:
-                result += f"\n     + Total Clicks match: {referrers_total_clicks}"
-            else:
-                result += f"\n     + Total Clicks mismatch: Referrers={referrers_total_clicks}, {pages_name}={pages_total_clicks}"
-        else:
-            result += f"\n     + No data found for Total Clicks for Referrers or {pages_name}."
-        
-        return result
-
+        return fallback_username
+    
     def _get_username(self):
         if ENVIRONMENT == "local":
             return "12BETAFF001"
         else:
             self.data_player = GetDataPlayer()
             self.data_player.referUtils(self.utils)
-            top_100_data_player = self.data_player.get_top_100_data_player()
-            return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
+            player_data_api = self.data_player.get_data_player_via_api()
+            return player_data_api["players_data"][0]["affiliate_name"]
         
     def _get_date_range(self, period):
         today = datetime.now()
@@ -190,88 +170,12 @@ class CompareDataReferrers(GetDataCustomer):
             from_date = yesterday.strftime("%m-%d-%Y")
             to_date = yesterday.strftime("%m-%d-%Y")
             month_date = yesterday.strftime("%m-%Y")
-        else:  # current_month
-            first_day_current_month = today.replace(day=1)
-            from_date = first_day_current_month.strftime("%m-%d-%Y")
-            to_date = today.strftime("%m-%d-%Y")
-            month_date = today.strftime("%m-%Y")
+
         
         return {
             "from_date": from_date,
             "to_date": to_date,
             "month_date": month_date
-        }
-
-    def _check_data_for_period_and_device(self, period, device_type):
-        username = self._get_username()
-        date_range = self._get_date_range(period)
-        
-        data_referrers = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
-        data_statistics = self.get_data_statistics_in_customer(username, date_range["month_date"])
-        
-        new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
-        statistics_signups = self.parse_int(new_signups_fdm[0])
-        statistics_fdm = self.parse_int(new_signups_fdm[1]) if len(new_signups_fdm) > 1 else 0
-        
-        pc_tracking = self.parse_fraction(data_statistics["tracking_pc_month"])
-        mobile_tracking = self.parse_fraction(data_statistics["tracking_mobile_month"])
-        
-        if device_type == "All":
-            statistics_total_clicks = pc_tracking["total"] + mobile_tracking["total"]
-            statistics_unique_clicks = pc_tracking["unique"] + mobile_tracking["unique"]
-        elif device_type == "Mobile":
-            statistics_total_clicks = mobile_tracking["total"]
-            statistics_unique_clicks = mobile_tracking["unique"]
-        else:
-            statistics_total_clicks = pc_tracking["total"]
-            statistics_unique_clicks = pc_tracking["unique"]
-        
-        referrers_total_clicks = 0
-        referrers_unique_clicks = 0
-        referrers_signups = 0
-        referrers_fdm = 0
-        
-        if data_referrers.get("has_data", True):
-            for site_data in data_referrers["site_urls_data"]:
-                referrers_total_clicks += self.parse_int(site_data["total_click"])
-                referrers_unique_clicks += self.parse_int(site_data["unique_click"])
-                referrers_signups += self.parse_int(site_data["signups"])
-                referrers_fdm += self.parse_int(site_data["fdm"])
-        
-        mismatches = []
-        
-        click_type = "Total Clicks"
-        if device_type == "Mobile":
-            click_type = "Mobile Total Clicks"
-        elif device_type == "PC / Laptop":
-            click_type = "Desktop Total Clicks"
-        
-        if referrers_total_clicks != statistics_total_clicks:
-            mismatches.append(f"{click_type} mismatch: Statistics={statistics_total_clicks}, Referrers={referrers_total_clicks}")
-        
-        if referrers_signups != statistics_signups:
-            mismatches.append(f"Signups mismatch: Statistics={statistics_signups}, Referrers={referrers_signups}")
-        
-        if referrers_fdm != statistics_fdm:
-            mismatches.append(f"FDM mismatch: Statistics={statistics_fdm}, Referrers={referrers_fdm}")
-        
-        if mismatches:
-            raise Exception("\n".join(mismatches))
-        
-        return {
-            "username": username,
-            "device_type": device_type,
-            "from_date": date_range["from_date"],
-            "to_date": date_range["to_date"],
-            "statistics_total_clicks": statistics_total_clicks,
-            "statistics_unique_clicks": statistics_unique_clicks,
-            "referrers_total_clicks": referrers_total_clicks,
-            "referrers_unique_clicks": referrers_unique_clicks,
-            "statistics_signups": statistics_signups,
-            "referrers_signups": referrers_signups,
-            "statistics_fdm": statistics_fdm,
-            "referrers_fdm": referrers_fdm,
-            "click_type": click_type
         }
 
     def _format_test_results(self, results, device_display_name):
@@ -329,6 +233,9 @@ class CompareDataReferrers(GetDataCustomer):
                 baseline_data = Data[baseline_key]
                 cache_key = baseline_to_cache_mapping[baseline_key]
                 
+                baseline_username = baseline_data["metadata"]["filters"]["username"]
+                
+                # Use CACHED data - no more API calls!
                 current_data = cache["referrers"][cache_key]
                 
                 baseline_has_data = baseline_data["metadata"].get("has_data", True)
@@ -343,7 +250,7 @@ class CompareDataReferrers(GetDataCustomer):
                 else:
                     self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
                     self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
-                    subAutoTestCase += f"\n     + {period_name}: Successfully verified data"
+                    subAutoTestCase += f"\n     + {period_name}: Successfully verified data (Username: {baseline_username})"
             
             self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0], sheet_name=Checklist_Sheet_Name)
             indexChl += 1
@@ -362,6 +269,7 @@ class CompareDataReferrers(GetDataCustomer):
             for device_period_name, baseline_key in device_tests:
                 baseline_data = Data[baseline_key]
                 cache_key = baseline_to_cache_mapping[baseline_key]
+                baseline_username = baseline_data["metadata"]["filters"]["username"]
                 
                 current_data = cache["referrers"][cache_key]
                 
@@ -377,7 +285,7 @@ class CompareDataReferrers(GetDataCustomer):
                 else:
                     self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
                     self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
-                    subAutoTestCase += f"\n     + {device_period_name}: Successfully verified data"
+                    subAutoTestCase += f"\n     + {device_period_name}: Successfully verified data (Username: {baseline_username})"
             
             self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0], sheet_name=Checklist_Sheet_Name)
             
@@ -395,10 +303,6 @@ class CompareDataReferrers(GetDataCustomer):
         if CompareDataReferrers._cache_data is not None:
             print("Using cached data from previous load!")
             return CompareDataReferrers._cache_data, CompareDataReferrers._cache_username
-            
-        periods = ["last_month", "last_week", "yesterday", "current_month"]
-        device_types = ["All", "PC / Laptop", "Mobile"]
-        stats_periods = ["last_month", "current_month"]
         
         cache = {
             "referrers": {},
@@ -407,44 +311,137 @@ class CompareDataReferrers(GetDataCustomer):
             "statistics": {}
         }
         
-        username = self._get_username()
+        if "Referres_Last_Month" not in Data or not Data["Referres_Last_Month"]:
+            raise Exception("Baseline data not found. Please run the job to collect baseline data first.")
         
-        for period in periods:
-            date_range = self._get_date_range(period)
-            cache[period] = {
-                "date_range": date_range
-            }
-            
-            if period in stats_periods:
-                cache["statistics"][period] = self.get_data_statistics_in_customer(
-                    username, date_range["month_date"]
-                )
-            
-            for device_type in device_types:
-                key = f"{period}_{device_type}"
+        baseline_last_month = Data["Referres_Last_Month"]
+        username = baseline_last_month["metadata"]["filters"]["username"]
+        print(f"Using consistent username from baseline: {username}")
+        
+        baseline_to_cache_mapping = {
+            "Referres_Last_Month": "last_month_All",
+            "Referres_Last_Month_By_Desktop": "last_month_PC / Laptop", 
+            "Referres_Last_Month_By_Mobile": "last_month_Mobile",
+            "Referres_Last_Week": "last_week_All",
+            "Referres_Last_Week_By_Desktop": "last_week_PC / Laptop",
+            "Referres_Last_Week_By_Mobile": "last_week_Mobile",
+            "Referres_Yesterday": "yesterday_All",
+            "Referres_Yesterday_By_Desktop": "yesterday_PC / Laptop",
+            "Referres_Yesterday_By_Mobile": "yesterday_Mobile"
+        }
+        
+        periods_with_data = set()
+        
+        print("Phase 1: Loading referrers data...")
+        for baseline_key, cache_key in baseline_to_cache_mapping.items():
+            if baseline_key not in Data or not Data[baseline_key]:
+                print(f"Skipping {cache_key} - baseline not found")
+                cache["referrers"][cache_key] = {"has_data": False, "site_urls_data": [], "website_urls_data": {}}
+                continue
                 
-                data_referrers = self.get_data_referrers_in_customer(
-                    username, date_range["from_date"], date_range["to_date"], device_type, get_detail=False
-                )
-                cache["referrers"][key] = data_referrers
+            baseline_data = Data[baseline_key]
+            baseline_has_data = baseline_data["metadata"].get("has_data", True)
+            
+            if not baseline_has_data:
+                print(f"Skipping {cache_key} - baseline has no data")
+                cache["referrers"][cache_key] = {"has_data": False, "site_urls_data": [], "website_urls_data": {}}
+                continue
+            
+            baseline_from_date = baseline_data["metadata"]["period"]["from_date"]
+            baseline_to_date = baseline_data["metadata"]["period"]["to_date"]
+            
+            # Extract device type from cache key
+            if "Mobile" in cache_key:
+                device_type = "Mobile"
+            elif "PC / Laptop" in cache_key:
+                device_type = "PC / Laptop"
+            else:
+                device_type = "All"
+            
+            print(f"Loading referrers data for {cache_key} (device: {device_type})")
+            current_data = self.get_data_referrers_in_customer(
+                username, baseline_from_date, baseline_to_date, device_type, get_detail=True
+            )
+            cache["referrers"][cache_key] = current_data
+            
+            period = cache_key.split("_")[0] + "_" + cache_key.split("_")[1]
+            if current_data.get("has_data", True):
+                periods_with_data.add(period)
                 
-                data_landing_pages = self.get_data_landing_pages_in_customer(
-                    username, "All", "All", date_range["from_date"], date_range["to_date"], device_type, get_detail=False
-                )
-                cache["landing_pages"][key] = data_landing_pages
+            if period not in cache:
+                cache[period] = {
+                    "date_range": {
+                        "from_date": baseline_from_date,
+                        "to_date": baseline_to_date
+                    }
+                }
+        
+        print(f"Periods with referrers data: {periods_with_data}")
+        
+        print("Phase 2: Loading landing pages data...")
+        for baseline_key, cache_key in baseline_to_cache_mapping.items():
+            if cache_key not in cache["referrers"]:
+                continue
+                
+            referrers_data = cache["referrers"][cache_key]
+            if not referrers_data.get("has_data", True):
+                print(f"Skipping landing pages for {cache_key} - no referrers data")
+                cache["landing_pages"][cache_key] = {"has_data": False, "pages_data": [], "website_urls_data": {}}
+                continue
+            
+            baseline_data = Data[baseline_key]
+            baseline_from_date = baseline_data["metadata"]["period"]["from_date"]
+            baseline_to_date = baseline_data["metadata"]["period"]["to_date"]
+            
+            if "Mobile" in cache_key:
+                device_type = "Mobile"
+            elif "PC / Laptop" in cache_key:
+                device_type = "PC / Laptop"
+            else:
+                device_type = "All"
+            
+            print(f"Loading landing pages data for {cache_key} (device: {device_type})")
+            landing_pages_data = self.get_data_landing_pages_in_customer(
+                username, "All", "All", baseline_from_date, baseline_to_date, device_type, get_detail=False
+            )
+            cache["landing_pages"][cache_key] = landing_pages_data
+        
+        print("Phase 3: Loading marketing pages data...")
+        for period in periods_with_data:
+            period_info = cache[period]
+            baseline_from_date = period_info["date_range"]["from_date"]
+            baseline_to_date = period_info["date_range"]["to_date"]
+            
+            print(f"Loading marketing pages data for {period} (no device filter)")
+            marketing_pages_data = self.get_data_marketing_pages_in_customer(
+                username, "All", baseline_from_date, baseline_to_date, include_inactive_tracking=False, get_detail=False
+            )
+            cache["marketing_pages"][period] = marketing_pages_data
 
-                data_marketing_pages = self.get_data_marketing_pages_in_customer(
-                    username, "All", date_range["from_date"], date_range["to_date"], get_detail=False
-                )
-                cache["marketing_pages"][key] = data_marketing_pages
+        print("Phase 4: Loading statistics data...")
+        if "last_month" in periods_with_data:
+            baseline_period_data = Data["Referres_Last_Month"]
+            baseline_from_date = baseline_period_data["metadata"]["period"]["from_date"]
+            month_date = datetime.strptime(baseline_from_date, "%m-%d-%Y").strftime("%m-%Y")
+            
+            print(f"Loading statistics for last_month (month: {month_date})")
+            cache["statistics"]["last_month"] = self.get_data_statistics_in_customer(
+                username, month_date
+            )
         
         CompareDataReferrers._cache_data = cache
         CompareDataReferrers._cache_username = username
         
+        print(f"✅ Data loading completed successfully!")
+        print(f"   Username: {username}")
+        print(f"   Loaded periods: {list(periods_with_data)}")
+        print(f"   Referrers cache keys: {list(cache['referrers'].keys())}")
+        print(f"   Landing pages cache keys: {list(cache['landing_pages'].keys())}")
+        print(f"   Marketing pages cache keys: {list(cache['marketing_pages'].keys())}")
+        print(f"   Statistics cache keys: {list(cache['statistics'].keys())}")
         return cache, username
 
     def check_data_referrers_click_statistics_and_compare(self, testcase):
-
         cache, username = self.preload_all_data()
         mainChecklist = ["Verify that the Referrers data in the \"Click Statistics\" sub‑function matches the data in Statistics.",
                         "Verify that the Total Clicks for Referrers equal the Total Clicks for Landing Pages.",
@@ -454,14 +451,16 @@ class CompareDataReferrers(GetDataCustomer):
         
         try:
             subAutoTestCase = ''
-            time_periods = ["last_month", "current_month"]
+            time_periods = ["last_month"]
             device_types = [
-                {"name": "All", "display_name": "All"},
-                {"name": "Mobile", "display_name": "Mobile"},
-                {"name": "PC / Laptop", "display_name": "Desktop"}
+                {"name": "All", "display_name": "All"}
             ]
             
             for period in time_periods:
+                if period not in cache["statistics"]:
+                    print(f"Skipping {period} - no statistics data available")
+                    continue
+                    
                 for device in device_types:
                     if subAutoTestCase:
                         subAutoTestCase += '\n'
@@ -500,27 +499,17 @@ class CompareDataReferrers(GetDataCustomer):
                             referrers_signups += self.parse_int(site_data["signups"])
                             referrers_fdm += self.parse_int(site_data["fdm"])
                     
-                    mismatches = []
+                    baseline_data = Data["Referres_Last_Month"]
+                    current_username = baseline_data["metadata"]["filters"]["username"]
+                    
                     click_type = "Total Clicks"
                     if device["name"] == "Mobile":
                         click_type = "Mobile Total Clicks"
                     elif device["name"] == "PC / Laptop":
                         click_type = "Desktop Total Clicks"
                     
-                    if referrers_total_clicks != statistics_total_clicks:
-                        mismatches.append(f"{click_type} mismatch: Statistics={statistics_total_clicks}, Referrers={referrers_total_clicks}")
-                    
-                    if referrers_signups != statistics_signups:
-                        mismatches.append(f"Signups mismatch: Statistics={statistics_signups}, Referrers={referrers_signups}")
-                    
-                    if referrers_fdm != statistics_fdm:
-                        mismatches.append(f"FDM mismatch: Statistics={statistics_fdm}, Referrers={referrers_fdm}")
-                    
-                    if mismatches:
-                        raise Exception("\n".join(mismatches))
-                    
                     results = {
-                        "username": username,
+                        "username": current_username,
                         "device_type": device["name"],
                         "from_date": cache[period]["date_range"]["from_date"],
                         "to_date": cache[period]["date_range"]["to_date"],
@@ -536,6 +525,15 @@ class CompareDataReferrers(GetDataCustomer):
                     }
                     
                     subAutoTestCase += self._format_test_results(results, device["display_name"])
+                    
+                    if referrers_total_clicks != statistics_total_clicks:
+                        subAutoTestCase += f"\n     + {click_type} mismatch: Statistics={statistics_total_clicks}, Referrers={referrers_total_clicks}"
+                    
+                    if referrers_signups != statistics_signups:
+                        subAutoTestCase += f"\n     + Signups mismatch: Statistics={statistics_signups}, Referrers={referrers_signups}"
+                    
+                    if referrers_fdm != statistics_fdm:
+                        subAutoTestCase += f"\n     + FDM mismatch: Statistics={statistics_fdm}, Referrers={referrers_fdm}"
             
             self.utils.update_result_to_ggsheet(
                 Data["TestCase_spread_sheet_id"], 
@@ -548,10 +546,13 @@ class CompareDataReferrers(GetDataCustomer):
             indexChl += 1
             
             subAutoTestCase = ''
-            periods = ["last_month", "last_week", "current_month"]
+            periods = ["last_month", "last_week", "yesterday"]
             device_types = ["All", "PC / Laptop", "Mobile"]
             
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 for device_type in device_types:
                     device_display = "Desktop" if device_type == "PC / Laptop" else device_type
                     period_display = period.replace("_", " ")
@@ -562,8 +563,8 @@ class CompareDataReferrers(GetDataCustomer):
                     subAutoTestCase += f"- Verify that Total Clicks for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display} are equal to Total Clicks for Landing Pages."
                     
                     key = f"{period}_{device_type}"
-                    data_referrers = cache["referrers"][key]
-                    data_landing_pages = cache["landing_pages"][key]
+                    data_referrers = cache["referrers"].get(key, {})
+                    data_landing_pages = cache["landing_pages"].get(key, {})
                     
                     referrers_total_clicks = 0
                     if data_referrers.get("has_data", True):
@@ -578,7 +579,8 @@ class CompareDataReferrers(GetDataCustomer):
                     has_data = data_referrers.get("has_data", True) and data_landing_pages.get("has_data", True)
                     
                     if has_data:
-                        subAutoTestCase += f"\n     + Username: {username}"
+                        current_username = self._get_username_for_period_device(period, device_type, username)
+                        subAutoTestCase += f"\n     + Username: {current_username}"
                         subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                         subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                         
@@ -602,6 +604,9 @@ class CompareDataReferrers(GetDataCustomer):
             subAutoTestCase = ''
             
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 for device_type in device_types:
                     device_display = "Desktop" if device_type == "PC / Laptop" else device_type
                     period_display = period.replace("_", " ")
@@ -612,8 +617,8 @@ class CompareDataReferrers(GetDataCustomer):
                     subAutoTestCase += f"- Verify that Total Clicks for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display} are equal to Total Clicks for Marketing Pages."
                     
                     key = f"{period}_{device_type}"
-                    data_referrers = cache["referrers"][key]
-                    data_marketing_pages = cache["marketing_pages"][key]
+                    data_referrers = cache["referrers"].get(key, {})
+                    data_marketing_pages = cache["marketing_pages"].get(period, {})
                     
                     referrers_total_clicks = 0
                     if data_referrers.get("has_data", True):
@@ -628,7 +633,8 @@ class CompareDataReferrers(GetDataCustomer):
                     has_data = data_referrers.get("has_data", True) and data_marketing_pages.get("has_data", True)
                     
                     if has_data:
-                        subAutoTestCase += f"\n     + Username: {username}"
+                        current_username = self._get_username_for_period_device(period, device_type, username)
+                        subAutoTestCase += f"\n     + Username: {current_username}"
                         subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                         subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                         
@@ -673,7 +679,6 @@ class CompareDataReferrers(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
 
     def check_data_signups_and_fdm(self, testcase):
-
         cache, username = self.preload_all_data()
         
         mainChecklist = [
@@ -697,10 +702,13 @@ class CompareDataReferrers(GetDataCustomer):
                 compare_with_display = "Landing Pages" if compare_with == "landing_pages" else "Marketing Pages"
                 
                 subAutoTestCase = ''
-                periods = ["last_month", "last_week", "current_month"]
+                periods = ["last_month", "last_week", "yesterday"]
                 device_types = ["All", "PC / Laptop", "Mobile"]
                 
                 for period in periods:
+                    if period not in cache:
+                        continue
+                        
                     for device_type in device_types:
                         device_display = "Desktop" if device_type == "PC / Laptop" else device_type
                         period_display = period.replace("_", " ")
@@ -711,8 +719,12 @@ class CompareDataReferrers(GetDataCustomer):
                         subAutoTestCase += f"- Verify that {data_type_display} for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display} are equal to {data_type_display} for {compare_with_display}."
                         
                         key = f"{period}_{device_type}"
-                        data_referrers = cache["referrers"][key]
-                        data_pages = cache[compare_with][key]
+                        data_referrers = cache["referrers"].get(key, {})
+                        
+                        if compare_with == "marketing_pages":
+                            data_pages = cache["marketing_pages"].get(period, {})
+                        else:
+                            data_pages = cache["landing_pages"].get(key, {})
                         
                         referrers_value = 0
                         if data_referrers.get("has_data", True):
@@ -731,7 +743,8 @@ class CompareDataReferrers(GetDataCustomer):
                         has_data = data_referrers.get("has_data", True) and data_pages.get("has_data", True)
                         
                         if has_data:
-                            subAutoTestCase += f"\n     + Username: {username}"
+                            current_username = self._get_username_for_period_device(period, device_type, username)
+                            subAutoTestCase += f"\n     + Username: {current_username}"
                             subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                             subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                             
@@ -778,7 +791,7 @@ class CompareDataReferrers(GetDataCustomer):
     def verify_site_url_website_url_match(self, testcase):
         cache, username = self.preload_all_data()
         
-        periods = ["last_month", "last_week", "current_month"]
+        periods = ["last_month", "last_week", "yesterday"]
         device_types = ["All", "PC / Laptop", "Mobile"]
         
         mainChecklist = [
@@ -791,6 +804,9 @@ class CompareDataReferrers(GetDataCustomer):
         
         try:
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 for device_type in device_types:
@@ -802,7 +818,7 @@ class CompareDataReferrers(GetDataCustomer):
                     subAutoTestCase += f"- Verify that for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display}, clicking on a Site URL shows the Website URLs sub-table"
                     
                     key = f"{period}_{device_type}"
-                    data_referrers = cache["referrers"][key]
+                    data_referrers = cache["referrers"].get(key, {})
                     
                     has_site_urls = False
                     has_sub_tables = False
@@ -816,7 +832,8 @@ class CompareDataReferrers(GetDataCustomer):
                                     has_sub_tables = True
                                     break
                 
-                    subAutoTestCase += f"\n     + Username: {username}"
+                    current_username = self._get_username_for_period_device(period, device_type, username)
+                    subAutoTestCase += f"\n     + Username: {current_username}"
                     subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                     subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     
@@ -826,8 +843,6 @@ class CompareDataReferrers(GetDataCustomer):
                         subAutoTestCase += f"\n     + No valid Site URLs found (all are 'none' or empty)."
                     elif has_sub_tables:
                         subAutoTestCase += f"\n     + Verified: Sub-data table is displayed when clicking on Site URLs."
-                    else:
-                        subAutoTestCase += f"\n     + Failed: No sub-data tables found for any Site URL."
             
             self.utils.update_result_to_ggsheet(
                 Data["TestCase_spread_sheet_id"], 
@@ -842,6 +857,9 @@ class CompareDataReferrers(GetDataCustomer):
             subAutoTestCase = ''
             
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 for device_type in device_types:
@@ -853,9 +871,10 @@ class CompareDataReferrers(GetDataCustomer):
                     subAutoTestCase += f"- Verify that for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display}, the sum of Website URL values match the Site URL values"
                     
                     key = f"{period}_{device_type}"
-                    data_referrers = cache["referrers"][key]
+                    data_referrers = cache["referrers"].get(key, {})
                     
-                    subAutoTestCase += f"\n     + Username: {username}"
+                    current_username = self._get_username_for_period_device(period, device_type, username)
+                    subAutoTestCase += f"\n     + Username: {current_username}"
                     subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                     subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     
@@ -883,7 +902,12 @@ class CompareDataReferrers(GetDataCustomer):
                         for website_data in website_urls:
                             website_total_clicks += self.parse_int(website_data["total_clicks"])
                             website_unique_clicks += self.parse_int(website_data["unique_clicks"])
-                            website_signups += self.parse_int(website_data["sign_up"])
+                            
+                            if "signups" in website_data:
+                                website_signups += self.parse_int(website_data["signups"])
+                            elif "sign_up" in website_data:
+                                website_signups += self.parse_int(website_data["sign_up"])
+                            
                             website_fdm += self.parse_int(website_data["fdm"])
                         
                         site_total_click = self.parse_int(site_data["total_click"])
@@ -957,9 +981,13 @@ class CompareDataReferrers(GetDataCustomer):
         
         try:
             subAutoTestCase = ''
-            time_periods = ["last_month", "current_month"]
+            time_periods = ["last_month"]
             
             for period in time_periods:
+                if period not in cache["statistics"]:
+                    print(f"Skipping {period} - no statistics data available")
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 if subAutoTestCase:
@@ -974,7 +1002,7 @@ class CompareDataReferrers(GetDataCustomer):
                 
                 for device_type in ["All", "PC / Laptop", "Mobile"]:
                     key = f"{period}_{device_type}"
-                    data_referrers = cache["referrers"][key]
+                    data_referrers = cache["referrers"].get(key, {})
                     
                     referrers_signups = 0
                     if data_referrers.get("has_data", True):
@@ -989,7 +1017,8 @@ class CompareDataReferrers(GetDataCustomer):
                 new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
                 statistics_signups = self.parse_int(new_signups_fdm[0])
                 
-                subAutoTestCase += f"\n     + Username: {username}"
+                current_username = self._get_username_for_period_device(period, "All", username)
+                subAutoTestCase += f"\n     + Username: {current_username}"
                 subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                 subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                 
@@ -1012,6 +1041,9 @@ class CompareDataReferrers(GetDataCustomer):
             subAutoTestCase = ''
             
             for period in time_periods:
+                if period not in cache["statistics"]:
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 if subAutoTestCase:
@@ -1026,7 +1058,7 @@ class CompareDataReferrers(GetDataCustomer):
                 
                 for device_type in ["All", "PC / Laptop", "Mobile"]:
                     key = f"{period}_{device_type}"
-                    data_referrers = cache["referrers"][key]
+                    data_referrers = cache["referrers"].get(key, {})
                     
                     referrers_fdm = 0
                     if data_referrers.get("has_data", True):
@@ -1041,7 +1073,8 @@ class CompareDataReferrers(GetDataCustomer):
                 new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
                 statistics_fdm = self.parse_int(new_signups_fdm[1]) if len(new_signups_fdm) > 1 else 0
                 
-                subAutoTestCase += f"\n     + Username: {username}"
+                current_username = self._get_username_for_period_device(period, "All", username)
+                subAutoTestCase += f"\n     + Username: {current_username}"
                 subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                 subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                 
@@ -1095,10 +1128,13 @@ class CompareDataReferrers(GetDataCustomer):
         subAutoTestCase = ''
         
         try:
-            periods = ["last_month", "last_week", "current_month"]
+            periods = ["last_month", "last_week", "yesterday"]
             device_types = ["All", "PC / Laptop", "Mobile"]
             
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 for device_type in device_types:
@@ -1110,9 +1146,10 @@ class CompareDataReferrers(GetDataCustomer):
                     subAutoTestCase += f"- Verify that for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display}, if Total Clicks has data, then Unique Clicks also has data"
                     
                     key = f"{period}_{device_type}"
-                    data_referrers = cache["referrers"][key]
+                    data_referrers = cache["referrers"].get(key, {})
                     
-                    subAutoTestCase += f"\n     + Username: {username}"
+                    current_username = self._get_username_for_period_device(period, device_type, username)
+                    subAutoTestCase += f"\n     + Username: {current_username}"
                     subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                     subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     

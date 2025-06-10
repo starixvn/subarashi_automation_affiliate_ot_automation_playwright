@@ -199,7 +199,7 @@ class GoogleMethods(ExtractTestCaseFailed):
             env_column_map = {
                 "local": "G",
                 "uat": "H",
-                "pro": "I"
+                "prod": "I"
             }
             sub_testcase_column = "F"
             date_column = "J"

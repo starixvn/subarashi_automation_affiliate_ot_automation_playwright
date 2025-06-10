@@ -1,4 +1,4 @@
-AFFILIATE_INFO_API = "/Admin/Portal/CustomerLeftPanel/GetAffiliateInfo"
+AFFILIATE_INFO_API = "/Portal/CustomerLeftPanel/GetAffiliateInfo"
 
 
 AFFILIATE_INFO_HEADERS = {

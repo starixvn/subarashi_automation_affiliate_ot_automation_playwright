@@ -148,8 +148,8 @@ class CompareDataMarketingPage(GetDataCustomer):
         else:
             self.data_player = GetDataPlayer()
             self.data_player.referUtils(self.utils)
-            top_100_data_player = self.data_player.get_top_100_data_player()
-            return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
+            player_data_api = self.data_player.get_data_player_via_api()
+            return player_data_api["players_data"][0]["affiliate_name"]
         
     def _get_date_range(self, period):
         today = datetime.now()
@@ -170,11 +170,7 @@ class CompareDataMarketingPage(GetDataCustomer):
             from_date = yesterday.strftime("%m-%d-%Y")
             to_date = yesterday.strftime("%m-%d-%Y")
             month_date = yesterday.strftime("%m-%Y")
-        else:
-            first_day_current_month = today.replace(day=1)
-            from_date = first_day_current_month.strftime("%m-%d-%Y")
-            to_date = today.strftime("%m-%d-%Y")
-            month_date = today.strftime("%m-%Y")
+
         
         return {
             "from_date": from_date,
@@ -184,10 +180,8 @@ class CompareDataMarketingPage(GetDataCustomer):
 
     def preload_all_data(self):
         if CompareDataMarketingPage._cache_data is not None:
+            print("Using cached data from previous load!")
             return CompareDataMarketingPage._cache_data, CompareDataMarketingPage._cache_username
-            
-        periods = ["last_month", "last_week", "current_month"]
-        stats_periods = ["last_month", "current_month"]
         
         cache = {
             "marketing_pages": {},
@@ -196,37 +190,104 @@ class CompareDataMarketingPage(GetDataCustomer):
             "statistics": {}
         }
         
-        username = self._get_username()
+        if "Marketing_Pages_Last_Month" not in Data or not Data["Marketing_Pages_Last_Month"]:
+            raise Exception("Baseline data not found. Please run the job to collect baseline data first.")
         
-        for period in periods:
-            date_range = self._get_date_range(period)
+        baseline_last_month = Data["Marketing_Pages_Last_Month"]
+        username = baseline_last_month["metadata"]["filters"]["username"]
+        print(f"Using consistent username from baseline: {username}")
+        
+        baseline_data_map = {
+            "last_month": Data["Marketing_Pages_Last_Month"],
+            "last_week": Data["Marketing_Pages_Last_Week"],
+            "yesterday": Data["Marketing_Pages_Yesterday"]
+        }
+        
+        periods_with_data = set()
+        
+        print("Phase 1: Loading marketing pages data...")
+        for period in ["last_month", "last_week", "yesterday"]:
+            if period not in baseline_data_map or not baseline_data_map[period]:
+                print(f"Skipping {period} - baseline not found")
+                cache["marketing_pages"][period] = {"has_data": False, "channels_data": [], "channel_details_data": {}}
+                continue
+                
+            baseline_period_data = baseline_data_map[period]
+            baseline_has_data = baseline_period_data["metadata"].get("has_data", True)
+            
+            if not baseline_has_data:
+                print(f"Skipping {period} - baseline has no data")
+                cache["marketing_pages"][period] = {"has_data": False, "channels_data": [], "channel_details_data": {}}
+                continue
+            
+            baseline_from_date = baseline_period_data["metadata"]["period"]["from_date"]
+            baseline_to_date = baseline_period_data["metadata"]["period"]["to_date"]
+            baseline_language = baseline_period_data["metadata"]["filters"]["language"]
+            baseline_include_inactive = baseline_period_data["metadata"]["filters"].get("include_inactive_tracking", False)
+            
             cache[period] = {
-                "date_range": date_range
+                "date_range": {
+                    "from_date": baseline_from_date,
+                    "to_date": baseline_to_date
+                }
             }
             
-            if period in stats_periods:
-                cache["statistics"][period] = self.get_data_statistics_in_customer(
-                    username, date_range["month_date"]
-                )
-            
+            print(f"Loading marketing pages data for {period} (language: {baseline_language})")
             data_marketing_pages = self.get_data_marketing_pages_in_customer(
-                username, "All", date_range["from_date"], date_range["to_date"], get_detail=True
+                username, baseline_language, baseline_from_date, baseline_to_date, baseline_include_inactive, get_detail=True
             )
             cache["marketing_pages"][period] = data_marketing_pages
             
+            if data_marketing_pages.get("has_data", True):
+                periods_with_data.add(period)
+        
+        print(f"Periods with marketing pages data: {periods_with_data}")
+        
+        print("Phase 2: Loading referrers data...")
+        for period in periods_with_data:
+            period_info = cache[period]
+            baseline_from_date = period_info["date_range"]["from_date"]
+            baseline_to_date = period_info["date_range"]["to_date"]
+            
+            print(f"Loading referrers data for {period} (device: All)")
             data_referrers = self.get_data_referrers_in_customer(
-                username, date_range["from_date"], date_range["to_date"], "All", get_detail=False
+                username, baseline_from_date, baseline_to_date, "All", get_detail=False
             )
             cache["referrers"][period] = data_referrers
+        
+        print("Phase 3: Loading landing pages data...")
+        for period in periods_with_data:
+            period_info = cache[period]
+            baseline_from_date = period_info["date_range"]["from_date"]
+            baseline_to_date = period_info["date_range"]["to_date"]
             
+            print(f"Loading landing pages data for {period} (device: All)")
             data_landing_pages = self.get_data_landing_pages_in_customer(
-                username, "All", "All", date_range["from_date"], date_range["to_date"], "All", get_detail=False
+                username, "All", "All", baseline_from_date, baseline_to_date, "All", get_detail=False
             )
             cache["landing_pages"][period] = data_landing_pages
+
+        print("Phase 4: Loading statistics data...")
+        if "last_month" in periods_with_data:
+            baseline_period_data = Data["Marketing_Pages_Last_Month"]
+            baseline_from_date = baseline_period_data["metadata"]["period"]["from_date"]
+            month_date = datetime.strptime(baseline_from_date, "%m-%d-%Y").strftime("%m-%Y")
+            
+            print(f"Loading statistics for last_month (month: {month_date})")
+            cache["statistics"]["last_month"] = self.get_data_statistics_in_customer(
+                username, month_date
+            )
         
         CompareDataMarketingPage._cache_data = cache
         CompareDataMarketingPage._cache_username = username
         
+        print(f"✅ Data loading completed successfully!")
+        print(f"   Username: {username}")
+        print(f"   Loaded periods: {list(periods_with_data)}")
+        print(f"   Marketing pages cache keys: {list(cache['marketing_pages'].keys())}")
+        print(f"   Referrers cache keys: {list(cache['referrers'].keys())}")
+        print(f"   Landing pages cache keys: {list(cache['landing_pages'].keys())}")
+        print(f"   Statistics cache keys: {list(cache['statistics'].keys())}")
         return cache, username
 
     def check_data_marketing_pages_filter_by_date_language(self, testcase):
@@ -349,9 +410,12 @@ class CompareDataMarketingPage(GetDataCustomer):
         try:
             subAutoTestCase = '- Verify that the sum of the collapsed data equals the data in the expanded section'
             
-            periods = ["last_month", "last_week", "current_month"]
+            periods = ["last_month", "last_week", "yesterday"]
             
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 if subAutoTestCase:
@@ -449,9 +513,12 @@ class CompareDataMarketingPage(GetDataCustomer):
         
         try:
             subAutoTestCase = ''
-            periods = ["last_month", "last_week", "current_month"]
+            periods = ["last_month", "last_week", "yesterday"]
             
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 if subAutoTestCase:
@@ -499,6 +566,9 @@ class CompareDataMarketingPage(GetDataCustomer):
             subAutoTestCase = ''
             
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 if subAutoTestCase:
@@ -590,9 +660,12 @@ class CompareDataMarketingPage(GetDataCustomer):
                 compare_with_display = "Referrers" if compare_with == "referrers" else "Landing Pages"
                 
                 subAutoTestCase = ''
-                periods = ["last_month", "last_week", "current_month"]
+                periods = ["last_month", "last_week", "yesterday"]
                 
                 for period in periods:
+                    if period not in cache:
+                        continue
+                        
                     period_display = period.replace("_", " ")
                     
                     if subAutoTestCase:
@@ -676,9 +749,13 @@ class CompareDataMarketingPage(GetDataCustomer):
         
         try:
             subAutoTestCase = ''
-            time_periods = ["last_month", "current_month"]
+            time_periods = ["last_month"]
             
             for period in time_periods:
+                if period not in cache["statistics"]:
+                    print(f"Skipping {period} - no statistics data available")
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 if subAutoTestCase:
@@ -719,6 +796,9 @@ class CompareDataMarketingPage(GetDataCustomer):
             subAutoTestCase = ''
             
             for period in time_periods:
+                if period not in cache["statistics"]:
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 if subAutoTestCase:
@@ -790,9 +870,12 @@ class CompareDataMarketingPage(GetDataCustomer):
         subAutoTestCase = ''
         
         try:
-            periods = ["last_month", "last_week", "current_month"]
+            periods = ["last_month", "last_week", "yesterday"]
             
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 period_display = period.replace("_", " ")
                 
                 if subAutoTestCase:

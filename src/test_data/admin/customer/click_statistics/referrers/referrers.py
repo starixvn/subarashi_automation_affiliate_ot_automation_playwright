@@ -1,5 +1,5 @@
-REFERRERS_API = "/Admin/Portal/UserPanel/Referrers/GetReferrersList"
-REFERRERS_DETAILS_API = "/Admin/Portal/UserPanel/Referrers/GetWebsiteUrlList"
+REFERRERS_API = "/Portal/UserPanel/Referrers/GetReferrersList"
+REFERRERS_DETAILS_API = "/Portal/UserPanel/Referrers/GetWebsiteUrlList"
 
 DEVICE_TYPE_MAPPING = {
     "All": -1,
