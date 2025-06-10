@@ -16,12 +16,15 @@ from src.utils.core.decorators import measure_test_execution_time
 class TestSuites_03_Check_Data_Click_Statistics_Marketing_Pages(unittest.TestCase):
     @classmethod
     def setUpClass(self):
+        CompareDataMarketingPage.clear_cache()
         self.check_data_marketing_page = CompareDataMarketingPage()
         self.check_data_marketing_page.setup()
         self.utils = self.check_data_marketing_page.utils
+        self.check_data_marketing_page.preload_all_data()
 
     @classmethod
     def tearDownClass(self):
+        CompareDataMarketingPage.clear_cache()
         self.check_data_marketing_page.tearDown()
 
     @measure_test_execution_time

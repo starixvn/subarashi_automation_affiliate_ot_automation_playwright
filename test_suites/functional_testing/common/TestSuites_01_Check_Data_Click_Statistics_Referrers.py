@@ -16,12 +16,15 @@ from src.utils.core.decorators import measure_test_execution_time
 class TestSuites_01_Check_Data_Click_Statistics_Referrers(unittest.TestCase):
     @classmethod
     def setUpClass(self):
+        CompareDataReferrers.clear_cache()
         self.check_data_referrers = CompareDataReferrers()
         self.check_data_referrers.setup()
         self.utils = self.check_data_referrers.utils
+        self.check_data_referrers.preload_all_data()
 
     @classmethod
     def tearDownClass(self):
+        CompareDataReferrers.clear_cache()
         self.check_data_referrers.tearDown()
 
     @measure_test_execution_time

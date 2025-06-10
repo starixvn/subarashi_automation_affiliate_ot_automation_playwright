@@ -1,10 +1,3 @@
-"""
-Utility functions for the automation framework.
-
-This module provides a collection of general-purpose utility functions
-that are used throughout the framework for tasks such as file handling,
-timing operations, error handling, and other common operations.
-"""
 import os
 import json
 import time
@@ -23,11 +16,6 @@ logger = get_logger(__name__)
 T = TypeVar('T')
 
 class Singleton(type):
-    """
-    Metaclass implementation of the Singleton pattern.
-
-    This ensures only one instance of a class is created.
-    """
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
@@ -37,19 +25,6 @@ class Singleton(type):
 
 
 def generate_unique_id(prefix: str = "", length: int = 8) -> str:
-    """
-    Generate a unique ID string consisting of random characters and a timestamp.
-
-    Args:
-        prefix: Optional prefix for the ID
-        length: Length of the random part of the ID
-
-    Returns:
-        A string containing the unique ID
-
-    Raises:
-        ValidationException: If length is not positive
-    """
     if length <= 0:
         raise ValidationException(f"ID length must be positive, got {length}")
 
@@ -62,44 +37,14 @@ def generate_unique_id(prefix: str = "", length: int = 8) -> str:
 
 
 def get_timestamp(format_str: str = "%Y%m%d_%H%M%S") -> str:
-    """
-    Get the current time formatted as a string.
-
-    Args:
-        format_str: Format string for the timestamp (default: "%Y%m%d_%H%M%S")
-
-    Returns:
-        A formatted timestamp string
-    """
     return datetime.datetime.now().strftime(format_str)
 
 
 def pretty_dict(data: Dict) -> str:
-    """
-    Convert a dictionary to a nicely formatted JSON string.
-
-    Args:
-        data: The dictionary to format
-
-    Returns:
-        A formatted JSON string
-    """
     return json.dumps(data, indent=2, sort_keys=True)
 
 
 def load_json_file(file_path: Union[str, Path]) -> Dict:
-    """
-    Load JSON data from a file.
-
-    Args:
-        file_path: Path to the JSON file
-
-    Returns:
-        The parsed JSON data as a dictionary
-
-    Raises:
-        FileException: If the file does not exist, contains invalid JSON, or other errors occur
-    """
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             return json.load(f)
@@ -112,17 +57,6 @@ def load_json_file(file_path: Union[str, Path]) -> Dict:
 
 
 def save_json_file(data: Dict, file_path: Union[str, Path], pretty: bool = True) -> None:
-    """
-    Save a dictionary as JSON to a file.
-
-    Args:
-        data: Dictionary to save
-        file_path: Path where to save the file
-        pretty: Whether to format the JSON with indentation
-
-    Raises:
-        FileException: If an error occurs while writing the file
-    """
     try:
         indent = 2 if pretty else None
         with open(file_path, 'w', encoding='utf-8') as f:
@@ -132,18 +66,6 @@ def save_json_file(data: Dict, file_path: Union[str, Path], pretty: bool = True)
 
 
 def ensure_directory_exists(directory_path: Union[str, Path]) -> Path:
-    """
-    Create a directory if it doesn't exist.
-
-    Args:
-        directory_path: Path to the directory to create
-
-    Returns:
-        Path object for the created/existing directory
-
-    Raises:
-        FileException: If the directory cannot be created
-    """
     path = Path(directory_path)
     try:
         path.mkdir(parents=True, exist_ok=True)
@@ -153,12 +75,6 @@ def ensure_directory_exists(directory_path: Union[str, Path]) -> Path:
 
 
 def get_environment_info() -> Dict[str, str]:
-    """
-    Get information about the current system environment.
-
-    Returns:
-        Dictionary containing platform, Python version, system information, etc.
-    """
     return {
         "platform": platform.platform(),
         "python_version": platform.python_version(),
@@ -173,15 +89,6 @@ def get_environment_info() -> Dict[str, str]:
 
 
 def format_duration(seconds: float) -> str:
-    """
-    Format a duration in seconds to a human-readable string.
-
-    Args:
-        seconds: The duration in seconds
-
-    Returns:
-        A human-readable string representation of the duration
-    """
     if seconds < 0.001:
         return f"{seconds * 1000000:.2f} μs"
     if seconds < 1:
@@ -194,17 +101,6 @@ def format_duration(seconds: float) -> str:
 
 
 def truncate_string(text: str, max_length: int = 100, suffix: str = "...") -> str:
-    """
-    Truncate a string to the specified maximum length.
-
-    Args:
-        text: The string to truncate
-        max_length: Maximum length of the output string including suffix
-        suffix: String to append when truncated (default: "...")
-
-    Returns:
-        The original string or a truncated version
-    """
     if len(text) <= max_length:
         return text
     return text[:max_length - len(suffix)] + suffix
@@ -212,22 +108,6 @@ def truncate_string(text: str, max_length: int = 100, suffix: str = "...") -> st
 
 def wait_until(condition: callable, timeout: float = 10.0, poll_interval: float = 0.5,
                error_message: str = "Timeout waiting for condition", **kwargs) -> Any:
-    """
-    Wait until a condition is true or a timeout occurs.
-
-    Args:
-        condition: Function that will be called to check the condition
-        timeout: Maximum time to wait in seconds
-        poll_interval: Time between condition checks in seconds
-        error_message: Message for the exception if timeout occurs
-        **kwargs: Keyword arguments to pass to the condition function
-
-    Returns:
-        The result of the condition function once it returns a truthy value
-
-    Raises:
-        TimeoutException: If the condition doesn't become true within the timeout
-    """
     start_time = time.time()
     last_exception = None
 
@@ -249,24 +129,6 @@ def wait_until(condition: callable, timeout: float = 10.0, poll_interval: float 
 def retry_on_exception(func: callable, max_attempts: int = 3, delay: float = 1.0,
                       backoff_factor: float = 2.0, exceptions: Tuple = (Exception,),
                       on_retry: callable = None, **kwargs) -> Any:
-    """
-    Execute a function and retry if it raises an exception.
-    
-    Args:
-        func: The function to execute
-        max_attempts: Maximum number of attempts
-        delay: Initial delay between attempts in seconds
-        backoff_factor: Multiplier applied to delay between attempts
-        exceptions: Tuple of exception types to catch and retry on
-        on_retry: Optional callback function called before retrying
-        **kwargs: Keyword arguments to pass to func
-        
-    Returns:
-        The result of func if it succeeds
-        
-    Raises:
-        The last exception raised by func if all attempts fail
-    """
     attempt = 1
     last_exception = None
     
@@ -290,8 +152,7 @@ def retry_on_exception(func: callable, max_attempts: int = 3, delay: float = 1.0
                 
             time.sleep(wait_time)
             attempt += 1
-    
-    # This shouldn't be reached but ensures consistent return statements
+            
     if last_exception:
         raise last_exception
     return None

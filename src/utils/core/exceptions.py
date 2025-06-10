@@ -31,11 +31,9 @@ class AutomationException(Exception):
         super().__init__(error_message)
 
     def __str__(self) -> str:
-        """Return the string representation of the exception."""
         return self.message
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert the exception to a dictionary representation."""
         return {
             'type': self.__class__.__name__,
             'message': self.message,
@@ -48,19 +46,10 @@ class AutomationException(Exception):
         }
 
     def to_json(self) -> str:
-        """Convert the exception to a JSON string."""
         return json.dumps(self.to_dict(), indent=2, default=str)
 
     def get_full_message(self, include_traceback: bool = False) -> str:
-        """
-        Get the full formatted message of the exception.
 
-        Args:
-            include_traceback: Whether to include the traceback in the message
-
-        Returns:
-            A multiline string with all details of the exception
-        """
         parts = [f"Error: {self.message}"]
 
         if self.details:
@@ -648,22 +637,6 @@ def create_exception(
     test_case: Optional[str] = None,
     **kwargs
 ) -> AutomationException:
-    """
-    Factory function to create an exception of the specified type with the given parameters.
-
-    Args:
-        exception_type: The type of exception to create
-        message: The exception message
-        details: Optional additional details about the exception
-        context: Optional context information as a dictionary
-        original_exception: Optional original exception that caused this one
-        operation: The operation that was being performed when the exception occurred
-        test_case: The test case during which the exception occurred
-        **kwargs: Additional keyword arguments specific to the exception type
-
-    Returns:
-        An instance of the specified exception type
-    """
     return exception_type(
         message=message,
         details=details,

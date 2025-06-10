@@ -30,12 +30,12 @@ class Common():
     def login_admin(self):
         try:
             PASSWORD = utilities.decrypt(
-                ciphertext=ADMIN_12BET_ENCRYPTED_PASSWORD,
-                password=ADMIN_12BET_PASSWORD,
-                salt=ADMIN_12BET_SALT_PASSWORD
+                ciphertext=ADMIN_12BET_ENCRYPTED_PASSWORD[self.env],
+                password=ADMIN_12BET_PASSWORD[self.env],
+                salt=ADMIN_12BET_SALT_PASSWORD[self.env]
             )
             self.utils.page.navigate(ADMIN_12BET_URL[self.env])
-            self.utils.page.input(elm_login_admin.inp_username, ADMIN_12BET_USERNAME)
+            self.utils.page.input(elm_login_admin.inp_username, ADMIN_12BET_USERNAME[self.env])
             self.utils.page.input(elm_login_admin.inp_password, PASSWORD)
             self.utils.page.click(elm_login_admin.btn_login)
             self.utils.page.verify_element_exist(elm_menu.nav_menu_list)

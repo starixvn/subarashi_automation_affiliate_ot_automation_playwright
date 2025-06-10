@@ -74,7 +74,7 @@ class GoogleMethods(ExtractTestCaseFailed):
             return result
         except Exception as e:
             logger.error(f"Failed to get Google Sheet values: {str(e)}")
-            print(e)  # Keep existing print behavior for compatibility
+            print(e)
             return []
 
     @log_exceptions(log_level="DEBUG")
@@ -199,7 +199,7 @@ class GoogleMethods(ExtractTestCaseFailed):
             env_column_map = {
                 "local": "G",
                 "uat": "H",
-                "pro": "I"
+                "prod": "I"
             }
             sub_testcase_column = "F"
             date_column = "J"
@@ -279,7 +279,7 @@ class GoogleMethods(ExtractTestCaseFailed):
             return values
         except Exception as e:
             logger.error(f"Failed to update test result to Google Sheet: {str(e)}")
-            print(e)  # Keep existing print behavior for compatibility
+            print(e)
             return None
 
     @log_exceptions(log_level="INFO")

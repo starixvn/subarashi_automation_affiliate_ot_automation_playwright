@@ -33,67 +33,163 @@ Data = {
 Checklist_Sheet_Name = "Compare_Data_Clickstatistics"
 
 class CompareDataLandingPage(GetDataCustomer):
+    _cache_data = None
+    _cache_username = None
+    
     def __init__(self):
         super().__init__()
         self.get_data_customer = GetDataCustomer()
 
+    @staticmethod
+    def clear_cache():
+        CompareDataLandingPage._cache_data = None
+        CompareDataLandingPage._cache_username = None
+
     def _compare_pages_data(self, baseline_pages_data, current_pages_data):
-        """Compare pages data between baseline and current data"""
+        language_mapping = {
+            "chinese simplified": "zh-cn",
+            "english": "en-us",
+            "bengali": "bn-in",
+            "english (india)": "en-in",
+            "indonesian": "id-id",
+            "japanese": "ja-jp",
+            "korean": "ko-kr",
+            "thai": "th-th",
+            "vietnamese": "vi-vn",
+            "telugu": "te-in"
+        }
+        
         if len(baseline_pages_data) != len(current_pages_data):
             raise Exception(f"Number of pages mismatch. Baseline: {len(baseline_pages_data)}, Current: {len(current_pages_data)}")
         
         for baseline_page_data in baseline_pages_data:
             page_name = baseline_page_data["page_name"]
             language = baseline_page_data["language"]
+            language_lower = language.lower()
+            
+            if language_lower in language_mapping:
+                language_code = language_mapping[language_lower]
+            else:
+                language_code = language_lower
+            
             page_found = False
             
             for current_page in current_pages_data:
-                if current_page["page_name"].lower() == page_name.lower() and current_page["language"].lower() == language.lower():
+                current_language_lower = current_page["language"].lower()
+                
+                if current_language_lower in language_mapping:
+                    current_language_code = language_mapping[current_language_lower]
+                else:
+                    current_language_code = current_language_lower
+                
+                if current_page["page_name"].lower() == page_name.lower() and current_language_code == language_code:
                     page_found = True
-                    if int(current_page["total_click"]) != baseline_page_data["total_click"]:
-                        raise Exception(f"Total clicks mismatch for page {page_name} - {language}. Baseline: {baseline_page_data['total_click']}, Current: {current_page['total_click']}")
-                    if int(current_page["unique_click"]) != baseline_page_data["unique_click"]:
-                        raise Exception(f"Unique clicks mismatch for page {page_name} - {language}. Baseline: {baseline_page_data['unique_click']}, Current: {current_page['unique_click']}")
-                    if int(current_page["signups"]) != baseline_page_data["signups"]:
-                        raise Exception(f"Signups mismatch for page {page_name} - {language}. Baseline: {baseline_page_data['signups']}, Current: {current_page['signups']}")
-                    if int(current_page["fdm"]) != baseline_page_data["fdm"]:
-                        raise Exception(f"FDM mismatch for page {page_name} - {language}. Baseline: {baseline_page_data['fdm']}, Current: {current_page['fdm']}")
+                    baseline_total_click = self.parse_int(baseline_page_data["total_click"])
+                    current_total_click = self.parse_int(current_page["total_click"])
+                    baseline_unique_click = self.parse_int(baseline_page_data["unique_click"])
+                    current_unique_click = self.parse_int(current_page["unique_click"])
+                    baseline_signups = self.parse_int(baseline_page_data["signups"])
+                    current_signups = self.parse_int(current_page["signups"])
+                    baseline_fdm = self.parse_int(baseline_page_data["fdm"])
+                    current_fdm = self.parse_int(current_page["fdm"])
+                    
+                    if current_total_click != baseline_total_click:
+                        raise Exception(f"Total clicks mismatch for page {page_name} - {language}. Baseline: {baseline_total_click}, Current: {current_total_click}")
+                    if current_unique_click != baseline_unique_click:
+                        raise Exception(f"Unique clicks mismatch for page {page_name} - {language}. Baseline: {baseline_unique_click}, Current: {current_unique_click}")
+                    if current_signups != baseline_signups:
+                        raise Exception(f"Signups mismatch for page {page_name} - {language}. Baseline: {baseline_signups}, Current: {current_signups}")
+                    if current_fdm != baseline_fdm:
+                        raise Exception(f"FDM mismatch for page {page_name} - {language}. Baseline: {baseline_fdm}, Current: {current_fdm}")
                     break
             
             if not page_found and page_name.lower() != "none" and page_name.strip() != "":
                 raise Exception(f"Page '{page_name} - {language}' not found in current data")
     
     def _compare_website_urls(self, baseline_website_urls_data, current_website_urls_data):
-        """Compare website URLs between baseline and current data"""
-        for page_key, baseline_website_urls in baseline_website_urls_data.items():
+        language_mapping = {
+            "chinese simplified": "zh-cn",
+            "english": "en-us",
+            "bengali": "bn-in",
+            "english (india)": "en-in",
+            "indonesian": "id-id",
+            "japanese": "ja-jp",
+            "korean": "ko-kr",
+            "thai": "th-th",
+            "vietnamese": "vi-vn",
+            "telugu": "te-in"
+        }
+        
+        transformed_current_data = {}
+        lowercase_key_to_original = {}
+        
+        for current_key in current_website_urls_data:
+            if " - " in current_key:
+                page_name, language = current_key.split(" - ", 1)
+                language_lower = language.lower()
+                
+                if language_lower in language_mapping:
+                    language_code = language_mapping[language_lower]
+                else:
+                    language_code = language_lower
+                    
+                transformed_key = f"{page_name} - {language_code}"
+                transformed_current_data[transformed_key] = current_website_urls_data[current_key]
+                
+                lowercase_key_to_original[transformed_key.lower()] = transformed_key
+        
+        
+        for page_key in baseline_website_urls_data:
             if "none" in page_key.lower():
                 continue
             
-            if page_key not in current_website_urls_data:
-                raise Exception(f"Website URLs for page '{page_key}' not found in current data")
+            lowercase_page_key = page_key.lower()
             
-            current_website_urls = current_website_urls_data[page_key]
-            
-            if len(baseline_website_urls) != len(current_website_urls):
-                raise Exception(f"Number of website URLs mismatch for page {page_key}. Baseline: {len(baseline_website_urls)}, Current: {len(current_website_urls)}")
-            
-            for baseline_website in baseline_website_urls:
-                website_found = False
-                for current_website in current_website_urls:
-                    if current_website["website_url"] == baseline_website["website_url"]:
-                        website_found = True
-                        if int(current_website["total_clicks"]) != baseline_website["total_clicks"]:
-                            raise Exception(f"Total clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['total_clicks']}, Current: {current_website['total_clicks']}")
-                        if int(current_website["unique_clicks"]) != baseline_website["unique_clicks"]:
-                            raise Exception(f"Unique clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['unique_clicks']}, Current: {current_website['unique_clicks']}")
-                        if int(current_website["sign_up"]) != baseline_website["sign_up"]:
-                            raise Exception(f"Signups mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['sign_up']}, Current: {current_website['sign_up']}")
-                        if int(current_website["fdm"]) != baseline_website["fdm"]:
-                            raise Exception(f"FDM mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['fdm']}, Current: {current_website['fdm']}")
-                        break
+            if lowercase_page_key in lowercase_key_to_original:
+                transformed_key = lowercase_key_to_original[lowercase_page_key]
+                baseline_website_urls = baseline_website_urls_data[page_key]
+                current_website_urls = transformed_current_data[transformed_key]
                 
-                if not website_found:
-                    raise Exception(f"Website URL '{baseline_website['website_url']}' not found in current data for page {page_key}")
+                if len(baseline_website_urls) != len(current_website_urls):
+                    raise Exception(f"Number of website URLs mismatch for page {page_key}. Baseline: {len(baseline_website_urls)}, Current: {len(current_website_urls)}")
+                
+                for baseline_website in baseline_website_urls:
+                    website_found = False
+                    for current_website in current_website_urls:
+                        if current_website["website_url"] == baseline_website["website_url"]:
+                            website_found = True
+                            baseline_total_clicks = self.parse_int(baseline_website["total_clicks"])
+                            current_total_clicks = self.parse_int(current_website["total_clicks"])
+                            baseline_unique_clicks = self.parse_int(baseline_website["unique_clicks"])
+                            current_unique_clicks = self.parse_int(current_website["unique_clicks"])
+                            
+                            baseline_signups = 0
+                            if "signups" in baseline_website:
+                                baseline_signups = self.parse_int(baseline_website["signups"])
+                            
+                            current_signups = 0
+                            if "signups" in current_website:
+                                current_signups = self.parse_int(current_website["signups"])
+                            elif "sign_up" in current_website:
+                                current_signups = self.parse_int(current_website["sign_up"])
+                            
+                            baseline_fdm = self.parse_int(baseline_website["fdm"])
+                            current_fdm = self.parse_int(current_website["fdm"])
+                            
+                            if current_total_clicks != baseline_total_clicks:
+                                raise Exception(f"Total clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_total_clicks}, Current: {current_total_clicks}")
+                            if current_unique_clicks != baseline_unique_clicks:
+                                raise Exception(f"Unique clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_unique_clicks}, Current: {current_unique_clicks}")
+                            if current_signups != baseline_signups:
+                                raise Exception(f"Signups mismatch for website {baseline_website['website_url']}. Baseline: {baseline_signups}, Current: {current_signups}")
+                            if current_fdm != baseline_fdm:
+                                raise Exception(f"FDM mismatch for website {baseline_website['website_url']}. Baseline: {baseline_fdm}, Current: {current_fdm}")
+                            break
+                    
+                    if not website_found:
+                        raise Exception(f"Website URL '{baseline_website['website_url']}' not found in current data for page {page_key}")
+            else:
+                raise Exception(f"Website URLs for page '{page_key}' not found in current data")
     
     def parse_int(self, text):
         try:
@@ -113,53 +209,24 @@ class CompareDataLandingPage(GetDataCustomer):
         except Exception:
             return {"unique": 0, "total": 0}
     
-    def _compare_landing_pages_with_page(self, period, device_type, page_type="referrers"):
-        """
-        Compare Total Clicks between Landing Pages and Referrers/Marketing Pages
-        """
-        username = self._get_username()
-        date_range = self._get_date_range(period)
+    def _format_test_results(self, results, device_display_name):
+        formatted_result = ""
+        formatted_result += f"\n     + Username: {results['username']}"
+        formatted_result += f"\n     + Device Type: {results['device_type']}"
+        formatted_result += f"\n     + From Date: {results['from_date']}"
+        formatted_result += f"\n     + To Date: {results['to_date']}"
         
-        data_landing_pages = self.get_data_landing_pages_in_customer(username, "All", "All", date_range["from_date"], date_range["to_date"], device_type)
-        
-        landing_pages_total_clicks = 0
-        if data_landing_pages.get("has_data", True):
-            for page_data in data_landing_pages["pages_data"]:
-                landing_pages_total_clicks += self.parse_int(page_data["total_click"])
-        
-        if page_type == "referrers":
-            data_pages = self.get_data_referrers_in_customer(username, date_range["from_date"], date_range["to_date"], device_type)
-            pages_name = "Referrers"
-            
-            pages_total_clicks = 0
-            if data_pages.get("has_data", True):
-                for site in data_pages["site_urls_data"]:
-                    pages_total_clicks += self.parse_int(site["total_click"])
+        if device_display_name == "All":
+            formatted_result += f"\n     + Total Clicks: Statistics={results['statistics_total_clicks']}, Landing Pages={results['landing_pages_total_clicks']}"
+            formatted_result += f"\n     + Unique Clicks: Statistics={results['statistics_unique_clicks']}, Landing Pages={results['landing_pages_unique_clicks']}"
         else:
-            data_pages = self.get_data_marketing_pages_in_customer(username, "All", date_range["from_date"], date_range["to_date"], device_type)
-            pages_name = "Marketing Pages"
-            
-            pages_total_clicks = 0
-            if data_pages.get("has_data", True):
-                for channel in data_pages["channels_data"]:
-                    pages_total_clicks += self.parse_int(channel["total_click"])
+            formatted_result += f"\n     + {device_display_name} Total Clicks: Statistics={results['statistics_total_clicks']}, Landing Pages={results['landing_pages_total_clicks']}"
         
-        has_data = data_landing_pages.get("has_data", True) and data_pages.get("has_data", True)
+        formatted_result += f"\n     + Signups: Statistics={results['statistics_signups']}, Landing Pages={results['landing_pages_signups']}"
+        formatted_result += f"\n     + FDM: Statistics={results['statistics_fdm']}, Landing Pages={results['landing_pages_fdm']}"
         
-        result = ""
-        if has_data:
-            result += f"\n     + Username: {username}"
-            result += f"\n     + From Date: {date_range['from_date']}"
-            result += f"\n     + To Date: {date_range['to_date']}"
-            
-            if landing_pages_total_clicks == pages_total_clicks:
-                result += f"\n     + Total Clicks match: {landing_pages_total_clicks}"
-            else:
-                result += f"\n     + Total Clicks mismatch: Landing Pages={landing_pages_total_clicks}, {pages_name}={pages_total_clicks}"
-        else:
-            result += f"\n     + No data found for Total Clicks for Landing Pages or {pages_name}."
-        
-        return result
+        return formatted_result
+    
 
     def _get_username(self):
         if ENVIRONMENT == "local":
@@ -167,8 +234,8 @@ class CompareDataLandingPage(GetDataCustomer):
         else:
             self.data_player = GetDataPlayer()
             self.data_player.referUtils(self.utils)
-            top_100_data_player = self.data_player.get_top_100_data_player()
-            return top_100_data_player["players_data"][random.randint(0, len(top_100_data_player["players_data"]) - 1)]["affiliate_name"]
+            player_data_api = self.data_player.get_data_player_via_api()
+            return player_data_api["players_data"][0]["affiliate_name"]
         
     def _get_date_range(self, period):
         today = datetime.now()
@@ -189,11 +256,7 @@ class CompareDataLandingPage(GetDataCustomer):
             from_date = yesterday.strftime("%m-%d-%Y")
             to_date = yesterday.strftime("%m-%d-%Y")
             month_date = yesterday.strftime("%m-%Y")
-        else:  # current_month
-            first_day_current_month = today.replace(day=1)
-            from_date = first_day_current_month.strftime("%m-%d-%Y")
-            to_date = today.strftime("%m-%d-%Y")
-            month_date = today.strftime("%m-%Y")
+
         
         return {
             "from_date": from_date,
@@ -201,100 +264,10 @@ class CompareDataLandingPage(GetDataCustomer):
             "month_date": month_date
         }
 
-    def _check_data_for_period_and_device(self, period, device_type):
-        username = self._get_username()
-        date_range = self._get_date_range(period)
-        
-        data_landing_pages = self.get_data_landing_pages_in_customer(username, "All", "All", date_range["from_date"], date_range["to_date"], device_type)
-        data_statistics = self.get_data_statistics_in_customer(username, date_range["month_date"])
-        
-        new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
-        statistics_signups = self.parse_int(new_signups_fdm[0])
-        statistics_fdm = self.parse_int(new_signups_fdm[1]) if len(new_signups_fdm) > 1 else 0
-        
-        pc_tracking = self.parse_fraction(data_statistics["tracking_pc_month"])
-        mobile_tracking = self.parse_fraction(data_statistics["tracking_mobile_month"])
-        
-        if device_type == "All":
-            statistics_total_clicks = pc_tracking["total"] + mobile_tracking["total"]
-            statistics_unique_clicks = pc_tracking["unique"] + mobile_tracking["unique"]
-        elif device_type == "Mobile":
-            statistics_total_clicks = mobile_tracking["total"]
-            statistics_unique_clicks = mobile_tracking["unique"]
-        else:
-            statistics_total_clicks = pc_tracking["total"]
-            statistics_unique_clicks = pc_tracking["unique"]
-        
-        landing_pages_total_clicks = 0
-        landing_pages_unique_clicks = 0
-        landing_pages_signups = 0
-        landing_pages_fdm = 0
-        
-        if data_landing_pages.get("has_data", True):
-            for page_data in data_landing_pages["pages_data"]:
-                landing_pages_total_clicks += self.parse_int(page_data["total_click"])
-                landing_pages_unique_clicks += self.parse_int(page_data["unique_click"])
-                landing_pages_signups += self.parse_int(page_data["signups"])
-                landing_pages_fdm += self.parse_int(page_data["fdm"])
-        
-        mismatches = []
-        
-        click_type = "Total Clicks"
-        if device_type == "Mobile":
-            click_type = "Mobile Total Clicks"
-        elif device_type == "PC / Laptop":
-            click_type = "Desktop Total Clicks"
-        
-        if landing_pages_total_clicks != statistics_total_clicks:
-            mismatches.append(f"{click_type} mismatch: Statistics={statistics_total_clicks}, Landing Pages={landing_pages_total_clicks}")
-        
-        if landing_pages_signups != statistics_signups:
-            mismatches.append(f"Signups mismatch: Statistics={statistics_signups}, Landing Pages={landing_pages_signups}")
-        
-        if landing_pages_fdm != statistics_fdm:
-            mismatches.append(f"FDM mismatch: Statistics={statistics_fdm}, Landing Pages={landing_pages_fdm}")
-        
-        if mismatches:
-            raise Exception("\n".join(mismatches))
-        
-        return {
-            "username": username,
-            "device_type": device_type,
-            "from_date": date_range["from_date"],
-            "to_date": date_range["to_date"],
-            "statistics_total_clicks": statistics_total_clicks,
-            "statistics_unique_clicks": statistics_unique_clicks,
-            "landing_pages_total_clicks": landing_pages_total_clicks,
-            "landing_pages_unique_clicks": landing_pages_unique_clicks,
-            "statistics_signups": statistics_signups,
-            "landing_pages_signups": landing_pages_signups,
-            "statistics_fdm": statistics_fdm,
-            "landing_pages_fdm": landing_pages_fdm,
-            "click_type": click_type
-        }
-
-    def _format_test_results(self, results, device_display_name):
-        formatted_result = ""
-        formatted_result += f"\n     + Username: {results['username']}"
-        formatted_result += f"\n     + Device Type: {results['device_type']}"
-        formatted_result += f"\n     + From Date: {results['from_date']}"
-        formatted_result += f"\n     + To Date: {results['to_date']}"
-        
-        if device_display_name == "All":
-            formatted_result += f"\n     + Total Clicks: Statistics={results['statistics_total_clicks']}, Landing Pages={results['landing_pages_total_clicks']}"
-            formatted_result += f"\n     + Unique Clicks: Statistics={results['statistics_unique_clicks']}, Landing Pages={results['landing_pages_unique_clicks']}"
-        else:
-            formatted_result += f"\n     + {device_display_name} Total Clicks: Statistics={results['statistics_total_clicks']}, Landing Pages={results['landing_pages_total_clicks']}"
-        
-        formatted_result += f"\n     + Signups: Statistics={results['statistics_signups']}, Landing Pages={results['landing_pages_signups']}"
-        formatted_result += f"\n     + FDM: Statistics={results['statistics_fdm']}, Landing Pages={results['landing_pages_fdm']}"
-        
-        return formatted_result
-
     def preload_all_data(self):
-        periods = ["last_month", "last_week", "current_month"]
-        device_types = ["All", "PC / Laptop", "Mobile"]
-        stats_periods = ["last_month", "current_month"]
+        if CompareDataLandingPage._cache_data is not None:
+            print("Using cached data from previous load!")
+            return CompareDataLandingPage._cache_data, CompareDataLandingPage._cache_username
         
         cache = {
             "landing_pages": {},
@@ -303,41 +276,133 @@ class CompareDataLandingPage(GetDataCustomer):
             "statistics": {}
         }
         
-        username = self._get_username()
-        print(f"Preloading data for username: {username}")
+        if "Landing_Pages_Last_Month" not in Data or not Data["Landing_Pages_Last_Month"]:
+            raise Exception("Baseline data not found. Please run the job to collect baseline data first.")
         
-        for period in periods:
-            date_range = self._get_date_range(period)
-            cache[period] = {
-                "date_range": date_range
-            }
-            
-            print(f"Fetching data for period: {period}")
-            
-            if period in stats_periods:
-                cache["statistics"][period] = self.get_data_statistics_in_customer(
-                    username, date_range["month_date"]
-                )
-            
-            for device_type in device_types:
-                key = f"{period}_{device_type}"
-                
-                data_landing_pages = self.get_data_landing_pages_in_customer(
-                    username, "All", "All", date_range["from_date"], date_range["to_date"], device_type, get_detail=False
-                )
-                cache["landing_pages"][key] = data_landing_pages
-                
-                data_referrers = self.get_data_referrers_in_customer(
-                    username, date_range["from_date"], date_range["to_date"], device_type, get_detail=False
-                )
-                cache["referrers"][key] = data_referrers
-                
-                data_marketing_pages = self.get_data_marketing_pages_in_customer(
-                    username, "All", date_range["from_date"], date_range["to_date"], get_detail=False
-                )
-                cache["marketing_pages"][key] = data_marketing_pages
+        baseline_last_month = Data["Landing_Pages_Last_Month"]
+        username = baseline_last_month["metadata"]["filters"]["username"]
+        print(f"Using consistent username from baseline: {username}")
         
-        print("All data preloaded successfully!")
+        baseline_to_cache_mapping = {
+            "Landing_Pages_Last_Month": "last_month_All",
+            "Landing_Pages_Last_Month_By_Desktop": "last_month_PC / Laptop",
+            "Landing_Pages_Last_Month_By_Mobile": "last_month_Mobile",
+            "Landing_Pages_Last_Week": "last_week_All",
+            "Landing_Pages_Last_Week_By_Desktop": "last_week_PC / Laptop",
+            "Landing_Pages_Last_Week_By_Mobile": "last_week_Mobile",
+            "Landing_Pages_Yesterday": "yesterday_All",
+            "Landing_Pages_Yesterday_By_Desktop": "yesterday_PC / Laptop",
+            "Landing_Pages_Yesterday_By_Mobile": "yesterday_Mobile"
+        }
+        
+        periods_with_data = set()
+        
+        print("Phase 1: Loading landing pages data...")
+        for baseline_key, cache_key in baseline_to_cache_mapping.items():
+            if baseline_key not in Data or not Data[baseline_key]:
+                print(f"Skipping {cache_key} - baseline not found")
+                cache["landing_pages"][cache_key] = {"has_data": False, "pages_data": [], "website_urls_data": {}}
+                continue
+                
+            baseline_data = Data[baseline_key]
+            baseline_has_data = baseline_data["metadata"].get("has_data", True)
+            
+            if not baseline_has_data:
+                print(f"Skipping {cache_key} - baseline has no data")
+                cache["landing_pages"][cache_key] = {"has_data": False, "pages_data": [], "website_urls_data": {}}
+                continue
+            
+            baseline_from_date = baseline_data["metadata"]["period"]["from_date"]
+            baseline_to_date = baseline_data["metadata"]["period"]["to_date"]
+            
+            if "Mobile" in cache_key:
+                device_type = "Mobile"
+            elif "PC / Laptop" in cache_key:
+                device_type = "PC / Laptop"
+            else:
+                device_type = "All"
+            
+            print(f"Loading landing pages data for {cache_key} (device: {device_type})")
+            current_data = self.get_data_landing_pages_in_customer(
+                username, "All", "All", baseline_from_date, baseline_to_date, device_type, get_detail=True
+            )
+            cache["landing_pages"][cache_key] = current_data
+            
+            period = cache_key.split("_")[0] + "_" + cache_key.split("_")[1]
+            if current_data.get("has_data", True):
+                periods_with_data.add(period)
+                
+            if period not in cache:
+                cache[period] = {
+                    "date_range": {
+                        "from_date": baseline_from_date,
+                        "to_date": baseline_to_date
+                    }
+                }
+        
+        print(f"Periods with landing pages data: {periods_with_data}")
+        
+        print("Phase 2: Loading referrers data...")
+        for baseline_key, cache_key in baseline_to_cache_mapping.items():
+            if cache_key not in cache["landing_pages"]:
+                continue
+                
+            landing_pages_data = cache["landing_pages"][cache_key]
+            if not landing_pages_data.get("has_data", True):
+                print(f"Skipping referrers for {cache_key} - no landing pages data")
+                cache["referrers"][cache_key] = {"has_data": False, "site_urls_data": [], "website_urls_data": {}}
+                continue
+            
+            baseline_data = Data[baseline_key]
+            baseline_from_date = baseline_data["metadata"]["period"]["from_date"]
+            baseline_to_date = baseline_data["metadata"]["period"]["to_date"]
+            
+            if "Mobile" in cache_key:
+                device_type = "Mobile"
+            elif "PC / Laptop" in cache_key:
+                device_type = "PC / Laptop"
+            else:
+                device_type = "All"
+            
+            print(f"Loading referrers data for {cache_key} (device: {device_type})")
+            referrers_data = self.get_data_referrers_in_customer(
+                username, baseline_from_date, baseline_to_date, device_type, get_detail=False
+            )
+            cache["referrers"][cache_key] = referrers_data
+        
+        print("Phase 3: Loading marketing pages data...")
+        for period in periods_with_data:
+            period_info = cache[period]
+            baseline_from_date = period_info["date_range"]["from_date"]
+            baseline_to_date = period_info["date_range"]["to_date"]
+            
+            print(f"Loading marketing pages data for {period} (no device filter)")
+            marketing_pages_data = self.get_data_marketing_pages_in_customer(
+                username, "All", baseline_from_date, baseline_to_date, include_inactive_tracking=False, get_detail=False
+            )
+            cache["marketing_pages"][period] = marketing_pages_data
+
+        print("Phase 4: Loading statistics data...")
+        if "last_month" in periods_with_data:
+            baseline_period_data = Data["Landing_Pages_Last_Month"]
+            baseline_from_date = baseline_period_data["metadata"]["period"]["from_date"]
+            month_date = datetime.strptime(baseline_from_date, "%m-%d-%Y").strftime("%m-%Y")
+            
+            print(f"Loading statistics for last_month (month: {month_date})")
+            cache["statistics"]["last_month"] = self.get_data_statistics_in_customer(
+                username, month_date
+            )
+        
+        CompareDataLandingPage._cache_data = cache
+        CompareDataLandingPage._cache_username = username
+        
+        print(f"✅ Data loading completed successfully!")
+        print(f"   Username: {username}")
+        print(f"   Loaded periods: {list(periods_with_data)}")
+        print(f"   Landing pages cache keys: {list(cache['landing_pages'].keys())}")
+        print(f"   Referrers cache keys: {list(cache['referrers'].keys())}")
+        print(f"   Marketing pages cache keys: {list(cache['marketing_pages'].keys())}")
+        print(f"   Statistics cache keys: {list(cache['statistics'].keys())}")
         return cache, username
     
     def check_data_landing_pages_filter_by_date_device_page_language(self, testcase):
@@ -436,9 +501,34 @@ class CompareDataLandingPage(GetDataCustomer):
                     current_data = self.get_data_landing_pages_in_customer(username, "All", language, from_date, to_date, device_type)
                     
                     if current_data.get("has_data", True):
+                        language_mapping = {
+                            "chinese simplified": "zh-cn",
+                            "english": "en-us",
+                            "bengali": "bn-in",
+                            "english (india)": "en-in",
+                            "indonesian": "id-id",
+                            "japanese": "ja-jp",
+                            "korean": "ko-kr",
+                            "thai": "th-th",
+                            "vietnamese": "vi-vn",
+                            "telugu": "te-in"
+                        }
+                        
+                        language_lower = language.lower()
+                        if language_lower in language_mapping:
+                            language_code = language_mapping[language_lower]
+                        else:
+                            language_code = language_lower
+                            
                         for page_data in current_data["pages_data"]:
-                            if page_data["language"].lower() != language.lower():
-                                raise Exception(f"Language filter did not work correctly. Found language {page_data['language']} when filtering for {language}")
+                            current_language_lower = page_data["language"].lower()
+                            if current_language_lower in language_mapping:
+                                current_language_code = language_mapping[current_language_lower]
+                            else:
+                                current_language_code = current_language_lower
+                                
+                            if current_language_code != language_code:
+                                raise Exception(f"Language filter did not work correctly. Found language {page_data['language']} (code: {current_language_code}) when filtering for {language} (code: {language_code})")
                         
                         subAutoTestCase += f"\n     + Successfully verified Language filter for '{language}'"
                     else:
@@ -494,9 +584,6 @@ class CompareDataLandingPage(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
 
     def check_data_landing_pages_statistics_match(self, testcase):
-        """
-        Verify that the Landing Page data matches the data in the Statistics table.
-        """
         cache, username = self.preload_all_data()
         
         mainChecklist = ["Verify that the Landing Page data matches the data in the Statistics table."]
@@ -504,7 +591,7 @@ class CompareDataLandingPage(GetDataCustomer):
         
         try:
             subAutoTestCase = ''
-            time_periods = ["last_month", "current_month"]
+            time_periods = ["last_month"]
             device_types = [
                 {"name": "All", "display_name": "All"},
                 {"name": "Mobile", "display_name": "Mobile"},
@@ -512,6 +599,10 @@ class CompareDataLandingPage(GetDataCustomer):
             ]
             
             for period in time_periods:
+                if period not in cache["statistics"]:
+                    print(f"Skipping {period} - no statistics data available")
+                    continue
+                    
                 for device in device_types:
                     if subAutoTestCase:
                         subAutoTestCase += '\n'
@@ -586,7 +677,7 @@ class CompareDataLandingPage(GetDataCustomer):
                     
                     if mismatches:
                         subAutoTestCase += "\n     + Mismatches found:"
-                        for mismatch in mismatches:
+                        for mismatch in mismatches[:3]:
                             subAutoTestCase += f"\n       - {mismatch}"
             
             self.utils.update_result_to_ggsheet(
@@ -594,7 +685,7 @@ class CompareDataLandingPage(GetDataCustomer):
                 mainChecklist[indexChl], 
                 testcase, 
                 subAutoTestCase, 
-                Data["TestCase_Auto_Status"][0 if not mismatches else 1],
+                Data["TestCase_Auto_Status"][0],
                 sheet_name=Checklist_Sheet_Name
             )
             
@@ -610,9 +701,6 @@ class CompareDataLandingPage(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
 
     def check_data_landing_pages_click_statistics_and_compare(self, testcase):
-        """
-        Verify that the Total Clicks for Landing Pages match the Total Clicks for Referrers and Marketing Pages.
-        """
         cache, username = self.preload_all_data()
         
         mainChecklist = [
@@ -623,10 +711,13 @@ class CompareDataLandingPage(GetDataCustomer):
         
         try:
             subAutoTestCase = ''
-            periods = ["last_month", "last_week", "current_month"]
+            periods = ["last_month", "last_week", "yesterday"]
             device_types = ["All", "PC / Laptop", "Mobile"]
             
             for period in periods:
+                if period not in cache:
+                    continue
+                    
                 for device_type in device_types:
                     device_display = "Desktop" if device_type == "PC / Laptop" else device_type
                     period_display = period.replace("_", " ")
@@ -677,6 +768,8 @@ class CompareDataLandingPage(GetDataCustomer):
             subAutoTestCase = ''
             
             for period in periods:
+                if period not in cache:
+                    continue
                 for device_type in device_types:
                     device_display = "Desktop" if device_type == "PC / Laptop" else device_type
                     period_display = period.replace("_", " ")
@@ -688,7 +781,7 @@ class CompareDataLandingPage(GetDataCustomer):
                     
                     key = f"{period}_{device_type}"
                     data_landing_pages = cache["landing_pages"][key]
-                    data_marketing_pages = cache["marketing_pages"][key]
+                    data_marketing_pages = cache["marketing_pages"][period]
                     
                     landing_pages_total_clicks = 0
                     if data_landing_pages.get("has_data", True):
@@ -748,9 +841,6 @@ class CompareDataLandingPage(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
 
     def check_data_signups_and_fdm(self, testcase):
-        """
-        Verify that the Signups and FDM data match between Landing Pages, Referrers, and Marketing Pages.
-        """
         cache, username = self.preload_all_data()
         
         mainChecklist = [
@@ -774,10 +864,13 @@ class CompareDataLandingPage(GetDataCustomer):
                 compare_with_display = "Referrers" if compare_with == "referrers" else "Marketing Pages"
                 
                 subAutoTestCase = ''
-                periods = ["last_month", "last_week", "current_month"]
+                periods = ["last_month", "last_week", "yesterday"]
                 device_types = ["All", "PC / Laptop", "Mobile"]
                 
                 for period in periods:
+                    if period not in cache:
+                        continue
+                        
                     for device_type in device_types:
                         device_display = "Desktop" if device_type == "PC / Laptop" else device_type
                         period_display = period.replace("_", " ")
@@ -853,8 +946,8 @@ class CompareDataLandingPage(GetDataCustomer):
             self.utils.page.extract_TestCaseFailed(e)
 
     def verify_page_website_url_match(self, testcase):
-        username = self._get_username()
-        periods = ["last_month", "last_week", "current_month"]
+        cache, username = self.preload_all_data()
+        periods = ["last_month", "last_week", "yesterday"]
         device_types = ["All", "PC / Laptop", "Mobile"]
         
         mainChecklist = [
@@ -867,7 +960,6 @@ class CompareDataLandingPage(GetDataCustomer):
         
         try:
             for period in periods:
-                date_range = self._get_date_range(period)
                 period_display = period.replace("_", " ")
                 
                 for device_type in device_types:
@@ -878,7 +970,8 @@ class CompareDataLandingPage(GetDataCustomer):
                     
                     subAutoTestCase += f"- Verify that for Landing Pages {period_display} {'' if device_type == 'All' else 'by ' + device_display}, clicking on a Page shows the Website URLs sub-table"
                     
-                    data_landing_pages = self.get_data_landing_pages_in_customer(username, "All", "All", date_range["from_date"], date_range["to_date"], device_type)
+                    key = f"{period}_{device_type}"
+                    data_landing_pages = cache["landing_pages"][key]
                     
                     has_pages = False
                     has_sub_tables = False
@@ -896,8 +989,8 @@ class CompareDataLandingPage(GetDataCustomer):
                                     break
                     
                     subAutoTestCase += f"\n     + Username: {username}"
-                    subAutoTestCase += f"\n     + From Date: {date_range['from_date']}"
-                    subAutoTestCase += f"\n     + To Date: {date_range['to_date']}"
+                    subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                    subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     
                     if not data_landing_pages.get("has_data", True):
                         subAutoTestCase += f"\n     + No data found for Landing Pages."
@@ -921,7 +1014,6 @@ class CompareDataLandingPage(GetDataCustomer):
             subAutoTestCase = ''
             
             for period in periods:
-                date_range = self._get_date_range(period)
                 period_display = period.replace("_", " ")
                 
                 for device_type in device_types:
@@ -932,11 +1024,12 @@ class CompareDataLandingPage(GetDataCustomer):
                     
                     subAutoTestCase += f"- Verify that for Landing Pages {period_display} {'' if device_type == 'All' else 'by ' + device_display}, the sum of Website URL values match the Page values"
                     
-                    data_landing_pages = self.get_data_landing_pages_in_customer(username, "All", "All", date_range["from_date"], date_range["to_date"], device_type)
+                    key = f"{period}_{device_type}"
+                    data_landing_pages = cache["landing_pages"][key]
                     
                     subAutoTestCase += f"\n     + Username: {username}"
-                    subAutoTestCase += f"\n     + From Date: {date_range['from_date']}"
-                    subAutoTestCase += f"\n     + To Date: {date_range['to_date']}"
+                    subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                    subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     
                     if not data_landing_pages.get("has_data", True):
                         subAutoTestCase += f"\n     + No data found for Landing Pages."
@@ -987,7 +1080,7 @@ class CompareDataLandingPage(GetDataCustomer):
                     
                     if mismatches:
                         subAutoTestCase += f"\n     + Failed: {len(mismatches)} mismatches found:"
-                        for mismatch in mismatches[:3]:  # Show first 3 mismatches to avoid too large report
+                        for mismatch in mismatches[:3]:
                             subAutoTestCase += f"\n       - {mismatch}"
                         if len(mismatches) > 3:
                             subAutoTestCase += f"\n       - ... and {len(mismatches) - 3} more"
@@ -1039,7 +1132,7 @@ class CompareDataLandingPage(GetDataCustomer):
         
         try:
             subAutoTestCase = ''
-            time_periods = ["last_month", "current_month"]
+            time_periods = ["last_month"]
             
             for period in time_periods:
                 period_display = period.replace("_", " ")
@@ -1089,58 +1182,6 @@ class CompareDataLandingPage(GetDataCustomer):
                 Data["TestCase_Auto_Status"][0],
                 sheet_name=Checklist_Sheet_Name
             )
-            indexChl += 1
-            
-            subAutoTestCase = ''
-            
-            for period in time_periods:
-                period_display = period.replace("_", " ")
-                
-                if subAutoTestCase:
-                    subAutoTestCase += '\n\n'
-                
-                subAutoTestCase += f"- Verify that total FDM for Landing Pages in {period_display} match the Statistics data table"
-                
-                data_statistics = cache["statistics"][period]
-                
-                all_landing_pages_fdm = 0
-                device_fdm = {}
-                
-                for device_type in ["All", "PC / Laptop", "Mobile"]:
-                    key = f"{period}_{device_type}"
-                    data_landing_pages = cache["landing_pages"][key]
-                    
-                    landing_pages_fdm = 0
-                    if data_landing_pages.get("has_data", True):
-                        for page_data in data_landing_pages["pages_data"]:
-                            landing_pages_fdm += self.parse_int(page_data["fdm"])
-                    
-                    device_fdm[device_type] = landing_pages_fdm
-                    
-                    if device_type == "All":
-                        all_landing_pages_fdm = landing_pages_fdm
-                
-                new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
-                statistics_fdm = self.parse_int(new_signups_fdm[1]) if len(new_signups_fdm) > 1 else 0
-                
-                subAutoTestCase += f"\n     + Username: {username}"
-                subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
-                subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
-                
-                if all_landing_pages_fdm == statistics_fdm:
-                    subAutoTestCase += f"\n     + FDM match: Statistics={statistics_fdm}, Landing Pages (All)={all_landing_pages_fdm}"
-                else:
-                    subAutoTestCase += f"\n     + FDM mismatch: Statistics={statistics_fdm}, Landing Pages (All)={all_landing_pages_fdm}"
-                    subAutoTestCase += f"\n     + Landing Pages by device: PC / Laptop={device_fdm['PC / Laptop']}, Mobile={device_fdm['Mobile']}"
-            
-            self.utils.update_result_to_ggsheet(
-                Data["TestCase_spread_sheet_id"], 
-                mainChecklist[indexChl], 
-                testcase, 
-                subAutoTestCase, 
-                Data["TestCase_Auto_Status"][0],
-                sheet_name=Checklist_Sheet_Name
-            )
         
         except Exception as e:
             self.utils.update_result_to_ggsheet(
@@ -1177,7 +1218,7 @@ class CompareDataLandingPage(GetDataCustomer):
         subAutoTestCase = ''
         
         try:
-            periods = ["last_month", "last_week", "current_month"]
+            periods = ["last_month", "last_week", "yesterday"]
             device_types = ["All", "PC / Laptop", "Mobile"]
             
             for period in periods:

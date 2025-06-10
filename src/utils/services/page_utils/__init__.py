@@ -47,10 +47,6 @@ class ui(
     FileMethods,
     ScreenshotMethods
 ):
-    """
-    UI handler class kế thừa từ tất cả các component.
-    Giữ nguyên interface như file page_utils.py gốc.
-    """
     TcName = TC_NAME
     page: Page
     

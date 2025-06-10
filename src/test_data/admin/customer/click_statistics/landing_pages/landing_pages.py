@@ -1,6 +1,6 @@
-LANDING_PAGE_STATISTICS_API = "/Admin/Portal/UserPanel/LandingPageStatistics/GetLandingPageStatisticsList"
+LANDING_PAGE_STATISTICS_API = "/Portal/UserPanel/LandingPageStatistics/GetLandingPageStatisticsList"
 
-LANDING_PAGE_DETAILS_API = "/Admin/Portal/UserPanel/LandingPageStatistics/GetLandingPageStatisticsDetailList"
+LANDING_PAGE_DETAILS_API = "/Portal/UserPanel/LandingPageStatistics/GetLandingPageStatisticsDetailList"
 
 DEVICE_TYPE_MAPPING = {
     "All": -1,

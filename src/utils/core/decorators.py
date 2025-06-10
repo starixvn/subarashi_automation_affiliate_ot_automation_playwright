@@ -1,17 +1,9 @@
-"""
-Decorators module providing utility decorators for the automation framework.
-This module contains decorators for retry mechanisms, exception handling,
-performance monitoring, and exception type conversion.
-"""
 import time
 import functools
 import traceback
 from typing import Any, Callable, Optional, Type, TypeVar, Union, cast, Dict
 from datetime import datetime, timedelta
 import inspect
-
-# Xóa import này để tránh circular import
-# from src.utils.services.utils.components.google_methods import GoogleMethods
 
 from src.utils.core.exceptions import AutomationException
 from src.utils.core.logging import get_logger
@@ -20,7 +12,6 @@ logger = get_logger(__name__)
 
 F = TypeVar('F', bound=Callable[..., Any])
 
-# Dictionary toàn cục để lưu thông tin checklist cuối cùng của mỗi test case
 _test_case_last_checklist = {}
 
 def retry(
@@ -31,19 +22,6 @@ def retry(
     should_retry: Optional[Union[Callable[[Exception], bool],
                                 Callable[[Any, Exception], bool]]] = None,
 ) -> Callable[[F], F]:
-    """
-    Retry decorator that retries the function if it raises specified exceptions.
-
-    Args:
-        max_attempts: Maximum number of attempts to retry or a callable that returns this value
-        delay_seconds: Initial delay between retries in seconds
-        backoff_factor: Factor by which the delay increases after each retry
-        exceptions_to_retry: Tuple of exception types to catch and retry
-        should_retry: Optional callable to determine if retry should happen
-
-    Returns:
-        Decorated function that implements retry logic
-    """
     def decorator(func: F) -> F:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -112,18 +90,6 @@ def log_exceptions(
     message_template: str = "Error in {func_name}: {error}",
     re_raise: bool = True,
 ) -> Callable[[F], F]:
-    """
-    Decorator to log exceptions raised by a function.
-
-    Args:
-        log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-        log_traceback: Whether to include traceback in the log
-        message_template: Template string for the log message
-        re_raise: Whether to re-raise the exception after logging
-
-    Returns:
-        Decorated function that logs exceptions
-    """
     def decorator(func: F) -> F:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -155,16 +121,6 @@ def monitor_performance(
     log_level: str = "DEBUG",
     threshold_seconds: Optional[float] = None,
 ) -> Callable[[F], F]:
-    """
-    Decorator to monitor the execution time of a function.
-
-    Args:
-        log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-        threshold_seconds: Only log if execution time exceeds this threshold
-
-    Returns:
-        Decorated function that monitors performance
-    """
     def decorator(func: F) -> F:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -202,16 +158,6 @@ def convert_exceptions(
     exception_map: Dict[Type[Exception], Type[Exception]],
     pass_original: bool = True,
 ) -> Callable[[F], F]:
-    """
-    Decorator to convert exceptions to different exception types.
-
-    Args:
-        exception_map: Dictionary mapping source exception types to target types
-        pass_original: Whether to pass the original exception to the new one
-
-    Returns:
-        Decorated function that converts exceptions
-    """
     def decorator(func: F) -> F:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -237,12 +183,8 @@ def convert_exceptions(
     return decorator
 
 def track_last_checklist(original_update_method):
-    """
-    Decorator cho update_result_to_ggsheet để theo dõi checklist cuối cùng của mỗi test case
-    """
     @functools.wraps(original_update_method)
     def wrapper(self, spread_sheet_id, checklist, auto_testcase, sub_auto_testcases, auto_status, sheet_name="Checklist", duration=None):
-        # Lưu checklist cuối cùng được cập nhật cho test case
         _test_case_last_checklist[auto_testcase] = {
             'spread_sheet_id': spread_sheet_id,
             'checklist': checklist,
