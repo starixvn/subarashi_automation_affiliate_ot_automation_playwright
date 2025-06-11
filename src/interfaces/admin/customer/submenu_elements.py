@@ -1,5 +1,4 @@
 class SubmenuElements:
-    
     # submenu_container
     div_submenu_container = "//div[@class='user-panel-menu-container']"
 

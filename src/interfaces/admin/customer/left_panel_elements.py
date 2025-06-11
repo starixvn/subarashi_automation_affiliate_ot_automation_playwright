@@ -1,13 +1,4 @@
 class LeftPanelElements:
-    """
-    Element selectors for the Customer Left Panel in the admin interface.
-    
-    Follows these criteria:
-    - Each XPath selector targets a unique element
-    - Uses IDs and unique classes where available
-    - Avoids selectors that rely on text content
-    - Follows a clear DOM structure
-    """
     # Search section
     div_search_container = "//div[@class='left-panel-container']/div[@class='']"
     inp_aff_name = "//input[@name='affName']"

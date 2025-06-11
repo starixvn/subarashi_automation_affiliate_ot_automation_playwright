@@ -1,5 +1,5 @@
 REFERRERS_API = "/Portal/UserPanel/Referrers/GetReferrersList"
-REFERRERS_DETAILS_API = "/Portal/UserPanel/Referrers/GetWebsiteUrlList"
+REFERRERS_DETAILS_API = "/Portal/UserPanel/Referrers/GetReferrersDetailList"
 
 DEVICE_TYPE_MAPPING = {
     "All": -1,
@@ -24,7 +24,7 @@ REFERRERS_DETAILS_REQUEST_BODY_TEMPLATE = {
     "deviceType": -1,
     "fromDate": None,
     "toDate": None,
-    "referrerUrl": None,
+    "selectedSiteUrl": None,
     "affId": None,
     "pageIndex": 1,
     "pageSize": 20

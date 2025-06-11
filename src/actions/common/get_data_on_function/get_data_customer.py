@@ -152,6 +152,7 @@ class GetDataCustomer(Common):
                 return result
             
             self.utils.page.wait_for_network_idle()
+            self.utils.page.wait_for_element_ready(elm_landing_pages.tbl_pages, visible=True, enabled=True)
             
             number_of_rows = self.utils.page.count_element("", f"{elm_landing_pages.tbl_pages}//tbody/tr[not(contains(@class, 'first-row'))]")
             for i in range(1, number_of_rows + 1):
@@ -818,7 +819,7 @@ class GetDataCustomer(Common):
             
             for site_item in list_data:
                 site_data = {
-                    "site_url": site_item.get("ReferrerUrl", ""),
+                    "site_url": site_item.get("SiteUrl", ""),
                     "total_click": str(site_item.get("TotalClick", 0)),
                     "unique_click": str(site_item.get("UniqueClick", 0)),
                     "signups": str(site_item.get("Signups", 0)),
@@ -827,14 +828,14 @@ class GetDataCustomer(Common):
                 result["site_urls_data"].append(site_data)
                 
                 if site_data["site_url"] and site_data["site_url"].lower() != "none":
-                    referrer_url = site_data["site_url"]
+                    site_url = site_data["site_url"]
                     
                     details_request_body = REFERRERS_DETAILS_REQUEST_BODY_TEMPLATE.copy()
                     details_request_body.update({
                         "deviceType": device_type_value,
                         "fromDate": from_date,
                         "toDate": to_date,
-                        "referrerUrl": referrer_url,
+                        "selectedSiteUrl": site_url,
                         "affId": aff_id,
                         "pageIndex": 1,
                         "pageSize": 20
@@ -848,9 +849,9 @@ class GetDataCustomer(Common):
                     
                     if details_response.status == 200:
                         details_data = self.utils.api.extract_response_json(details_response)
-                        
+                          
                         if details_data and "MainData" in details_data:
-                            result["website_urls_data"][referrer_url] = []
+                            result["website_urls_data"][site_url] = []
                             
                             for url_item in details_data["MainData"]:
                                 url_data = {
@@ -860,7 +861,7 @@ class GetDataCustomer(Common):
                                     "sign_up": str(url_item.get("Signups", 0)),
                                     "fdm": str(url_item.get("Fdm", 0))
                                 }
-                                result["website_urls_data"][referrer_url].append(url_data)
+                                result["website_urls_data"][site_url].append(url_data)
             
             return result
         except Exception as e:

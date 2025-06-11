@@ -1,15 +1,15 @@
-# get data baseline landing page last_week at 2025-06-10 19:37:03 +0800 (GMT+8)
+# get data baseline landing page last_week at 2025-06-11 16:32:51 +0800 (GMT+8)
 
 class DataLandingPagesLastWeek:
     data_landing_pages_last_week = {
     "metadata": {
-        "collected_at": "2025-06-10 19:37:03 +0800",
+        "collected_at": "2025-06-11 16:32:51 +0800",
         "period": {
             "from_date": "06-02-2025",
             "to_date": "06-08-2025"
         },
         "filters": {
-            "username": "12BETAFF16502",
+            "username": "12BETAFF14351",
             "page_name": "All",
             "language": "All",
             "device_type": "All"
@@ -19,185 +19,112 @@ class DataLandingPagesLastWeek:
     "pages_data": [
         {
             "page_name": "join",
-            "language": "th-TH",
-            "total_click": "20994",
-            "unique_click": "16935",
-            "signups": "980",
-            "fdm": "80"
-        },
-        {
-            "page_name": "thb-12join",
-            "language": "th-TH",
-            "total_click": "7",
-            "unique_click": "3",
-            "signups": "2",
-            "fdm": "1"
+            "language": "id-ID",
+            "total_click": "2338",
+            "unique_click": "1417",
+            "signups": "150",
+            "fdm": "91"
         }
     ],
     "website_urls_data": {
-        "join - th-TH": [
+        "join - id-ID": [
             {
-                "website_url": "android-app://m.facebook.com/",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
+                "website_url": "https://12indobet.com/",
+                "total_clicks": 44,
+                "unique_clicks": 37,
+                "signups": 8,
+                "fdm": 9
             },
             {
-                "website_url": "http://instagram.com/",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
+                "website_url": "https://12indobet.com/",
+                "total_clicks": 1886,
+                "unique_clicks": 1191,
+                "signups": 125,
+                "fdm": 74
             },
             {
-                "website_url": "http://instagram.com/",
-                "total_clicks": 322,
-                "unique_clicks": 293,
-                "signups": 79,
-                "fdm": 7
-            },
-            {
-                "website_url": "http://m.facebook.com/",
-                "total_clicks": 3,
-                "unique_clicks": 3,
+                "website_url": "https://12indobet-com.cdn.ampproject.org/",
+                "total_clicks": 4,
+                "unique_clicks": 4,
                 "signups": 1,
-                "fdm": 0
-            },
-            {
-                "website_url": "http://m.facebook.com/",
-                "total_clicks": 2684,
-                "unique_clicks": 2323,
-                "signups": 613,
-                "fdm": 32
-            },
-            {
-                "website_url": "https://facebook.com/",
-                "total_clicks": 9,
-                "unique_clicks": 8,
-                "signups": 2,
                 "fdm": 1
             },
             {
-                "website_url": "https://google.com/",
-                "total_clicks": 7,
-                "unique_clicks": 7,
-                "signups": 1,
+                "website_url": "https://12indobet-com.cdn.ampproject.org/v/s/12indobet.com/?amp_gsa=1&amp_js_v=a9&usqp=mq331AQIUAKwASCAAgM%3D",
+                "total_clicks": 81,
+                "unique_clicks": 55,
+                "signups": 4,
+                "fdm": 2
+            },
+            {
+                "website_url": "https://12indobet-com.cdn.ampproject.org/v/s/12indobet.com/?amp_js_v=0.1&usqp=mq331AQIUAKwASCAAgM%3D",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
                 "fdm": 0
             },
             {
-                "website_url": "https://goto.12bmylink1.com/join/95200/th/mktsbdsp/index.html",
+                "website_url": "https://12indobet-com.cdn.ampproject.org/v/s/12indobet.com/12bet-login/?amp_gsa=1&amp_js_v=a9&usqp=mq331AQIUAKwASCAAgM%3D",
+                "total_clicks": 244,
+                "unique_clicks": 128,
+                "signups": 11,
+                "fdm": 5
+            },
+            {
+                "website_url": "https://12indobet-com.cdn.ampproject.org/v/s/12indobet.com/12bet-login/?amp_js_v=0.1&usqp=mq331AQIUAKwASCAAgM%3D",
+                "total_clicks": 9,
+                "unique_clicks": 5,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://12indobet-com.cdn.ampproject.org/v/s/12indobet.com/12bet-login/?usqp=mq331AQIUAKwASCAAgM%3D&amp_js_v=a9&amp_gsa=1",
                 "total_clicks": 2,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             },
             {
-                "website_url": "https://instagram.com/",
-                "total_clicks": 11,
-                "unique_clicks": 11,
-                "signups": 3,
+                "website_url": "https://12indobet-com.cdn.ampproject.org/v/s/12indobet.com/link-alternatif-12bet/?amp_gsa=1&amp_js_v=a9&usqp=mq331AQIUAKwASCAAgM%3D",
+                "total_clicks": 13,
+                "unique_clicks": 7,
+                "signups": 0,
                 "fdm": 0
             },
             {
-                "website_url": "https://l.facebook.com/",
-                "total_clicks": 63,
-                "unique_clicks": 49,
-                "signups": 8,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://l.facebook.com/",
-                "total_clicks": 463,
-                "unique_clicks": 395,
-                "signups": 98,
-                "fdm": 11
-            },
-            {
-                "website_url": "https://l.facebook.com/l.php?u=https://12techworld.com/site/?uro8qpih&utm_medium=paid&utm_source=fb&utm_id=120224397471140302&utm_content=120224397471150302&utm_term=120224397471190302&utm_campaign=120224397471140302&fbclid=IwZXh0bgNhZW0BMABhZGlkAasfc9wSC25icmlkETFYWVFNNHJRTWVMeDdjbTJrAR6C-zfQA7jB-1",
+                "website_url": "https://florida4all.com/?I=6c3141716632533073452f6a7570724a3633437346513d3d",
                 "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             },
             {
-                "website_url": "https://l.facebook.com/l.php?u=https://12techworld.com/site/?uro8qpih&utm_medium=paid&utm_source=fb&utm_id=120224397471140302&utm_content=120224398418010302&utm_term=120224398418020302&utm_campaign=120224397471140302&fbclid=IwZXh0bgNhZW0BMABhZGlkAasfdBt4NU5icmlkETExQWhMUFl1NWNOejR0RVJxAR4cN9BF3Ld7j5",
+                "website_url": "https://florida4all.com/?I=6c3141716632533073452f6a7570724a3633437346513d3d",
+                "total_clicks": 4,
+                "unique_clicks": 4,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://florida4all.com/?I=6c3141716632533073452f6a7570724a3633437346513d3d'123",
                 "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             },
             {
-                "website_url": "https://lm.facebook.com/",
-                "total_clicks": 3,
-                "unique_clicks": 3,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://m.baidu.com/",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://meta.com/",
+                "website_url": "none",
                 "total_clicks": 11,
                 "unique_clicks": 10,
-                "signups": 2,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://search-dra.dt.dbankcloud.com/",
-                "total_clicks": 11,
-                "unique_clicks": 8,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://search-dra.dt.dbankcloud.com/",
-                "total_clicks": 22,
-                "unique_clicks": 15,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://www.facebook.com/",
-                "total_clicks": 36,
-                "unique_clicks": 31,
-                "signups": 7,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://www.petalsearch.com/",
-                "total_clicks": 14,
-                "unique_clicks": 13,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "thb-12join - th-TH": [
-            {
-                "website_url": "http://www.google.com/",
-                "total_clicks": 1,
-                "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             },
             {
                 "website_url": "none",
-                "total_clicks": 2,
-                "unique_clicks": 2,
-                "signups": 0,
+                "total_clicks": 37,
+                "unique_clicks": 32,
+                "signups": 1,
                 "fdm": 0
-            },
-            {
-                "website_url": "none",
-                "total_clicks": 4,
-                "unique_clicks": 3,
-                "signups": 2,
-                "fdm": 1
             }
         ]
     }

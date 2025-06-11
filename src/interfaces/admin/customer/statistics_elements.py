@@ -1,13 +1,4 @@
 class StatisticsElements:
-    """
-    Element selectors for the Customer Statistics page in the admin interface.
-    
-    Follows these criteria:
-    - Each XPath selector targets a unique element
-    - Uses IDs and unique classes where available
-    - Avoids selectors that rely on text content
-    - Follows a clear DOM structure
-    """
     # Main container
     div_customer_statistics = "//div[@class='customer-statistics']"
     div_app_container = "//div[@class='customer-statistics']/div[@class='app-container']"

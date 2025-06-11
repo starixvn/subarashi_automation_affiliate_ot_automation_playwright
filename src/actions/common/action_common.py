@@ -1,12 +1,14 @@
+import time
+import re
+from playwright.sync_api import Page
 from src.utils.services.utils import utilities
 from config.constants.settings import *
-import time
-from playwright.sync_api import Page
-
 from src.interfaces.admin.authentication.login import LoginElements as elm_login_admin
 from src.interfaces.admin.common.menu_elements import MenuElements as elm_menu
 from src.interfaces.admin.common.common_elements import CommonElements as elm_common
 from src.interfaces.admin.common.header_elements import HeaderElements as elm_header
+from src.interfaces.admin.customer.left_panel_elements import LeftPanelElements as elm_left_panel
+from src.interfaces.user.ui.header.header_elements import HeaderElements as elm_header
 
 class Common():    
     def __init__(self):
@@ -43,6 +45,27 @@ class Common():
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
 
+    def sso_login(self, affiliatename):
+        try:
+            super().selectMenu("Customer")
+            self.utils.page.input(elm_left_panel.inp_aff_name, affiliatename)
+            self.utils.page.click(elm_left_panel.btn_search)
+            self.utils.page.wait_for_element_ready(elm_left_panel.div_affiliate_label, visible=True, enabled=True)
+            time.sleep(2)
+            self.utils.page.open_new_page_by_click(elm_left_panel.lnk_affiliate)
+            self.utils.page.new_pages.wait_for_element_ready(elm_header.a_my_account, visible=True, enabled=True)
+            username_text = re.sub(r'\b([A-Z0-9]{10,})\b', self.utils.page.get_text(elm_header.a_my_account)).group(1)
+            self.utils.should_be_equal(username_text, affiliatename)
+
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)
+
+    def close_page_new_page(self):
+        try:
+            self.utils.page.new_pages.close_page()
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)
+
     def selectMenu(self, mainMenu):
         try:
             self.utils.page.click("//a[@id='"+ mainMenu +"']")
@@ -51,12 +74,6 @@ class Common():
             self.utils.page.extract_TestCaseFailed(e)
 
     def select_date_picker(self, element, date_value='05-16-2025'):
-        """
-        Select a date using the date picker component
-        Format: month-day-year (e.g., '05-16-2025')
-        
-        Example element: div.daterange-container input.datepicker
-        """
         try:
             month = date_value.split("-")[0]
             day = date_value.split("-")[1]
@@ -81,14 +98,6 @@ class Common():
             self.utils.page.extract_TestCaseFailed(e)
 
     def select_month_picker(self, element, month_year='05-2025'):
-        """
-        Select a month using the month picker component
-        Format: month-year (e.g., '05-2025')
-        
-        Examples: 
-        - <div class="mp-form-container">
-        - <div class="position-relative d-inline-block">
-        """
         try:
             month = month_year.split("-")[0]
             year = month_year.split("-")[1]
@@ -111,11 +120,6 @@ class Common():
             self.utils.page.extract_TestCaseFailed(e)
 
     def select_multiple_option(self, container_element, options_list):
-        """
-        Select multiple options from a multi-select dropdown
-        
-        Example element: div.multiple-select-container
-        """
         try:
             dropdown_button = f"{container_element} button.multiple-select-label"
             self.utils.page.click(dropdown_button)
@@ -141,11 +145,6 @@ class Common():
             self.utils.page.extract_TestCaseFailed(e)
 
     def select_option(self, dropdown_element, option_value):
-        """
-        Select an option from a dropdown select element
-        
-        Example: select#BaseCurrency
-        """
         try:
             try:
                 self.utils.page.select_options(dropdown_element, option_value)
@@ -161,11 +160,6 @@ class Common():
             self.utils.page.extract_TestCaseFailed(e)
 
     def go_to_next_page(self, pagination_container=".page-container"):
-        """
-        Navigate to the next page using pagination controls
-        
-        Example element: div.page-container
-        """
         try:
             next_button = f"{pagination_container} a.page-next:not(.disable)"
             if self.utils.page.does_element_exist(next_button):
@@ -178,11 +172,6 @@ class Common():
             return False
 
     def go_to_prev_page(self, pagination_container=".page-container"):
-        """
-        Navigate to the previous page using pagination controls
-        
-        Example element: div.page-container
-        """
         try:
             prev_button = f"{pagination_container} a.page-prev:not(.disable)"
             if self.utils.page.does_element_exist(prev_button):
@@ -195,11 +184,6 @@ class Common():
             return False
 
     def go_to_last_page(self, pagination_container=".page-container"):
-        """
-        Navigate to the last page using pagination controls
-        
-        Example element: div.page-container
-        """
         try:
             last_button = f"{pagination_container} a.page-last:not(.disable)"
             if self.utils.page.does_element_exist(last_button):
@@ -212,11 +196,6 @@ class Common():
             return False
 
     def go_to_first_page(self, pagination_container=".page-container"):
-        """
-        Navigate to the first page using pagination controls
-        
-        Example element: div.page-container
-        """
         try:
             first_button = f"{pagination_container} a.page-first:not(.disable)"
             if self.utils.page.does_element_exist(first_button):
@@ -229,11 +208,6 @@ class Common():
             return False
     
     def go_to_specific_page(self, pagination_container=".page-container", page_number=1):
-        """
-        Navigate to a specific page by entering the page number
-        
-        Example element: div.page-container
-        """
         try:
             page_input = f"{pagination_container} input.page-form"
             if self.utils.page.does_element_exist(page_input):
@@ -247,11 +221,6 @@ class Common():
             return False
     
     def set_page_size(self, pagination_container=".page-container", size="20"):
-        """
-        Set the number of items to display per page
-        
-        Example element: div.page-container
-        """
         try:
             page_size_select = f"{pagination_container} select.pagesize-select"
             if self.utils.page.does_element_exist(page_size_select):
