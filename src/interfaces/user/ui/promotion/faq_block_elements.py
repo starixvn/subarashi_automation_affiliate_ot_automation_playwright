@@ -1,13 +1,4 @@
-"""
-FAQ Block Elements
-
-This file contains XPath locators for FAQ block elements on the Affiliate page.
-"""
-
 class FAQBlockElements:
-    """
-    Class containing XPath locators for FAQ block elements.
-    """
     
     # Block container
     div_block_faq = "//div[@class='block block-faq']"
@@ -47,29 +38,3 @@ class FAQBlockElements:
     # Link in answer text
     a_terms_link = "//div[@class='block block-faq']//div[@class='group-faq']/div[@class='anwser']/div[@class='anwser-text'][6]/a[@href='/UserAsian/en/TermAndCondition']"
     span_red_bold_in_link = "//div[@class='block block-faq']//div[@class='group-faq']/div[@class='anwser']/div[@class='anwser-text'][6]/a/span[@class='red-bold']"
-    
-    @staticmethod
-    def get_answer_text_by_index(index=1):
-        """
-        Get the XPath for a specific answer text by index.
-        
-        Args:
-            index (int): The index of the answer text (1-based).
-            
-        Returns:
-            str: XPath locator for the specified answer text.
-        """
-        return f"//div[@class='block block-faq']//div[@class='group-faq']/div[@class='anwser']/div[@class='anwser-text'][{index}]"
-    
-    @staticmethod
-    def get_list_number_by_text_index(index=1):
-        """
-        Get the XPath for a specific list number by text index.
-        
-        Args:
-            index (int): The index of the answer text containing the list number (1-based).
-            
-        Returns:
-            str: XPath locator for the specified list number.
-        """
-        return f"//div[@class='block block-faq']//div[@class='group-faq']/div[@class='anwser']/div[@class='anwser-text'][{index}]/span[@class='list-number']" 

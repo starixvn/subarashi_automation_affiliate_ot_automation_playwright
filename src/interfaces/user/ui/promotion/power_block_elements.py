@@ -1,13 +1,4 @@
-"""
-Power Block Elements
-
-This file contains XPath locators for the power block elements on the Affiliate page.
-"""
-
 class PowerBlockElements:
-    """
-    Class containing XPath locators for the power block elements.
-    """
     
     # Block container
     div_block_power = "//div[@class='block block-power']"
@@ -35,30 +26,3 @@ class PowerBlockElements:
     tr_second = "//div[@class='block block-power']//table/tbody/tr[2]"
     tr_third = "//div[@class='block block-power']//table/tbody/tr[3]"
     tr_fourth = "//div[@class='block block-power']//table/tbody/tr[4]"
-    
-    @staticmethod
-    def get_row_by_index(index=1):
-        """
-        Get the XPath for a specific table row by index.
-        
-        Args:
-            index (int): The index of the row (1-based).
-            
-        Returns:
-            str: XPath locator for the specified row.
-        """
-        return f"//div[@class='block block-power']//table/tbody/tr[{index}]"
-    
-    @staticmethod
-    def get_cell_by_row_and_column(row_index=1, col_index=1):
-        """
-        Get the XPath for a specific table cell by row and column index.
-        
-        Args:
-            row_index (int): The index of the row (1-based).
-            col_index (int): The index of the column (1-based).
-            
-        Returns:
-            str: XPath locator for the specified cell.
-        """
-        return f"//div[@class='block block-power']//table/tbody/tr[{row_index}]/td[{col_index}]" 

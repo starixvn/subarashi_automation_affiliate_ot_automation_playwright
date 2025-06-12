@@ -1,14 +1,5 @@
-"""
-Header Elements
-
-This file contains XPath locators for header elements.
-"""
-
 class HeaderElements:
-    """
-    Class containing XPath locators for header elements.
-    """
-    
+
     # Header top container
     div_header_top = "//div[@class='header-top']"
     div_page_container = "//div[@class='header-top']/div[@class='page-container']"
@@ -28,6 +19,8 @@ class HeaderElements:
     input_public_key = "//input[@id='PublicKey']"
     a_btn_login = "//a[@class='btn-auth btn-login'][@id='mobileLogin']"
     a_btn_signup = "//a[@class='btn-auth btn-signup']"
+    a_btn_logout = "//div[@class='group-auth-login']/a[contains(text(), 'Logout')]"
+    a_my_account = "//div[@class='group-auth-login']/a[contains(text(), 'My Account')]"
     
     # Language selection
     div_language_container = "//div[@class='language-container']"
@@ -38,23 +31,3 @@ class HeaderElements:
     i_caret = "//button[@class='select-language']/i[@class='caret']"
     div_language_list_wrapper = "//div[@class='language-list-wrapper'][@id='languageList']"
     ul_language_list = "//ul[@class='list-unstyled language-list']"
-    
-    @staticmethod
-    def get_language_item(language_code):
-        """
-        Returns XPath for a language item by its code
-        
-        Args:
-            language_code: The language code (e.g., 'en', 'id', 'th')
-        """
-        return f"//a[@class='language-item'][@data-option='{language_code}']"
-    
-    @staticmethod
-    def get_language_flag(language_code):
-        """
-        Returns XPath for a language flag by its code
-        
-        Args:
-            language_code: The language code (e.g., 'en', 'id', 'th')
-        """
-        return f"//a[@data-option='{language_code}']/i[@class='flag']" 

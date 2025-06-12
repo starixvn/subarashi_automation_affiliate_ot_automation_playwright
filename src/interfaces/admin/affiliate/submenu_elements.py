@@ -1,14 +1,5 @@
 class SubmenuElements:
-    """
-    Element selectors for the Affiliate Submenu navigation in the admin interface.
-    
-    Follows these criteria:
-    - Each XPath selector targets a unique element
-    - Uses IDs and unique classes where available
-    - Avoids selectors that rely on text content where possible
-    - Follows a clear DOM structure
-    - Simple and direct XPath without unnecessary conditions
-    """
+
     # Main container
     div_submenu_container = "//div[@class='sub-menu-container']"
     div_icon_container = "//div[@class='sub-menu-container']/div[@class='d-inline-block'][1]"

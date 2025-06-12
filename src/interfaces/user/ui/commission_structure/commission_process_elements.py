@@ -1,13 +1,4 @@
-"""
-Commission Process Elements
-
-This file contains XPath locators for the commission process flow diagram elements.
-"""
-
 class CommissionProcessElements:
-    """
-    Class containing XPath locators for commission process flow diagram elements.
-    """
     
     # Section container
     div_block_process = "//div[@class='block block-process']"
@@ -59,44 +50,3 @@ class CommissionProcessElements:
     
     # Bottom text
     div_bottom_text = "//div[@class='block block-process']//div[@class='bottom-text']"
-    
-    @staticmethod
-    def get_process_item(index):
-        """
-        Returns XPath for a specific process item by index
-        
-        Args:
-            index: The 1-based index of the process item (1-5)
-        """
-        return f"//div[@class='block block-process']//div[@class='main-process']/div[@class='items'][{index}]"
-    
-    @staticmethod
-    def get_item_icon(index):
-        """
-        Returns XPath for the icon of a specific process item
-        
-        Args:
-            index: The 1-based index of the process item (1-5)
-        """
-        return f"//div[@class='block block-process']//div[@class='main-process']/div[@class='items'][{index}]//div[@class='icon']/img"
-    
-    @staticmethod
-    def get_item_heading(index):
-        """
-        Returns XPath for the heading of a specific process item
-        
-        Args:
-            index: The 1-based index of the process item (1-5)
-        """
-        return f"//div[@class='block block-process']//div[@class='main-process']/div[@class='items'][{index}]//div[@class='heading']"
-    
-    @staticmethod
-    def get_arrow(item_index, arrow_index):
-        """
-        Returns XPath for a specific arrow by item and arrow index
-        
-        Args:
-            item_index: The 1-based index of the process item (1-5)
-            arrow_index: The arrow index (1-4)
-        """
-        return f"//div[@class='block block-process']//div[@class='main-process']/div[@class='items'][{item_index}]//span[@class='process-arrow arrow-{arrow_index}']" 

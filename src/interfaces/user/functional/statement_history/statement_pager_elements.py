@@ -1,8 +1,4 @@
 class StatementPagerElements:
-    """
-    Class containing XPath locators for the Statement Pager elements.
-    These elements are for the pagination controls in the statement history.
-    """
 
     # Pager container elements
     div_statement_pager = "//div[@id='statementPager']"
@@ -31,31 +27,3 @@ class StatementPagerElements:
     
     # Total items hidden field
     input_total_item = "//input[@id='TotalItem']"
-    
-    def get_page_first_button(self, is_disabled=False):
-        """Get first page button with or without disabled state"""
-        if is_disabled:
-            return "//div[@id='statementPager']//a[contains(@class, 'page-first') and contains(@class, 'disable')]"
-        return "//div[@id='statementPager']//a[contains(@class, 'page-first') and not(contains(@class, 'disable'))]"
-    
-    def get_page_prev_button(self, is_disabled=False):
-        """Get previous page button with or without disabled state"""
-        if is_disabled:
-            return "//div[@id='statementPager']//a[contains(@class, 'page-prev') and contains(@class, 'disable')]"
-        return "//div[@id='statementPager']//a[contains(@class, 'page-prev') and not(contains(@class, 'disable'))]"
-    
-    def get_page_next_button(self, is_disabled=False):
-        """Get next page button with or without disabled state"""
-        if is_disabled:
-            return "//div[@id='statementPager']//a[contains(@class, 'page-next') and contains(@class, 'disable')]"
-        return "//div[@id='statementPager']//a[contains(@class, 'page-next') and not(contains(@class, 'disable'))]"
-    
-    def get_page_last_button(self, is_disabled=False):
-        """Get last page button with or without disabled state"""
-        if is_disabled:
-            return "//div[@id='statementPager']//a[contains(@class, 'page-last') and contains(@class, 'disable')]"
-        return "//div[@id='statementPager']//a[contains(@class, 'page-last') and not(contains(@class, 'disable'))]"
-    
-    def get_pagesize_option(self, size):
-        """Get page size option by value"""
-        return f"//div[@id='statementPager']//select[@class='pagesize-select']/option[@value='{size}']" 

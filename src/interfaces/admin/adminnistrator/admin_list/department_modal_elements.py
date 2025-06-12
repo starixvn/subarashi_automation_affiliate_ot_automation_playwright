@@ -1,4 +1,5 @@
 class DepartmentModalElements:
+    
     # Modal container
     mdl_department = "//div[@class='modal-content']"
     mdl_title = "//h5[@class='modal-title']"

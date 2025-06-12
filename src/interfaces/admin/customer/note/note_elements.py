@@ -1,13 +1,5 @@
 class NoteElements:
-    """
-    Note page element selectors for the admin interface.
     
-    Follows these criteria:
-    - Each XPath selector targets a unique element
-    - Uses IDs and unique classes where available
-    - Avoids selectors that rely on text content
-    - Follows a clear DOM structure
-    """
     # Action Buttons
     btn_add_note = "//button[@class='btn btn-outline-secondary']"
     spn_add_icon = "//button[@class='btn btn-outline-secondary']/span[@class='oi oi-plus ml-2']"

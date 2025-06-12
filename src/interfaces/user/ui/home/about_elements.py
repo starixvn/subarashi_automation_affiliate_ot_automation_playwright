@@ -1,13 +1,4 @@
-"""
-About Elements
-
-This file contains XPath locators for the About section elements.
-"""
-
 class AboutElements:
-    """
-    Class containing XPath locators for the About section elements.
-    """
     
     # Section container
     div_block_about = "//div[@class='block block-about']"
@@ -24,13 +15,3 @@ class AboutElements:
     # Paragraphs
     p_first_paragraph = "//div[@class='block block-about']//div[@class='block-content']/p[1]"
     p_second_paragraph = "//div[@class='block block-about']//div[@class='block-content']/p[2]"
-    
-    @staticmethod
-    def get_paragraph(index):
-        """
-        Returns XPath for a specific paragraph by index
-        
-        Args:
-            index: The 1-based index of the paragraph
-        """
-        return f"//div[@class='block block-about']//div[@class='block-content']/p[{index}]" 

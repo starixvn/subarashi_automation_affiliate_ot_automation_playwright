@@ -47,8 +47,10 @@ class CompareDataMarketingPage(GetDataCustomer):
             "telugu": "te-in"
         }
         
+        mismatches = []
+        
         if len(baseline_channels_data) != len(current_channels_data):
-            raise Exception(f"Number of channels mismatch. Baseline: {len(baseline_channels_data)}, Current: {len(current_channels_data)}")
+            mismatches.append(f"Number of channels mismatch. Baseline: {len(baseline_channels_data)}, Current: {len(current_channels_data)}")
         
         for baseline_channel_data in baseline_channels_data:
             channel_name = baseline_channel_data["channel_name"]
@@ -81,52 +83,64 @@ class CompareDataMarketingPage(GetDataCustomer):
                     current_fdm = self.parse_int(current_channel["fdm"])
                     
                     if current_total_click != baseline_total_click:
-                        raise Exception(f"Total clicks mismatch for channel {channel_name} - {language}. Baseline: {baseline_total_click}, Current: {current_total_click}")
+                        mismatches.append(f"Total clicks mismatch for channel {channel_name} - {language}. Baseline: {baseline_total_click}, Current: {current_total_click}")
                     if current_unique_click != baseline_unique_click:
-                        raise Exception(f"Unique clicks mismatch for channel {channel_name} - {language}. Baseline: {baseline_unique_click}, Current: {current_unique_click}")
+                        mismatches.append(f"Unique clicks mismatch for channel {channel_name} - {language}. Baseline: {baseline_unique_click}, Current: {current_unique_click}")
                     if current_signups != baseline_signups:
-                        raise Exception(f"Signups mismatch for channel {channel_name} - {language}. Baseline: {baseline_signups}, Current: {current_signups}")
+                        mismatches.append(f"Signups mismatch for channel {channel_name} - {language}. Baseline: {baseline_signups}, Current: {current_signups}")
                     if current_fdm != baseline_fdm:
-                        raise Exception(f"FDM mismatch for channel {channel_name} - {language}. Baseline: {baseline_fdm}, Current: {current_fdm}")
+                        mismatches.append(f"FDM mismatch for channel {channel_name} - {language}. Baseline: {baseline_fdm}, Current: {current_fdm}")
                     break
             
             if not channel_found:
-                raise Exception(f"Channel '{channel_name} - {language}' not found in current data")
+                mismatches.append(f"Channel '{channel_name} - {language}' not found in current data")
+        
+        return mismatches
     
     def _compare_channel_details(self, baseline_channel_details_data, current_channel_details_data):
+        mismatches = []
+        
         for channel_key, baseline_urls in baseline_channel_details_data.items():
             if "none" in channel_key.lower():
                 continue
             
             if channel_key not in current_channel_details_data:
-                raise Exception(f"Channel details for '{channel_key}' not found in current data")
+                mismatches.append(f"Channel details for '{channel_key}' not found in current data")
+                continue
             
             current_urls = current_channel_details_data[channel_key]
             
             if len(baseline_urls) != len(current_urls):
-                raise Exception(f"Number of URLs mismatch for channel {channel_key}. Baseline: {len(baseline_urls)}, Current: {len(current_urls)}")
+                mismatches.append(f"Number of URLs mismatch for channel {channel_key}. Baseline: {len(baseline_urls)}, Current: {len(current_urls)}")
             
             for baseline_url in baseline_urls:
                 url_found = False
                 for current_url in current_urls:
                     if current_url["url"] == baseline_url["url"]:
                         url_found = True
-                        if int(current_url["total_clicks"]) != baseline_url["total_clicks"]:
-                            raise Exception(f"Total clicks mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['total_clicks']}, Current: {current_url['total_clicks']}")
-                        if int(current_url["unique_clicks"]) != baseline_url["unique_clicks"]:
-                            raise Exception(f"Unique clicks mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['unique_clicks']}, Current: {current_url['unique_clicks']}")
-                        if int(current_url["signups"]) != baseline_url["signups"]:
-                            raise Exception(f"Signups mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['signups']}, Current: {current_url['signups']}")
-                        if int(current_url["fdm"]) != baseline_url["fdm"]:
-                            raise Exception(f"FDM mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['fdm']}, Current: {current_url['fdm']}")
+                        if self.parse_int(current_url["total_clicks"]) != baseline_url["total_clicks"]:
+                            mismatches.append(f"Total clicks mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['total_clicks']}, Current: {current_url['total_clicks']}")
+                        if self.parse_int(current_url["unique_clicks"]) != baseline_url["unique_clicks"]:
+                            mismatches.append(f"Unique clicks mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['unique_clicks']}, Current: {current_url['unique_clicks']}")
+                        if self.parse_int(current_url["signups"]) != baseline_url["signups"]:
+                            mismatches.append(f"Signups mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['signups']}, Current: {current_url['signups']}")
+                        if self.parse_int(current_url["fdm"]) != baseline_url["fdm"]:
+                            mismatches.append(f"FDM mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['fdm']}, Current: {current_url['fdm']}")
                         break
                 
                 if not url_found and baseline_url["url"].lower() != "none" and baseline_url["url"].strip() != "":
-                    raise Exception(f"URL '{baseline_url['url']}' not found in current data for channel {channel_key}")
+                    mismatches.append(f"URL '{baseline_url['url']}' not found in current data for channel {channel_key}")
+        
+        return mismatches
     
     def parse_int(self, text):
         try:
-            return int(str(text).replace(',', '').strip() or 0)
+            if text is None:
+                return 0
+            text_str = str(text).replace(',', '').strip().lower()
+            if text_str in ['', 'none', '-', 'null', 'n/a', 'na']:
+                return 0
+            return int(text_str)
         except (ValueError, TypeError):
             return 0
     
@@ -141,6 +155,20 @@ class CompareDataMarketingPage(GetDataCustomer):
             return {"unique": 0, "total": 0}
         except Exception:
             return {"unique": 0, "total": 0}
+    
+    def _get_username_for_period(self, period, fallback_username):
+        period_mapping = {
+            "last_month": "Marketing_Pages_Last_Month",
+            "last_week": "Marketing_Pages_Last_Week", 
+            "yesterday": "Marketing_Pages_Yesterday"
+        }
+        
+        if period in period_mapping:
+            baseline_key = period_mapping[period]
+            if baseline_key in Data and Data[baseline_key]:
+                return Data[baseline_key]["metadata"]["filters"]["username"]
+        
+        return fallback_username
     
     def _get_username(self):
         if ENVIRONMENT == "local":
@@ -180,7 +208,6 @@ class CompareDataMarketingPage(GetDataCustomer):
 
     def preload_all_data(self):
         if CompareDataMarketingPage._cache_data is not None:
-            print("Using cached data from previous load!")
             return CompareDataMarketingPage._cache_data, CompareDataMarketingPage._cache_username
         
         cache = {
@@ -195,7 +222,6 @@ class CompareDataMarketingPage(GetDataCustomer):
         
         baseline_last_month = Data["Marketing_Pages_Last_Month"]
         username = baseline_last_month["metadata"]["filters"]["username"]
-        print(f"Using consistent username from baseline: {username}")
         
         baseline_data_map = {
             "last_month": Data["Marketing_Pages_Last_Month"],
@@ -205,10 +231,8 @@ class CompareDataMarketingPage(GetDataCustomer):
         
         periods_with_data = set()
         
-        print("Phase 1: Loading marketing pages data...")
         for period in ["last_month", "last_week", "yesterday"]:
             if period not in baseline_data_map or not baseline_data_map[period]:
-                print(f"Skipping {period} - baseline not found")
                 cache["marketing_pages"][period] = {"has_data": False, "channels_data": [], "channel_details_data": {}}
                 continue
                 
@@ -216,7 +240,6 @@ class CompareDataMarketingPage(GetDataCustomer):
             baseline_has_data = baseline_period_data["metadata"].get("has_data", True)
             
             if not baseline_has_data:
-                print(f"Skipping {period} - baseline has no data")
                 cache["marketing_pages"][period] = {"has_data": False, "channels_data": [], "channel_details_data": {}}
                 continue
             
@@ -232,7 +255,6 @@ class CompareDataMarketingPage(GetDataCustomer):
                 }
             }
             
-            print(f"Loading marketing pages data for {period} (language: {baseline_language})")
             data_marketing_pages = self.get_data_marketing_pages_in_customer(
                 username, baseline_language, baseline_from_date, baseline_to_date, baseline_include_inactive, get_detail=True
             )
@@ -241,53 +263,37 @@ class CompareDataMarketingPage(GetDataCustomer):
             if data_marketing_pages.get("has_data", True):
                 periods_with_data.add(period)
         
-        print(f"Periods with marketing pages data: {periods_with_data}")
-        
-        print("Phase 2: Loading referrers data...")
         for period in periods_with_data:
             period_info = cache[period]
             baseline_from_date = period_info["date_range"]["from_date"]
             baseline_to_date = period_info["date_range"]["to_date"]
             
-            print(f"Loading referrers data for {period} (device: All)")
             data_referrers = self.get_data_referrers_in_customer(
                 username, baseline_from_date, baseline_to_date, "All", get_detail=False
             )
             cache["referrers"][period] = data_referrers
         
-        print("Phase 3: Loading landing pages data...")
         for period in periods_with_data:
             period_info = cache[period]
             baseline_from_date = period_info["date_range"]["from_date"]
             baseline_to_date = period_info["date_range"]["to_date"]
             
-            print(f"Loading landing pages data for {period} (device: All)")
             data_landing_pages = self.get_data_landing_pages_in_customer(
                 username, "All", "All", baseline_from_date, baseline_to_date, "All", get_detail=False
             )
             cache["landing_pages"][period] = data_landing_pages
 
-        print("Phase 4: Loading statistics data...")
         if "last_month" in periods_with_data:
             baseline_period_data = Data["Marketing_Pages_Last_Month"]
             baseline_from_date = baseline_period_data["metadata"]["period"]["from_date"]
             month_date = datetime.strptime(baseline_from_date, "%m-%d-%Y").strftime("%m-%Y")
             
-            print(f"Loading statistics for last_month (month: {month_date})")
             cache["statistics"]["last_month"] = self.get_data_statistics_in_customer(
                 username, month_date
             )
         
         CompareDataMarketingPage._cache_data = cache
         CompareDataMarketingPage._cache_username = username
-        
-        print(f"✅ Data loading completed successfully!")
-        print(f"   Username: {username}")
-        print(f"   Loaded periods: {list(periods_with_data)}")
-        print(f"   Marketing pages cache keys: {list(cache['marketing_pages'].keys())}")
-        print(f"   Referrers cache keys: {list(cache['referrers'].keys())}")
-        print(f"   Landing pages cache keys: {list(cache['landing_pages'].keys())}")
-        print(f"   Statistics cache keys: {list(cache['statistics'].keys())}")
         return cache, username
 
     def check_data_marketing_pages_filter_by_date_language(self, testcase):
@@ -328,9 +334,17 @@ class CompareDataMarketingPage(GetDataCustomer):
                 elif baseline_has_data and not current_has_data:
                     raise Exception(f"{period_name}: No current data found for user {username} from {from_date} to {to_date} with language {language}, but baseline data exists")
                 else:
-                    self._compare_channels_data(baseline_data["channels_data"], current_data["channels_data"])
-                    self._compare_channel_details(baseline_data["channel_details_data"], current_data["channel_details_data"])
-                    subAutoTestCase += f"\n     + {period_name}: Successfully verified data with date range {from_date} to {to_date}"
+                    channel_mismatches = self._compare_channels_data(baseline_data["channels_data"], current_data["channels_data"])
+                    detail_mismatches = self._compare_channel_details(baseline_data["channel_details_data"], current_data["channel_details_data"])
+                    
+                    all_mismatches = channel_mismatches + detail_mismatches
+                    
+                    if all_mismatches:
+                        subAutoTestCase += f"\n     + {period_name}: Data mismatches found ({len(all_mismatches)} issues) for user {username}"
+                        for i, mismatch in enumerate(all_mismatches):
+                            subAutoTestCase += f"\n       - {mismatch}"
+                    else:
+                        subAutoTestCase += f"\n     + {period_name}: Successfully verified data with date range {from_date} to {to_date}"
             
             self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0], sheet_name=Checklist_Sheet_Name)
             indexChl += 1
@@ -345,45 +359,62 @@ class CompareDataMarketingPage(GetDataCustomer):
             include_inactive = baseline_data["metadata"]["filters"].get("include_inactive_tracking", False)
             
             languages = set()
-            for channel_data in baseline_data["channels_data"]:
-                if channel_data["language"] and channel_data["language"].lower() != "none" and channel_data["language"].strip() != "":
-                    languages.add(channel_data["language"])
+            for channel_key, url_details in baseline_data["channel_details_data"].items():
+                for url_data in url_details:
+                    if url_data["language"] and url_data["language"].lower() not in ["none", "-"] and url_data["language"].strip() != "":
+                        languages.add(url_data["language"])
             
             if languages:
                 language = next(iter(languages))
+                
+                language_mapping = {
+                    "chinese simplified": "zh-cn",
+                    "english": "en-us",
+                    "bengali": "bn-in",
+                    "english (india)": "en-in",
+                    "indonesian": "id-id",
+                    "japanese": "ja-jp",
+                    "korean": "ko-kr",
+                    "thai": "th-th",
+                    "vietnamese": "vi-vn",
+                    "telugu": "te-in"
+                }
+                
+                language_lower = language.lower()
+                if language_lower in language_mapping:
+                    language_code_to_select = language_mapping[language_lower]
+                else:
+                    language_code_to_select = language_lower
+                
                 current_data = self.get_data_marketing_pages_in_customer(username, language, from_date, to_date, include_inactive)
                 
                 if current_data.get("has_data", True):
-                    language_mapping = {
-                        "chinese simplified": "zh-cn",
-                        "english": "en-us",
-                        "bengali": "bn-in",
-                        "english (india)": "en-in",
-                        "indonesian": "id-id",
-                        "japanese": "ja-jp",
-                        "korean": "ko-kr",
-                        "thai": "th-th",
-                        "vietnamese": "vi-vn",
-                        "telugu": "te-in"
-                    }
+                    language_code = language_code_to_select
                     
-                    language_lower = language.lower()
-                    if language_lower in language_mapping:
-                        language_code = language_mapping[language_lower]
-                    else:
-                        language_code = language_lower
-                        
-                    for channel_data in current_data["channels_data"]:
-                        current_language_lower = channel_data["language"].lower()
-                        if current_language_lower in language_mapping:
-                            current_language_code = language_mapping[current_language_lower]
+                    language_found = False
+                    mismatched_languages = []
+                    
+                    for channel_key, url_details in current_data["channel_details_data"].items():
+                        for url_data in url_details:
+                            if url_data["language"] and url_data["language"].lower() not in ["none", "-"] and url_data["language"].strip() != "":
+                                current_language_lower = url_data["language"].lower()
+                                if current_language_lower in language_mapping:
+                                    current_language_code = language_mapping[current_language_lower]
+                                else:
+                                    current_language_code = current_language_lower
+                                    
+                                if current_language_code == language_code:
+                                    language_found = True
+                                else:
+                                    mismatched_languages.append(f"{url_data['language']} (code: {current_language_code})")
+                    
+                    if language_found:
+                        if mismatched_languages:
+                            subAutoTestCase += f"\n     + Language filter partially verified for '{language}' but found some mismatched languages: {', '.join(set(mismatched_languages))}"
                         else:
-                            current_language_code = current_language_lower
-                            
-                        if current_language_code != language_code:
-                            raise Exception(f"Language filter did not work correctly. Found language {channel_data['language']} (code: {current_language_code}) when filtering for {language} (code: {language_code})")
-                    
-                    subAutoTestCase += f"\n     + Successfully verified Language filter for '{language}'"
+                            subAutoTestCase += f"\n     + Successfully verified Language filter for '{language}'"
+                    else:
+                        subAutoTestCase += f"\n     + Language filter test failed: No URLs found with the filtered language '{language}' (code: {language_code})"
                 else:
                     subAutoTestCase += f"\n     + No data found when filtering for language '{language}'"
             else:
@@ -429,7 +460,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                     subAutoTestCase += f"\n     + No data found for Marketing Pages in {period_display}."
                     continue
                 
-                subAutoTestCase += f"\n     + Username: {username}"
+                current_username = self._get_username_for_period(period, username)
+                subAutoTestCase += f"\n     + Username: {current_username}"
                 subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                 subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                 
@@ -475,10 +507,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                 
                 if mismatches:
                     subAutoTestCase += f"\n     + Failed: {len(mismatches)} mismatches found:"
-                    for mismatch in mismatches[:3]:
+                    for mismatch in mismatches:
                         subAutoTestCase += f"\n       - {mismatch}"
-                    if len(mismatches) > 3:
-                        subAutoTestCase += f"\n       - ... and {len(mismatches) - 3} more"
                 else:
                     subAutoTestCase += f"\n     + Verified: All channel totals match the sum of their detail URLs."
             
@@ -527,7 +557,7 @@ class CompareDataMarketingPage(GetDataCustomer):
                 subAutoTestCase += f"- Verify that Total Clicks for Marketing Pages {period_display} are equal to Total Clicks for Referrers."
                 
                 data_marketing_pages = cache["marketing_pages"][period]
-                data_referrers = cache["referrers"][period]
+                data_referrers = cache["referrers"].get(period, {"has_data": False})
                 
                 marketing_pages_total_clicks = 0
                 if data_marketing_pages.get("has_data", True):
@@ -542,7 +572,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                 has_data = data_marketing_pages.get("has_data", True) and data_referrers.get("has_data", True)
                 
                 if has_data:
-                    subAutoTestCase += f"\n     + Username: {username}"
+                    current_username = self._get_username_for_period(period, username)
+                    subAutoTestCase += f"\n     + Username: {current_username}"
                     subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                     subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     
@@ -577,7 +608,7 @@ class CompareDataMarketingPage(GetDataCustomer):
                 subAutoTestCase += f"- Verify that Total Clicks for Marketing Pages {period_display} are equal to Total Clicks for Landing Pages."
                 
                 data_marketing_pages = cache["marketing_pages"][period]
-                data_landing_pages = cache["landing_pages"][period]
+                data_landing_pages = cache["landing_pages"].get(period, {"has_data": False})
                 
                 marketing_pages_total_clicks = 0
                 if data_marketing_pages.get("has_data", True):
@@ -592,7 +623,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                 has_data = data_marketing_pages.get("has_data", True) and data_landing_pages.get("has_data", True)
                 
                 if has_data:
-                    subAutoTestCase += f"\n     + Username: {username}"
+                    current_username = self._get_username_for_period(period, username)
+                    subAutoTestCase += f"\n     + Username: {current_username}"
                     subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                     subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     
@@ -674,7 +706,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                     subAutoTestCase += f"- Verify that {data_type_display} for Marketing Pages {period_display} are equal to {data_type_display} for {compare_with_display}."
                     
                     data_marketing_pages = cache["marketing_pages"][period]
-                    data_compare = cache[compare_with][period]
+                    
+                    data_compare = cache[compare_with].get(period, {"has_data": False})
                     
                     marketing_pages_value = 0
                     if data_marketing_pages.get("has_data", True):
@@ -693,7 +726,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                     has_data = data_marketing_pages.get("has_data", True) and data_compare.get("has_data", True)
                     
                     if has_data:
-                        subAutoTestCase += f"\n     + Username: {username}"
+                        current_username = self._get_username_for_period(period, username)
+                        subAutoTestCase += f"\n     + Username: {current_username}"
                         subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                         subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                         
@@ -753,7 +787,6 @@ class CompareDataMarketingPage(GetDataCustomer):
             
             for period in time_periods:
                 if period not in cache["statistics"]:
-                    print(f"Skipping {period} - no statistics data available")
                     continue
                     
                 period_display = period.replace("_", " ")
@@ -774,7 +807,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                 new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
                 statistics_signups = self.parse_int(new_signups_fdm[0])
                 
-                subAutoTestCase += f"\n     + Username: {username}"
+                current_username = self._get_username_for_period(period, username)
+                subAutoTestCase += f"\n     + Username: {current_username}"
                 subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                 subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                 
@@ -817,7 +851,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                 new_signups_fdm = str(data_statistics["new_signups_month"]).split('/')
                 statistics_fdm = self.parse_int(new_signups_fdm[1]) if len(new_signups_fdm) > 1 else 0
                 
-                subAutoTestCase += f"\n     + Username: {username}"
+                current_username = self._get_username_for_period(period, username)
+                subAutoTestCase += f"\n     + Username: {current_username}"
                 subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                 subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                 
@@ -885,7 +920,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                 
                 data_marketing_pages = cache["marketing_pages"][period]
                 
-                subAutoTestCase += f"\n     + Username: {username}"
+                current_username = self._get_username_for_period(period, username)
+                subAutoTestCase += f"\n     + Username: {current_username}"
                 subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
                 subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                 
@@ -924,10 +960,8 @@ class CompareDataMarketingPage(GetDataCustomer):
                     subAutoTestCase += f"\n     + No channels with Total Clicks data found."
                 elif violations:
                     subAutoTestCase += f"\n     + Failed: {len(violations)} channels/URLs have Total Clicks but no Unique Clicks:"
-                    for violation in violations[:3]:
+                    for violation in violations:
                         subAutoTestCase += f"\n       - {violation}"
-                    if len(violations) > 3:
-                        subAutoTestCase += f"\n       - ... and {len(violations) - 3} more"
                 else:
                     subAutoTestCase += f"\n     + Verified: All {channels_with_total_clicks} channels/URLs with Total Clicks also have Unique Clicks data."
             

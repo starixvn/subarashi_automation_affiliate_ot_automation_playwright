@@ -1,13 +1,4 @@
-"""
-Note Block Elements
-
-This file contains XPath locators for the note block elements on the Affiliate page.
-"""
-
 class NoteBlockElements:
-    """
-    Class containing XPath locators for the note block elements.
-    """
     
     # Block container
     div_block_note = "//div[@class='block block-note']"

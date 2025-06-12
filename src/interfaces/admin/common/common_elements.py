@@ -1,4 +1,5 @@
 class CommonElements:
+    
     # Multiple option select
     div_multiple_option_filter = "//div[@class='my-sm-1 mr-sm-2 multiple-currency-filter form-group']"
     lbl_linked_currency = "//div[@class='my-sm-1 mr-sm-2 multiple-currency-filter form-group']/label[@class='mr-sm-2']"

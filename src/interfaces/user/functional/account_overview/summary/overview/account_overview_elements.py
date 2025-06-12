@@ -1,13 +1,4 @@
-"""
-Account Overview Elements
-
-This file contains XPath locators for the main elements on the Account Overview page.
-"""
-
 class AccountOverviewElements:
-    """
-    Class containing XPath locators for Account Overview page elements.
-    """
     
     # Main container elements
     div_main_container = "//div[@class='main-container']"
@@ -31,38 +22,3 @@ class AccountOverviewElements:
     # Content container
     div_account_overview_content = "//div[@id='account-overview-content']"
     
-    @staticmethod
-    def get_menu_item_by_id(menu_id):
-        """
-        Get the XPath for a specific menu item by its ID.
-        
-        Args:
-            menu_id (str): The ID of the menu item (menuSummary, menuAffiliateLink, menuMediaGallery).
-            
-        Returns:
-            str: XPath locator for the specified menu item.
-        """
-        return f"//div[@id='account-overview-menu']//li/a[@id='{menu_id}']"
-    
-    @staticmethod
-    def get_menu_item_by_name(name):
-        """
-        Get the XPath for a specific menu item by its data-name attribute.
-        
-        Args:
-            name (str): The data-name attribute value (Summary, AffiliateLink, MediaGallery).
-            
-        Returns:
-            str: XPath locator for the specified menu item.
-        """
-        return f"//div[@id='account-overview-menu']//li/a[@data-name='{name}']"
-    
-    @staticmethod
-    def get_active_menu_item():
-        """
-        Get the XPath for the currently active menu item.
-        
-        Returns:
-            str: XPath locator for the active menu item.
-        """
-        return "//div[@id='account-overview-menu']//li/a[@class='menu-item account-overview-menu-item active']" 

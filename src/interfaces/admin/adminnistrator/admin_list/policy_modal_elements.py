@@ -1,4 +1,5 @@
 class PolicyModalElements:
+    
     # Modal container
     mdl_policy = "//div[@class='modal-dialog']"
     mdl_content = "//div[@class='modal-content']"

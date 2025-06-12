@@ -1,9 +1,4 @@
 class QrCodeElements:
-    """
-    Class containing XPath locators for the QR Code elements on the Affiliate page.
-    These elements are used to display QR codes and tracking links.
-    """
-
     # Main container elements
     div_qr_code = "//div[@id='qrcode']"
     div_info_group = "//div[@id='qrcode' and @class='info-group']"
@@ -44,39 +39,3 @@ class QrCodeElements:
     div_qr_link_display = "//div[@id='qrcode']//div[contains(@class, 'qr-link-display')]"
     span_qr_link = "//div[@id='qrcode']//span[contains(@class, 'qr-link')]"
     button_copy_link = "//div[@id='qrcode']//button[contains(@class, 'btn-copy-link')]"
-
-    def get_qr_item_by_index(self, index):
-        """Get QR item element by index (1-based)"""
-        return f"//div[@id='qrcode']//div[contains(@class, 'qr-item')][{index}]"
-    
-    def get_qr_item_by_language(self, language):
-        """Get QR item element by language"""
-        return f"//div[@id='qrcode']//div[contains(@class, 'qr-item')][.//label[@class='language' and contains(text(), '{language}')]]"
-
-    def get_qr_item_by_link_containing(self, text):
-        """Get QR item element by link text"""
-        return f"//div[@id='qrcode']//div[contains(@class, 'qr-item')][.//span[contains(@class, 'qr-link') and contains(text(), '{text}')]]"
-        
-    def get_qr_img_by_language(self, language):
-        """Get QR image element by language"""
-        return f"//div[@id='qrcode']//div[contains(@class, 'qr-item')][.//label[@class='language' and contains(text(), '{language}')]]//img[@class='qrcode-img']"
-        
-    def get_qr_link_by_language(self, language):
-        """Get QR link span by language"""
-        return f"//div[@id='qrcode']//div[contains(@class, 'qr-item')][.//label[@class='language' and contains(text(), '{language}')]]//span[contains(@class, 'qr-link')]"
-        
-    def get_copy_qr_button_by_language(self, language):
-        """Get copy QR button by language"""
-        return f"//div[@id='qrcode']//div[contains(@class, 'qr-item')][.//label[@class='language' and contains(text(), '{language}')]]//button[contains(@class, 'btn-copy-qr')]"
-        
-    def get_save_img_button_by_language(self, language):
-        """Get save image button by language"""
-        return f"//div[@id='qrcode']//div[contains(@class, 'qr-item')][.//label[@class='language' and contains(text(), '{language}')]]//button[contains(@class, 'btn-save-img')]"
-        
-    def get_copy_link_button_by_language(self, language):
-        """Get copy link button by language"""
-        return f"//div[@id='qrcode']//div[contains(@class, 'qr-item')][.//label[@class='language' and contains(text(), '{language}')]]//button[contains(@class, 'btn-copy-link')]"
-        
-    def get_toggle_link_by_language(self, language):
-        """Get toggle link input by language"""
-        return f"//div[@id='qrcode']//div[contains(@class, 'qr-item')][.//label[@class='language' and contains(text(), '{language}')]]//input[@type='checkbox']" 

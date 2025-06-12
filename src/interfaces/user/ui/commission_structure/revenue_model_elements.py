@@ -1,13 +1,4 @@
-"""
-Revenue Model Elements
-
-This file contains XPath locators for the revenue model section elements.
-"""
-
 class RevenueModelElements:
-    """
-    Class containing XPath locators for revenue model section elements.
-    """
     
     # Section container
     div_block_revenue = "//div[@class='block block-revenue']"
@@ -21,13 +12,3 @@ class RevenueModelElements:
     div_description = "//div[@class='block block-revenue']//div[@class='description']"
     first_paragraph = "//div[@class='block block-revenue']//div[@class='description'][1]"
     second_paragraph = "//div[@class='block block-revenue']//div[@class='description'][2]"
-    
-    @staticmethod
-    def get_paragraph(index):
-        """
-        Returns XPath for a specific paragraph by index
-        
-        Args:
-            index: The 1-based index of the paragraph
-        """
-        return f"//div[@class='block block-revenue']//div[@class='description'][{index}]" 

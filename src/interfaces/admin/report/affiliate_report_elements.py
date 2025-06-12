@@ -1,4 +1,5 @@
 class AffiliateReportElements:
+    
     # Filter section elements
     inp_affiliate = "//input[@id='Affiliate']"
     sel_base_currency = "//select[@id='BaseCurrency']"

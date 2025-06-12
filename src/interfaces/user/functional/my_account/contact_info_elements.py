@@ -1,9 +1,5 @@
 class ContactInfoElements:
-    """
-    Class containing XPath locators for the Contact Information section.
-    These elements are for the contact details fields.
-    """
-
+    
     # Contact info group
     div_contact_info_group = "//div[@class='info-group'][.//span[text()='Contact Information']]"
     div_contact_title = "//div[@class='info-group'][.//span[text()='Contact Information']]/div[@class='title']"
@@ -59,14 +55,3 @@ class ContactInfoElements:
     input_hidden_contact_app_name = "//input[@name='ContactAppList[0].Name']"
     input_hidden_contact_app_order = "//input[@name='ContactAppList[0].Order']"
     
-    def get_contact_form_group_by_label(self, label_text):
-        """Get contact form group by label text"""
-        return f"//div[@class='info-group'][.//span[text()='Contact Information']]//div[@class='form-group'][.//label[text()='{label_text}']]"
-    
-    def get_contact_field_value_by_label(self, label_text):
-        """Get contact field value by label text"""
-        return f"//div[@class='info-group'][.//span[text()='Contact Information']]//div[@class='form-group'][.//label[text()='{label_text}']]/div[2]/p"
-    
-    def get_contact_input_by_label(self, label_text):
-        """Get contact input field by label text"""
-        return f"//div[@class='info-group'][.//span[text()='Contact Information']]//div[@class='form-group'][.//label[text()='{label_text}']]/div[2]/input" 

@@ -1,13 +1,4 @@
-"""
-Commission Banner Elements
-
-This file contains XPath locators for the commission banner elements.
-"""
-
 class CommissionBannerElements:
-    """
-    Class containing XPath locators for commission banner elements.
-    """
     
     # Banner container
     div_swiper_top_banner = "//div[@class='swiper top-banner']"

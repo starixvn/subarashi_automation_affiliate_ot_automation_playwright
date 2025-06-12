@@ -1,13 +1,4 @@
-"""
-Terms Page Elements
-
-This file contains XPath locators for the main elements on the Terms and Conditions page.
-"""
-
 class TermsPageElements:
-    """
-    Class containing XPath locators for Terms and Conditions page elements.
-    """
     
     # Main container elements
     div_main_container = "//div[@class='main-container']"

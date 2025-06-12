@@ -1,4 +1,5 @@
 class AdminListElements:
+    
     # Add Department button
     btn_add_dept = "//button[contains(@class, 'btn-outline-secondary') and contains(text(), 'Add Dept')]"
     icn_add_dept = "//button[contains(@class, 'btn-outline-secondary')]//span[@class='oi oi-plus']"

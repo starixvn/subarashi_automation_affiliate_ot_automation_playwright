@@ -1,13 +1,4 @@
-"""
-Move To Top Elements
-
-This file contains XPath locators for the move to top button elements.
-"""
-
 class MoveToTopElements:
-    """
-    Class containing XPath locators for move to top button elements.
-    """
     
     # Container
     div_moving_block = "//div[@class='moving-block']"

@@ -1,16 +1,4 @@
 class MarketingTeamNoteElements:
-    """
-    Marketing Team Note page element selectors for the admin interface.
-    
-    Follows these criteria:
-    - Each XPath selector targets a unique element
-    - Uses IDs and unique classes where available
-    - Avoids selectors that rely on text content
-    - Follows a clear DOM structure
-    """
-    # Since the Marketing Team Note page has the same structure as the Note page,
-    # we can reuse the same selectors with specific context to ensure they target
-    # elements only in the Marketing Team Note section
     
     # Action Buttons
     btn_add_marketing_note = "//div[@class='data-content']/div[@class='my-2']/button[@class='btn btn-outline-secondary']"

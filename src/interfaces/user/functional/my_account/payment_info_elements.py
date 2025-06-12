@@ -1,9 +1,5 @@
 class PaymentInfoElements:
-    """
-    Class containing XPath locators for the Payment Information section.
-    These elements are for the payment details fields.
-    """
-
+    
     # Payment info group
     div_payment_info_group = "//div[@class='info-group'][.//span[text()='Payment Information']]"
     div_payment_title = "//div[@class='info-group'][.//span[text()='Payment Information']]/div[@class='title']"
@@ -28,11 +24,3 @@ class PaymentInfoElements:
     div_button_block = "//div[@class='info-group'][.//span[text()='Payment Information']]/../div[@class='col-sm-offset-3 button-block']"
     button_submit = "//button[@id='btnMyAccountSubmit']"
     button_cancel = "//button[@id='btnCancel']"
-    
-    def get_payment_form_group_by_label(self, label_text):
-        """Get payment form group by label text"""
-        return f"//div[@class='info-group'][.//span[text()='Payment Information']]//div[@class='form-group'][.//label[text()='{label_text}']]"
-    
-    def get_payment_field_value_by_label(self, label_text):
-        """Get payment field value by label text"""
-        return f"//div[@class='info-group'][.//span[text()='Payment Information']]//div[@class='form-group'][.//label[text()='{label_text}']]/div[2]/p" 

@@ -1,13 +1,4 @@
-"""
-FAQ Elements
-
-This file contains XPath locators for the FAQ section elements.
-"""
-
 class FAQElements:
-    """
-    Class containing XPath locators for the FAQ section elements.
-    """
     
     # Section container
     div_block_faq = "//div[@class='block block-faq']"
@@ -39,23 +30,3 @@ class FAQElements:
     # More FAQs button
     div_text_center = "//div[@class='block block-faq']//div[@class='group-faq']/div[@class='anwser']/div[@class='text-center']"
     a_more_faqs = "//div[@class='block block-faq']//div[@class='group-faq']/div[@class='anwser']/div[@class='text-center']/a"
-    
-    @staticmethod
-    def get_faq_heading(index):
-        """
-        Returns XPath for a specific FAQ heading by index
-        
-        Args:
-            index: The 1-based index of the FAQ heading
-        """
-        return f"//div[@class='block block-faq']//div[@class='group-faq']/div[@class='anwser']/div[@class='anwser-heading'][{index}]"
-    
-    @staticmethod
-    def get_faq_text(index):
-        """
-        Returns XPath for a specific FAQ text by index
-        
-        Args:
-            index: The 1-based index of the FAQ text
-        """
-        return f"//div[@class='block block-faq']//div[@class='group-faq']/div[@class='anwser']/div[@class='anwser-text'][{index}]" 

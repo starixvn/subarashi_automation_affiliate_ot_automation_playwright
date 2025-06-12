@@ -1,4 +1,5 @@
 class LandingPagesElements:
+    
     # Filter section
     div_filter_container = "//div[@class='filter-container py-0']"
     div_form_inline = "//div[@class='filter-container py-0']/div[@class='form-inline']"

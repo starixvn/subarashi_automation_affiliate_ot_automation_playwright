@@ -1,13 +1,4 @@
-"""
-FAQ Page Elements
-
-This file contains XPath locators for the main elements on the FAQ page.
-"""
-
 class FAQPageElements:
-    """
-    Class containing XPath locators for FAQ page elements.
-    """
     
     # Main container elements
     div_main_container = "//div[@class='main-container']"

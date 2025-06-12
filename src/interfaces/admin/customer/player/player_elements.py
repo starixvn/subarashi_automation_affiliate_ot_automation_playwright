@@ -1,4 +1,5 @@
 class PlayerElements:
+    
     # Filter section elements
     # Player type dropdown
     lbl_player = "//label[@for='memberType']"

@@ -1,9 +1,5 @@
 class PaymentRequestElements:
-    """
-    Class containing XPath locators for the Payment Request section.
-    These elements are for the payment request form and related fields.
-    """
-
+    
     # Main container elements
     div_main_content = "//div[@class='main-content']"
     div_container_fluid = "//div[@class='main-content']/div[@class='container-fluid']"
@@ -55,11 +51,3 @@ class PaymentRequestElements:
     # Hidden inputs
     input_hidden_balance = "//form[@id='requestPayoutForm']//input[@id='BalBroughtForward']"
     input_hidden_min_amount = "//form[@id='requestPayoutForm']//input[@id='MinAmount']"
-    
-    def get_alert_message(self):
-        """Get alert message text"""
-        return f"//div[@id='resultMessage']/p[@class='alert alert-danger']"
-    
-    def is_request_button_disabled(self):
-        """Check if request button is disabled"""
-        return f"//form[@id='requestPayoutForm']//button[contains(@class, 'disabled')]" 

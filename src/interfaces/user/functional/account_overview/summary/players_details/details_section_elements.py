@@ -1,13 +1,4 @@
-"""
-Details Section Elements
-
-This file contains XPath locators for the details section elements.
-"""
-
 class DetailsSectionElements:
-    """
-    Class containing XPath locators for details section elements.
-    """
     
     # Details section container
     div_details_section_content = "//div[@class='details-section-content'][@id='details-section-content']"
@@ -55,69 +46,3 @@ class DetailsSectionElements:
     input_has_scroll = "//div[@class='details-section-content']//input[@id='HasScroll']"
     input_total_item = "//div[@class='details-section-content']//input[@id='TotalItem']"
     
-    @staticmethod
-    def get_header_column_by_index(index=1):
-        """
-        Get the XPath for a specific header column by its index.
-        
-        Args:
-            index (int): The index of the header column (1-based).
-            
-        Returns:
-            str: XPath locator for the specified header column.
-        """
-        return f"//div[@class='details-section-content']//table/thead/tr/th[{index}]"
-    
-    @staticmethod
-    def get_header_column_by_name(data_name):
-        """
-        Get the XPath for a specific header column by its data-name attribute.
-        
-        Args:
-            data_name (str): The data-name attribute value (Username, RegisteredDate, FdmDate, etc.).
-            
-        Returns:
-            str: XPath locator for the specified header column.
-        """
-        return f"//div[@class='details-section-content']//table/thead/tr/th[@data-name='{data_name}']"
-    
-    @staticmethod
-    def get_row_by_index(index=1):
-        """
-        Get the XPath for a specific data row by its index.
-        
-        Args:
-            index (int): The index of the data row (1-based).
-            
-        Returns:
-            str: XPath locator for the specified data row.
-        """
-        return f"//div[@class='details-section-content']//table/tbody/tr[{index}]"
-    
-    @staticmethod
-    def get_cell_by_row_and_column(row=1, column=1):
-        """
-        Get the XPath for a specific table cell by its row and column index.
-        
-        Args:
-            row (int): The index of the row (1-based).
-            column (int): The index of the column (1-based).
-            
-        Returns:
-            str: XPath locator for the specified table cell.
-        """
-        return f"//div[@class='details-section-content']//table/tbody/tr[{row}]/td[{column}]"
-    
-    @staticmethod
-    def get_cell_by_username_and_column(username, column=1):
-        """
-        Get the XPath for a specific table cell by username and column.
-        
-        Args:
-            username (str): The username text in the Username column.
-            column (int): The index of the column (1-based).
-            
-        Returns:
-            str: XPath locator for the specified table cell.
-        """
-        return f"//div[@class='details-section-content']//table/tbody/tr[td[2][text()='{username}']]/td[{column}]"

@@ -1,13 +1,5 @@
 class SubMenuElements:
-    """
-    Sub-menu element selectors for the notes section of the admin interface.
     
-    Follows these criteria:
-    - Each XPath selector targets a unique element
-    - Uses IDs and unique classes where available
-    - Avoids selectors that rely on text content when possible
-    - Follows a clear DOM structure
-    """
     # Menu container
     ul_nav_menu = "//ul[@class='nav']"
     

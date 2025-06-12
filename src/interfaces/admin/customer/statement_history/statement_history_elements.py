@@ -1,13 +1,5 @@
 class StatementHistoryElements:
-    """
-    Element selectors for the Customer Statement History page in the admin interface.
-    
-    Follows these criteria:
-    - Each XPath selector targets a unique element
-    - Uses IDs and unique classes where available
-    - Avoids selectors that rely on text content
-    - Follows a clear DOM structure
-    """
+
     # Filter section
     div_filter_container = "//div[@class='filter-container']"
     div_form_inline = "//div[@class='filter-container']/div[@class='form-inline']"

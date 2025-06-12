@@ -1,13 +1,4 @@
-"""
-Product Block Elements
-
-This file contains XPath locators for the product block elements.
-"""
-
 class ProductBlockElements:
-    """
-    Class containing XPath locators for product block elements.
-    """
     
     # Product block container
     div_block_items_products = "//div[@class='block block-items-products']"
@@ -31,33 +22,3 @@ class ProductBlockElements:
     
     # Items container (for individual product)
     div_items = "//div[@class='page-container']/div[@class='items']"
-    
-    @staticmethod
-    def get_wrapper_by_id(product_id):
-        """
-        Returns XPath for a specific product wrapper by its ID
-        
-        Args:
-            product_id: The ID of the product wrapper (e.g., 'Sports', 'LiveCasino')
-        """
-        return f"//div[@class='main-items']/div[@class='wrapper-items'][@id='{product_id}']"
-    
-    @staticmethod
-    def get_page_container_by_product_id(product_id):
-        """
-        Returns XPath for a page container within a specific product wrapper
-        
-        Args:
-            product_id: The ID of the product wrapper (e.g., 'Sports', 'LiveCasino')
-        """
-        return f"//div[@class='main-items']/div[@class='wrapper-items'][@id='{product_id}']/div[@class='page-container']"
-    
-    @staticmethod
-    def get_items_by_product_id(product_id):
-        """
-        Returns XPath for items container within a specific product wrapper
-        
-        Args:
-            product_id: The ID of the product wrapper (e.g., 'Sports', 'LiveCasino')
-        """
-        return f"//div[@class='main-items']/div[@class='wrapper-items'][@id='{product_id}']/div[@class='page-container']/div[@class='items']" 

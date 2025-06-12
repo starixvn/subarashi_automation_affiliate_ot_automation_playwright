@@ -47,8 +47,10 @@ class CompareDataReferrers(GetDataCustomer):
         CompareDataReferrers._cache_username = None
 
     def _compare_site_urls(self, baseline_site_urls, current_site_urls):
+        mismatches = []
+        
         if len(baseline_site_urls) != len(current_site_urls):
-            raise Exception(f"Number of site URLs mismatch. Baseline: {len(baseline_site_urls)}, Current: {len(current_site_urls)}")
+            mismatches.append(f"Number of site URLs mismatch. Baseline: {len(baseline_site_urls)}, Current: {len(current_site_urls)}")
         
         for baseline_site_data in baseline_site_urls:
             site_url = baseline_site_data["site_url"]
@@ -57,30 +59,35 @@ class CompareDataReferrers(GetDataCustomer):
                 if current_site["site_url"].lower() == site_url.lower():
                     site_found = True
                     if int(current_site["total_click"]) != baseline_site_data["total_click"]:
-                        raise Exception(f"Total clicks mismatch for site {site_url}. Baseline: {baseline_site_data['total_click']}, Current: {current_site['total_click']}")
+                        mismatches.append(f"Total clicks mismatch for site {site_url}. Baseline: {baseline_site_data['total_click']}, Current: {current_site['total_click']}")
                     if int(current_site["unique_click"]) != baseline_site_data["unique_click"]:
-                        raise Exception(f"Unique clicks mismatch for site {site_url}. Baseline: {baseline_site_data['unique_click']}, Current: {current_site['unique_click']}")
+                        mismatches.append(f"Unique clicks mismatch for site {site_url}. Baseline: {baseline_site_data['unique_click']}, Current: {current_site['unique_click']}")
                     if int(current_site["signups"]) != baseline_site_data["signups"]:
-                        raise Exception(f"Signups mismatch for site {site_url}. Baseline: {baseline_site_data['signups']}, Current: {current_site['signups']}")
+                        mismatches.append(f"Signups mismatch for site {site_url}. Baseline: {baseline_site_data['signups']}, Current: {current_site['signups']}")
                     if int(current_site["fdm"]) != baseline_site_data["fdm"]:
-                        raise Exception(f"FDM mismatch for site {site_url}. Baseline: {baseline_site_data['fdm']}, Current: {current_site['fdm']}")
+                        mismatches.append(f"FDM mismatch for site {site_url}. Baseline: {baseline_site_data['fdm']}, Current: {current_site['fdm']}")
                     break
             
             if not site_found and site_url.lower() != "none" and site_url.strip() != "":
-                raise Exception(f"Site URL '{site_url}' not found in current data")
+                mismatches.append(f"Site URL '{site_url}' not found in current data")
+        
+        return mismatches
     
     def _compare_website_urls(self, baseline_website_urls_data, current_website_urls_data):
+        mismatches = []
+        
         for site_url, baseline_website_urls in baseline_website_urls_data.items():
             if site_url.lower() == "none":
                 continue
             
             if site_url not in current_website_urls_data:
-                raise Exception(f"Website URLs for site '{site_url}' not found in current data")
+                mismatches.append(f"Website URLs for site '{site_url}' not found in current data")
+                continue
             
             current_website_urls = current_website_urls_data[site_url]
             
             if len(baseline_website_urls) != len(current_website_urls):
-                raise Exception(f"Number of website URLs mismatch for site {site_url}. Baseline: {len(baseline_website_urls)}, Current: {len(current_website_urls)}")
+                mismatches.append(f"Number of website URLs mismatch for site {site_url}. Baseline: {len(baseline_website_urls)}, Current: {len(current_website_urls)}")
             
             for baseline_website in baseline_website_urls:
                 website_found = False
@@ -88,9 +95,9 @@ class CompareDataReferrers(GetDataCustomer):
                     if current_website["website_url"] == baseline_website["website_url"]:
                         website_found = True
                         if int(current_website["total_clicks"]) != baseline_website["total_clicks"]:
-                            raise Exception(f"Total clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['total_clicks']}, Current: {current_website['total_clicks']}")
+                            mismatches.append(f"Total clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['total_clicks']}, Current: {current_website['total_clicks']}")
                         if int(current_website["unique_clicks"]) != baseline_website["unique_clicks"]:
-                            raise Exception(f"Unique clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['unique_clicks']}, Current: {current_website['unique_clicks']}")
+                            mismatches.append(f"Unique clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['unique_clicks']}, Current: {current_website['unique_clicks']}")
                         
                         baseline_signups = baseline_website["signups"]
                         current_signups = 0
@@ -100,14 +107,16 @@ class CompareDataReferrers(GetDataCustomer):
                             current_signups = int(current_website["sign_up"])
                         
                         if current_signups != baseline_signups:
-                            raise Exception(f"Signups mismatch for website {baseline_website['website_url']}. Baseline: {baseline_signups}, Current: {current_signups}")
+                            mismatches.append(f"Signups mismatch for website {baseline_website['website_url']}. Baseline: {baseline_signups}, Current: {current_signups}")
                         
                         if int(current_website["fdm"]) != baseline_website["fdm"]:
-                            raise Exception(f"FDM mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['fdm']}, Current: {current_website['fdm']}")
+                            mismatches.append(f"FDM mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['fdm']}, Current: {current_website['fdm']}")
                         break
                 
                 if not website_found:
-                    raise Exception(f"Website URL '{baseline_website['website_url']}' not found in current data for site {site_url}")
+                    mismatches.append(f"Website URL '{baseline_website['website_url']}' not found in current data for site {site_url}")
+        
+        return mismatches
     
     def parse_int(self, text):
                 try:
@@ -171,7 +180,6 @@ class CompareDataReferrers(GetDataCustomer):
             to_date = yesterday.strftime("%m-%d-%Y")
             month_date = yesterday.strftime("%m-%Y")
 
-        
         return {
             "from_date": from_date,
             "to_date": to_date,
@@ -234,8 +242,7 @@ class CompareDataReferrers(GetDataCustomer):
                 cache_key = baseline_to_cache_mapping[baseline_key]
                 
                 baseline_username = baseline_data["metadata"]["filters"]["username"]
-                
-                # Use CACHED data - no more API calls!
+
                 current_data = cache["referrers"][cache_key]
                 
                 baseline_has_data = baseline_data["metadata"].get("has_data", True)
@@ -248,9 +255,19 @@ class CompareDataReferrers(GetDataCustomer):
                 elif baseline_has_data and not current_has_data:
                     raise Exception(f"{period_name}: No current data found but baseline data exists")
                 else:
-                    self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
-                    self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
-                    subAutoTestCase += f"\n     + {period_name}: Successfully verified data (Username: {baseline_username})"
+                    site_mismatches = self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
+                    website_mismatches = self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
+                    
+                    all_mismatches = site_mismatches + website_mismatches
+                    
+                    if all_mismatches:
+                        subAutoTestCase += f"\n     + {period_name}: Data mismatches found ({len(all_mismatches)} issues) for Username: {baseline_username}"
+                        for i, mismatch in enumerate(all_mismatches[:5]):
+                            subAutoTestCase += f"\n       - {mismatch}"
+                        if len(all_mismatches) > 5:
+                            subAutoTestCase += f"\n       - ... and {len(all_mismatches) - 5} more mismatches"
+                    else:
+                        subAutoTestCase += f"\n     + {period_name}: Successfully verified data (Username: {baseline_username})"
             
             self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0], sheet_name=Checklist_Sheet_Name)
             indexChl += 1
@@ -283,9 +300,19 @@ class CompareDataReferrers(GetDataCustomer):
                 elif baseline_has_data and not current_has_data:
                     raise Exception(f"{device_period_name}: No current data found but baseline data exists")
                 else:
-                    self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
-                    self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
-                    subAutoTestCase += f"\n     + {device_period_name}: Successfully verified data (Username: {baseline_username})"
+                    site_mismatches = self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
+                    website_mismatches = self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
+                    
+                    all_mismatches = site_mismatches + website_mismatches
+                    
+                    if all_mismatches:
+                        subAutoTestCase += f"\n     + {device_period_name}: Data mismatches found ({len(all_mismatches)} issues) for Username: {baseline_username}"
+                        for i, mismatch in enumerate(all_mismatches[:5]):
+                            subAutoTestCase += f"\n       - {mismatch}"
+                        if len(all_mismatches) > 5:
+                            subAutoTestCase += f"\n       - ... and {len(all_mismatches) - 5} more mismatches"
+                    else:
+                        subAutoTestCase += f"\n     + {device_period_name}: Successfully verified data (Username: {baseline_username})"
             
             self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0], sheet_name=Checklist_Sheet_Name)
             
@@ -349,8 +376,7 @@ class CompareDataReferrers(GetDataCustomer):
             
             baseline_from_date = baseline_data["metadata"]["period"]["from_date"]
             baseline_to_date = baseline_data["metadata"]["period"]["to_date"]
-            
-            # Extract device type from cache key
+
             if "Mobile" in cache_key:
                 device_type = "Mobile"
             elif "PC / Laptop" in cache_key:
@@ -432,7 +458,7 @@ class CompareDataReferrers(GetDataCustomer):
         CompareDataReferrers._cache_data = cache
         CompareDataReferrers._cache_username = username
         
-        print(f"✅ Data loading completed successfully!")
+        print(f"   Data loading completed successfully!")
         print(f"   Username: {username}")
         print(f"   Loaded periods: {list(periods_with_data)}")
         print(f"   Referrers cache keys: {list(cache['referrers'].keys())}")
@@ -607,43 +633,41 @@ class CompareDataReferrers(GetDataCustomer):
                 if period not in cache:
                     continue
                     
-                for device_type in device_types:
-                    device_display = "Desktop" if device_type == "PC / Laptop" else device_type
-                    period_display = period.replace("_", " ")
+                period_display = period.replace("_", " ")
+                
+                if subAutoTestCase:
+                    subAutoTestCase += '\n\n'
                     
-                    if subAutoTestCase:
-                        subAutoTestCase += '\n\n'
-                        
-                    subAutoTestCase += f"- Verify that Total Clicks for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display} are equal to Total Clicks for Marketing Pages."
+                subAutoTestCase += f"- Verify that Total Clicks for Referrers {period_display} (All devices) are equal to Total Clicks for Marketing Pages."
+                
+                key = f"{period}_All"
+                data_referrers = cache["referrers"].get(key, {})
+                data_marketing_pages = cache["marketing_pages"].get(period, {})
+                
+                referrers_total_clicks = 0
+                if data_referrers.get("has_data", True):
+                    for site_data in data_referrers["site_urls_data"]:
+                        referrers_total_clicks += self.parse_int(site_data["total_click"])
+                
+                marketing_pages_total_clicks = 0
+                if data_marketing_pages.get("has_data", True):
+                    for channel in data_marketing_pages["channels_data"]:
+                        marketing_pages_total_clicks += self.parse_int(channel["total_click"])
+                
+                has_data = data_referrers.get("has_data", True) and data_marketing_pages.get("has_data", True)
+                
+                if has_data:
+                    current_username = self._get_username_for_period_device(period, "All", username)
+                    subAutoTestCase += f"\n     + Username: {current_username}"
+                    subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
+                    subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
                     
-                    key = f"{period}_{device_type}"
-                    data_referrers = cache["referrers"].get(key, {})
-                    data_marketing_pages = cache["marketing_pages"].get(period, {})
-                    
-                    referrers_total_clicks = 0
-                    if data_referrers.get("has_data", True):
-                        for site_data in data_referrers["site_urls_data"]:
-                            referrers_total_clicks += self.parse_int(site_data["total_click"])
-                    
-                    marketing_pages_total_clicks = 0
-                    if data_marketing_pages.get("has_data", True):
-                        for channel in data_marketing_pages["channels_data"]:
-                            marketing_pages_total_clicks += self.parse_int(channel["total_click"])
-                    
-                    has_data = data_referrers.get("has_data", True) and data_marketing_pages.get("has_data", True)
-                    
-                    if has_data:
-                        current_username = self._get_username_for_period_device(period, device_type, username)
-                        subAutoTestCase += f"\n     + Username: {current_username}"
-                        subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
-                        subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
-                        
-                        if referrers_total_clicks == marketing_pages_total_clicks:
-                            subAutoTestCase += f"\n     + Total Clicks match: {referrers_total_clicks}"
-                        else:
-                            subAutoTestCase += f"\n     + Total Clicks mismatch: Referrers={referrers_total_clicks}, Marketing Pages={marketing_pages_total_clicks}"
+                    if referrers_total_clicks == marketing_pages_total_clicks:
+                        subAutoTestCase += f"\n     + Total Clicks match: {referrers_total_clicks}"
                     else:
-                        subAutoTestCase += f"\n     + No data found for Total Clicks for Referrers or Marketing Pages."
+                        subAutoTestCase += f"\n     + Total Clicks mismatch: Referrers={referrers_total_clicks}, Marketing Pages={marketing_pages_total_clicks}"
+                else:
+                    subAutoTestCase += f"\n     + No data found for Total Clicks for Referrers or Marketing Pages."
             
             self.utils.update_result_to_ggsheet(
                 Data["TestCase_spread_sheet_id"], 
@@ -703,7 +727,11 @@ class CompareDataReferrers(GetDataCustomer):
                 
                 subAutoTestCase = ''
                 periods = ["last_month", "last_week", "yesterday"]
-                device_types = ["All", "PC / Laptop", "Mobile"]
+                
+                if compare_with == "marketing_pages":
+                    device_types = ["All"]
+                else:
+                    device_types = ["All", "PC / Laptop", "Mobile"]
                 
                 for period in periods:
                     if period not in cache:
@@ -715,8 +743,11 @@ class CompareDataReferrers(GetDataCustomer):
                         
                         if subAutoTestCase:
                             subAutoTestCase += '\n\n'
-                            
-                        subAutoTestCase += f"- Verify that {data_type_display} for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display} are equal to {data_type_display} for {compare_with_display}."
+                        
+                        if compare_with == "marketing_pages":
+                            subAutoTestCase += f"- Verify that {data_type_display} for Referrers {period_display} (All devices) are equal to {data_type_display} for {compare_with_display}."
+                        else:
+                            subAutoTestCase += f"- Verify that {data_type_display} for Referrers {period_display} {'' if device_type == 'All' else 'by ' + device_display} are equal to {data_type_display} for {compare_with_display}."
                         
                         key = f"{period}_{device_type}"
                         data_referrers = cache["referrers"].get(key, {})

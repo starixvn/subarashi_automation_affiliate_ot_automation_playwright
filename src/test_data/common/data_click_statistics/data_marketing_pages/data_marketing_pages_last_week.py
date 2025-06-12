@@ -1,15 +1,15 @@
-# get data baseline marketing page last_week at 2025-06-10 19:36:10 +0800 (GMT+8)
+# get data baseline marketing page last_week at 2025-06-12 10:21:19 +0800 (GMT+8)
 
 class DataMarketingPagesLastWeek:
     data_marketing_pages_last_week = {
     "metadata": {
-        "collected_at": "2025-06-10 19:36:10 +0800",
+        "collected_at": "2025-06-12 10:21:19 +0800",
         "period": {
             "from_date": "06-02-2025",
             "to_date": "06-08-2025"
         },
         "filters": {
-            "username": "12BETAFF16502",
+            "username": "12BETAFF16505",
             "language": "All",
             "include_inactive_tracking": False
         },
@@ -17,59 +17,41 @@ class DataMarketingPagesLastWeek:
     },
     "channels_data": [
         {
-            "channel_name": "Facebook",
+            "channel_name": "MKTown",
             "language": "-",
-            "total_click": 7,
-            "unique_click": 3,
-            "signups": 2,
-            "fdm": 1
+            "total_click": 1,
+            "unique_click": 1,
+            "signups": 0,
+            "fdm": 0
         },
         {
-            "channel_name": "MKTsbDSP",
+            "channel_name": "Others",
             "language": "-",
-            "total_click": 17054,
-            "unique_click": 13782,
-            "signups": 78,
-            "fdm": 17
-        },
-        {
-            "channel_name": "MKTsoybean",
-            "language": "-",
-            "total_click": 3940,
-            "unique_click": 3324,
-            "signups": 902,
-            "fdm": 63
+            "total_click": 0,
+            "unique_click": 0,
+            "signups": 68,
+            "fdm": 2
         }
     ],
     "channel_details_data": {
-        "1 - Facebook": [
+        "1 - MKTown": [
             {
-                "url": "https://goto.12bthlink6.com/thb-12join/95200/th/facebook/index.html",
-                "language": "Thai",
-                "total_clicks": 7,
-                "unique_clicks": 3,
-                "signups": 2,
-                "fdm": 1
+                "url": "https://goto.12bmylink8.com/myr-12join/47342/en/mktown/index.html",
+                "language": "English",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
             }
         ],
-        "2 - MKTsbDSP": [
+        "2 - Others": [
             {
-                "url": "https://goto.12bmylink1.com/join/95200/th/mktsbdsp/index.html",
-                "language": "Thai",
-                "total_clicks": 17054,
-                "unique_clicks": 13782,
-                "signups": 78,
-                "fdm": 17
-            }
-        ],
-        "3 - MKTsoybean": [
-            {
-                "url": "https://goto.12bmylink1.com/join/95200/th/mktsoybean/index.html",
-                "language": "Thai",
-                "total_clicks": 3940,
-                "unique_clicks": 3324,
-                "signups": 902,
-                "fdm": 63
+                "url": "",
+                "language": None,
+                "total_clicks": 0,
+                "unique_clicks": 0,
+                "signups": 68,
+                "fdm": 2
             }
         ]
     }
