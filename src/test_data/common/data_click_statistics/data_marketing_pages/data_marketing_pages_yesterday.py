@@ -1,15 +1,15 @@
-# get data baseline marketing page yesterday at 2025-06-12 10:21:18 +0800 (GMT+8)
+# get data baseline marketing page yesterday at 2025-06-12 13:15:33 +0800 (GMT+8)
 
 class DataMarketingPagesYesterday:
     data_marketing_pages_yesterday = {
     "metadata": {
-        "collected_at": "2025-06-12 10:21:18 +0800",
+        "collected_at": "2025-06-12 13:15:33 +0800",
         "period": {
             "from_date": "06-11-2025",
             "to_date": "06-11-2025"
         },
         "filters": {
-            "username": "12BETAFF16505",
+            "username": "12BETAFF14351",
             "language": "All",
             "include_inactive_tracking": False
         },
@@ -17,23 +17,23 @@ class DataMarketingPagesYesterday:
     },
     "channels_data": [
         {
-            "channel_name": "Others",
+            "channel_name": "ID03IDNA12BETNA",
             "language": "-",
-            "total_click": 0,
-            "unique_click": 0,
-            "signups": 7,
-            "fdm": 1
+            "total_click": 372,
+            "unique_click": 272,
+            "signups": 39,
+            "fdm": 27
         }
     ],
     "channel_details_data": {
-        "1 - Others": [
+        "1 - ID03IDNA12BETNA": [
             {
-                "url": "",
-                "language": None,
-                "total_clicks": 0,
-                "unique_clicks": 0,
-                "signups": 7,
-                "fdm": 1
+                "url": "https://goto.5689fun.com/join/13011/id/id03idna12betna/index.html",
+                "language": "Indonesian",
+                "total_clicks": 372,
+                "unique_clicks": 272,
+                "signups": 39,
+                "fdm": 27
             }
         ]
     }

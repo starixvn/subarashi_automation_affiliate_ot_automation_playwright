@@ -10,7 +10,7 @@ unittest.TestLoader.testMethodPrefix = "TestCase"
 unittest.TestLoader.sortTestMethodsUsing = None
 
 # Add based on your function you define
-from actions.common.compare_data.click_statistics_marketing_page.compare_data_marketing_page import CompareDataMarketingPage
+from src.actions.common.compare_data.click_statistics_marketing_page.compare_data_marketing_page import CompareDataMarketingPage
 from src.utils.core.decorators import measure_test_execution_time
 
 class TestSuites_03_Check_Data_Click_Statistics_Marketing_Pages(unittest.TestCase):

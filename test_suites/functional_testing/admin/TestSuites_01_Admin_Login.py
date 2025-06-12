@@ -9,7 +9,7 @@ unittest.TestLoader.testMethodPrefix = "TestCase"
 unittest.TestLoader.sortTestMethodsUsing = None
 
 # Add based on your function you define
-from actions.common.action_common import Common
+from src.actions.common.action_common import Common
 
 class Login_admin(unittest.TestCase):
     @classmethod

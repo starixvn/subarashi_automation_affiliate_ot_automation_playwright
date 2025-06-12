@@ -10,7 +10,7 @@ unittest.TestLoader.testMethodPrefix = "TestCase"
 unittest.TestLoader.sortTestMethodsUsing = None
 
 # Add based on your function you define
-from actions.common.compare_data.click_statictis_referrers.compare_data_referrers import CompareDataReferrers
+from src.actions.common.compare_data.click_statictis_referrers.compare_data_referrers import CompareDataReferrers
 from src.utils.core.decorators import measure_test_execution_time
 
 class TestSuites_01_Check_Data_Click_Statistics_Referrers(unittest.TestCase):

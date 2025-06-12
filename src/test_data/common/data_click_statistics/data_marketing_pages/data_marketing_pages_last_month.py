@@ -1,15 +1,15 @@
-# get data baseline marketing page last_month at 2025-06-12 10:21:20 +0800 (GMT+8)
+# get data baseline marketing page last_month at 2025-06-12 13:15:34 +0800 (GMT+8)
 
 class DataMarketingPagesLastMonth:
     data_marketing_pages_last_month = {
     "metadata": {
-        "collected_at": "2025-06-12 10:21:20 +0800",
+        "collected_at": "2025-06-12 13:15:34 +0800",
         "period": {
             "from_date": "05-01-2025",
             "to_date": "05-31-2025"
         },
         "filters": {
-            "username": "12BETAFF16505",
+            "username": "12BETAFF14351",
             "language": "All",
             "include_inactive_tracking": False
         },
@@ -17,37 +17,45 @@ class DataMarketingPagesLastMonth:
     },
     "channels_data": [
         {
-            "channel_name": "MKTown",
+            "channel_name": "ID03IDNA12BETNA",
             "language": "-",
-            "total_click": 613,
-            "unique_click": 459,
-            "signups": 30,
-            "fdm": 2
+            "total_click": 9956,
+            "unique_click": 5679,
+            "signups": 958,
+            "fdm": 501
         },
         {
             "channel_name": "Others",
             "language": "-",
-            "total_click": 0,
-            "unique_click": 0,
-            "signups": 186,
-            "fdm": 14
+            "total_click": 15,
+            "unique_click": 11,
+            "signups": 2,
+            "fdm": 3
         }
     ],
     "channel_details_data": {
-        "1 - MKTown": [
+        "1 - ID03IDNA12BETNA": [
             {
-                "url": "https://goto.12bmylink8.com/myr-12join/47342/en/mktown/index.html",
-                "language": "English",
-                "total_clicks": 603,
-                "unique_clicks": 450,
-                "signups": 30,
-                "fdm": 2
+                "url": "https://goto.168sure.com/join/13011/id/id03idna12betna/index.html",
+                "language": "Indonesian",
+                "total_clicks": 2635,
+                "unique_clicks": 1044,
+                "signups": 37,
+                "fdm": 10
             },
             {
-                "url": "https://goto.5689fun.com/join/47342/en/mktown/index.html",
-                "language": "English",
-                "total_clicks": 10,
-                "unique_clicks": 9,
+                "url": "https://goto.5689fun.com/join/13011/id/id03idna12betna/index.html",
+                "language": "Indonesian",
+                "total_clicks": 7320,
+                "unique_clicks": 4634,
+                "signups": 921,
+                "fdm": 491
+            },
+            {
+                "url": "https://goto.elv520.com/join/13011/id/id03idna12betna/index.html",
+                "language": "Indonesian",
+                "total_clicks": 1,
+                "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             }
@@ -58,8 +66,24 @@ class DataMarketingPagesLastMonth:
                 "language": None,
                 "total_clicks": 0,
                 "unique_clicks": 0,
-                "signups": 186,
-                "fdm": 14
+                "signups": 2,
+                "fdm": 3
+            },
+            {
+                "url": "https://go.168sure.com/92041439/signup/id/index.html",
+                "language": "Indonesian",
+                "total_clicks": 13,
+                "unique_clicks": 9,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "url": "https://go.soi258.com/92041439/signup/id/index.html",
+                "language": "Indonesian",
+                "total_clicks": 2,
+                "unique_clicks": 2,
+                "signups": 0,
+                "fdm": 0
             }
         ]
     }
