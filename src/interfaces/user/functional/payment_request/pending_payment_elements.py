@@ -1,9 +1,5 @@
 class PendingPaymentElements:
-    """
-    Class containing XPath locators for the Pending Payment section.
-    These elements are for the pending payment request information and cancel button.
-    """
-
+    
     # Pending payment section
     div_pending_payment = "//div[@id='pendingPayment']"
     
@@ -45,23 +41,3 @@ class PendingPaymentElements:
     input_hidden_trans_id = "//form[@id='cancelPaymentForm']//input[@id='TransId']"
     input_hidden_amount = "//form[@id='cancelPaymentForm']//input[@id='Amount']"
     input_hidden_request_date = "//form[@id='cancelPaymentForm']//input[@id='RequestDate']"
-    
-    def get_pending_request_date(self):
-        """Get pending request date"""
-        return self.td_request_date
-    
-    def get_pending_request_amount(self):
-        """Get pending request amount"""
-        return self.td_request_amount
-    
-    def get_pending_status(self):
-        """Get pending status"""
-        return self.td_status
-    
-    def has_pending_request(self):
-        """Check if there is a pending request"""
-        return f"//form[@id='cancelPaymentForm']//table/tbody/tr"
-    
-    def is_request_processing(self):
-        """Check if request is in processing status"""
-        return f"//form[@id='cancelPaymentForm']//table/tbody/tr/td[3][text()='Processing']" 

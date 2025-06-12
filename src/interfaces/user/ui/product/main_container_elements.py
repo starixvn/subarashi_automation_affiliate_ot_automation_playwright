@@ -1,13 +1,4 @@
-"""
-Main Container Elements
-
-This file contains XPath locators for the main container elements.
-"""
-
 class MainContainerElements:
-    """
-    Class containing XPath locators for main container elements.
-    """
     
     # Main container
     div_main_container = "//div[@class='main-container']"

@@ -1,13 +1,4 @@
-"""
-FAQ Elements
-
-This file contains XPath locators for the FAQ section elements.
-"""
-
 class FAQElements:
-    """
-    Class containing XPath locators for FAQ section elements.
-    """
     
     # Section container
     div_block_faq = "//div[@class='block block-faq']"
@@ -38,54 +29,3 @@ class FAQElements:
     li_player_account = "//div[@class='block block-faq']//div[@class='group-faq'][2]/div[@class='anwser']/div[@class='anwser-text'][2]/ul/li[1]"
     li_wire_transfer = "//div[@class='block block-faq']//div[@class='group-faq'][2]/div[@class='anwser']/div[@class='anwser-text'][2]/ul/li[2]"
     span_red_bold = "//div[@class='block block-faq']//div[@class='group-faq'][2]/div[@class='anwser']//span[@class='red-bold']"
-    
-    @staticmethod
-    def get_faq_group(index):
-        """
-        Returns XPath for a specific FAQ group by index
-        
-        Args:
-            index: The 1-based index of the FAQ group
-        """
-        return f"//div[@class='block block-faq']//div[@class='group-faq'][{index}]"
-    
-    @staticmethod
-    def get_faq_question(index):
-        """
-        Returns XPath for a specific FAQ question by group index
-        
-        Args:
-            index: The 1-based index of the FAQ group
-        """
-        return f"//div[@class='block block-faq']//div[@class='group-faq'][{index}]/div[@class='question']"
-    
-    @staticmethod
-    def get_faq_title(index):
-        """
-        Returns XPath for a specific FAQ title by group index
-        
-        Args:
-            index: The 1-based index of the FAQ group
-        """
-        return f"//div[@class='block block-faq']//div[@class='group-faq'][{index}]/div[@class='question']/div[@class='title']/span"
-    
-    @staticmethod
-    def get_faq_answer(index):
-        """
-        Returns XPath for a specific FAQ answer section by group index
-        
-        Args:
-            index: The 1-based index of the FAQ group
-        """
-        return f"//div[@class='block block-faq']//div[@class='group-faq'][{index}]/div[@class='anwser']"
-    
-    @staticmethod
-    def get_answer_text(group_index, text_index):
-        """
-        Returns XPath for a specific answer text by group and text index
-        
-        Args:
-            group_index: The 1-based index of the FAQ group
-            text_index: The 1-based index of the text block within the answer
-        """
-        return f"//div[@class='block block-faq']//div[@class='group-faq'][{group_index}]/div[@class='anwser']/div[@class='anwser-text'][{text_index}]" 

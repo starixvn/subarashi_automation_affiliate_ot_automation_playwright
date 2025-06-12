@@ -1,13 +1,4 @@
-"""
-Commission Table Elements
-
-This file contains XPath locators for the commission table elements.
-"""
-
 class CommissionTableElements:
-    """
-    Class containing XPath locators for commission table elements.
-    """
     
     # Section container
     div_block_commission = "//div[@class='block block-commission']"
@@ -45,34 +36,3 @@ class CommissionTableElements:
     tr_tier_4 = "//div[@class='block block-commission']//table/tbody/tr[4]"
     tr_tier_5 = "//div[@class='block block-commission']//table/tbody/tr[5]"
     tr_tier_6 = "//div[@class='block block-commission']//table/tbody/tr[6]"
-    
-    @staticmethod
-    def get_header_cell(index):
-        """
-        Returns XPath for a specific header cell by index
-        
-        Args:
-            index: The 1-based index of the header cell
-        """
-        return f"//div[@class='block block-commission']//table/thead/tr/th[{index}]"
-    
-    @staticmethod
-    def get_tier_row(tier):
-        """
-        Returns XPath for a specific tier row by tier number
-        
-        Args:
-            tier: The tier number (1-6)
-        """
-        return f"//div[@class='block block-commission']//table/tbody/tr[{tier}]"
-    
-    @staticmethod
-    def get_cell(row, col):
-        """
-        Returns XPath for a specific cell by row and column index
-        
-        Args:
-            row: The 1-based row index
-            col: The 1-based column index
-        """
-        return f"//div[@class='block block-commission']//table/tbody/tr[{row}]/td[{col}]" 

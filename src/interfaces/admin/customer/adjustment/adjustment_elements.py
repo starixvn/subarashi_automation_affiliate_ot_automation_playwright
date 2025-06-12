@@ -1,4 +1,5 @@
 class AdjustmentElements:
+    
     # Form container
     frm_adjustment = "//form[@class='adjustment-form']"
     

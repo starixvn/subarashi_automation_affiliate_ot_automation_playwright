@@ -1,14 +1,5 @@
-"""
-Affiliate Page Elements
-
-This file contains XPath locators for the main elements on the Affiliate page.
-"""
-
 class AffiliatePageElements:
-    """
-    Class containing XPath locators for Affiliate page elements.
-    """
-    
+
     # Main container elements
     div_main_container = "//div[@class='main-container']"
     div_main = "//div[@class='main']"

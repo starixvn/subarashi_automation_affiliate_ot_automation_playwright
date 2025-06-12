@@ -1,4 +1,5 @@
 class ViewLogElements:
+    
     # Filter section elements
     # Log type dropdown
     lbl_type = "//label[@for='logType']"

@@ -1,9 +1,4 @@
 class PreferenceElements:
-    """
-    Class containing XPath locators for the Preference section.
-    These elements are for the preference settings fields.
-    """
-
     # Preference info group
     div_preference_info_group = "//div[@class='info-group'][.//span[text()='Preference']]"
     div_preference_title = "//div[@class='info-group'][.//span[text()='Preference']]/div[@class='title']"
@@ -52,19 +47,3 @@ class PreferenceElements:
     option_bdt = "//div[@class='info-group'][.//span[text()='Preference']]//select[@id='DefaultBaseCurrency']/option[@value='74']"
     div_info_container = "//div[@class='info-group'][.//span[text()='Preference']]//div[@class='info-container col-sm-1']"
     span_glyphicon_info = "//div[@class='info-group'][.//span[text()='Preference']]//span[@class='glyphicon glyphicon-info-sign']"
-    
-    def get_target_country_option_by_value(self, value):
-        """Get target country option by value"""
-        return f"//div[@class='info-group'][.//span[text()='Preference']]//select[@name='TargetCountryCode']/option[@value='{value}']"
-    
-    def get_target_country_option_by_text(self, text):
-        """Get target country option by text"""
-        return f"//div[@class='info-group'][.//span[text()='Preference']]//select[@name='TargetCountryCode']/option[contains(text(), '{text}')]"
-    
-    def get_default_base_currency_option_by_value(self, value):
-        """Get default base currency option by value"""
-        return f"//div[@class='info-group'][.//span[text()='Preference']]//select[@id='DefaultBaseCurrency']/option[@value='{value}']"
-    
-    def get_default_base_currency_option_by_text(self, text):
-        """Get default base currency option by text"""
-        return f"//div[@class='info-group'][.//span[text()='Preference']]//select[@id='DefaultBaseCurrency']/option[text()='{text}']" 

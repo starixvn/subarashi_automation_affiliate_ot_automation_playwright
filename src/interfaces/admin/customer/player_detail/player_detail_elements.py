@@ -1,4 +1,5 @@
 class PlayerDetailElements:
+    
     # Filter section elements
     # Product filter
     lbl_product = "//label[text()='Product']"

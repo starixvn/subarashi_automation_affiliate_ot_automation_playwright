@@ -1,13 +1,4 @@
-"""
-Banner Elements
-
-This file contains XPath locators for the top banner elements on the homepage.
-"""
-
 class BannerElements:
-    """
-    Class containing XPath locators for banner elements.
-    """
     
     # Main content container
     div_main_content = "//div[@class='main-content']"
@@ -30,23 +21,3 @@ class BannerElements:
     
     # Banner navigation
     div_swiper_pagination = "//div[@class='swiper top-banner']/div[@class='swiper-pagination']"
-    
-    @staticmethod
-    def get_swiper_slide(index):
-        """
-        Returns XPath for a specific banner slide by index
-        
-        Args:
-            index: The 1-based index of the slide
-        """
-        return f"//div[@class='swiper top-banner']/div[@class='swiper-wrapper']/div[@class='swiper-slide'][{index}]"
-    
-    @staticmethod
-    def get_pagination_bullet(index):
-        """
-        Returns XPath for a specific pagination bullet by index
-        
-        Args:
-            index: The 1-based index of the pagination bullet
-        """
-        return f"//div[@class='swiper top-banner']/div[@class='swiper-pagination']/span[@class='swiper-pagination-bullet'][{index}]" 

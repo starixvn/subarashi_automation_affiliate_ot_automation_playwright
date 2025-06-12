@@ -1,9 +1,5 @@
 class WebsiteInfoElements:
-    """
-    Class containing XPath locators for the Website Information section.
-    These elements are for the website details fields.
-    """
-
+    
     # Website info group
     div_website_info_group = "//div[@class='info-group website-info']"
     div_website_title = "//div[@class='info-group website-info']/div[@class='title']"
@@ -56,15 +52,3 @@ class WebsiteInfoElements:
     label_no_site_desc = "//div[@class='info-group website-info']//label[contains(text(), 'Please describe how you would like to promote 12Bet')]"
     textarea_no_site_desc = "//div[@class='info-group website-info']//textarea[@id='NoSiteDesc']"
     span_validation_no_site_desc = "//span[@data-valmsg-for='AccountInformation.NoSiteDesc']"
-    
-    def get_more_url_field_by_index(self, index):
-        """Get additional website URL field by index (2-based, since first is SiteUrl)"""
-        return f"//div[@class='info-group website-info']//input[@id='MoreUrlInput{index}']"
-    
-    def get_more_url_label_by_index(self, index):
-        """Get additional website URL label by index (2-based, since first is SiteUrl)"""
-        return f"//div[@class='info-group website-info']//label[@for='MoreUrlInput{index}']"
-    
-    def get_delete_url_button_by_index(self, index):
-        """Get delete URL button by index (2-based, since first is SiteUrl)"""
-        return f"//div[@class='info-group website-info']//div[@class='form-group websiteInput'][.//label[text()='Website URL {index}']]//button[@class='btn btn-submit btnDeleteUrl']" 

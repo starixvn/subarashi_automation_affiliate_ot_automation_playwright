@@ -1,4 +1,5 @@
 class EditElements:
+    
     # Personal Information section
     # ------------ Labels ------------
     lbl_username = "//label[@for='username']"

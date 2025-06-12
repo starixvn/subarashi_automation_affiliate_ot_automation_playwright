@@ -1,13 +1,4 @@
-"""
-Contact Page Elements
-
-This file contains XPath locators for the main elements on the Contact page.
-"""
-
 class ContactPageElements:
-    """
-    Class containing XPath locators for Contact page elements.
-    """
     
     # Main container elements
     div_main_container = "//div[@class='main-container']"

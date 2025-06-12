@@ -1,4 +1,5 @@
 class MenuElements:
+    
     # Menu container
     nav_menu_list = "//ul[@class='nav menu-list']"
     

@@ -1,13 +1,4 @@
 class HeaderElements:
-    """
-    Header element selectors for the admin interface.
-    
-    Notes for implementation:
-    - Use ID attributes when available as they are most reliable
-    - Use contains() for text and class attributes to handle dynamic content
-    - Avoid using static attributes like href that may change
-    - Ensure each XPath targets a unique element
-    """
     # Header container
     div_header = "//header[@class='header']"
     div_header_wrapper = "//header[@class='header']/div[@class='headWrapper']"

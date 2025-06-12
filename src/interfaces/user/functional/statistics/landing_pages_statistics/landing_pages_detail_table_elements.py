@@ -1,9 +1,4 @@
 class LandingPagesDetailTableElements:
-    """
-    Class containing XPath locators for the landing pages statistics detail table section.
-    These elements are for the detail table showing website URLs and their statistics, 
-    along with pagination controls.
-    """
     
     # Pagination container
     div_statistics_detail_pager = "//div[@id='statisticsDetailPager']"
@@ -56,39 +51,3 @@ class LandingPagesDetailTableElements:
     
     # JavaScript resource
     script_landing_page_statistics = "//script[contains(@src, 'landingpagestatistics.js')]"
-    
-    def get_detail_row_by_index(self, index):
-        """Get detail row by its index (1-based)"""
-        return f"//div[@id='statisticsDetailTable']/table/tbody/tr[{index}]"
-    
-    def get_website_url_by_index(self, index):
-        """Get website URL cell by row index (1-based)"""
-        return f"//div[@id='statisticsDetailTable']/table/tbody/tr[{index}]/td[1]"
-    
-    def get_detail_total_clicks_by_index(self, index):
-        """Get total clicks cell by row index (1-based)"""
-        return f"//div[@id='statisticsDetailTable']/table/tbody/tr[{index}]/td[2]"
-    
-    def get_detail_unique_clicks_by_index(self, index):
-        """Get unique clicks cell by row index (1-based)"""
-        return f"//div[@id='statisticsDetailTable']/table/tbody/tr[{index}]/td[3]"
-    
-    def get_detail_signup_by_index(self, index):
-        """Get signup cell by row index (1-based)"""
-        return f"//div[@id='statisticsDetailTable']/table/tbody/tr[{index}]/td[4]"
-    
-    def get_detail_fdm_by_index(self, index):
-        """Get FDM cell by row index (1-based)"""
-        return f"//div[@id='statisticsDetailTable']/table/tbody/tr[{index}]/td[5]"
-    
-    def get_pagesize_option(self, value):
-        """Get page size option by value"""
-        return f"//div[@id='statisticsDetailPager']//select[@class='pagesize-select']/option[@value='{value}']"
-    
-    def is_pagesize_selected(self, value):
-        """Check if page size option is selected"""
-        return f"//div[@id='statisticsDetailPager']//select[@class='pagesize-select']/option[@value='{value}' and @selected]"
-    
-    def is_page_control_disabled(self, control_class):
-        """Check if a pagination control is disabled"""
-        return f"//div[@id='statisticsDetailPager']//a[contains(@class, '{control_class}')][contains(@class, 'disable')]" 

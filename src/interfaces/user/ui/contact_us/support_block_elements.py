@@ -1,13 +1,4 @@
-"""
-Support Block Elements
-
-This file contains XPath locators for the support block elements on the Contact page.
-"""
-
 class SupportBlockElements:
-    """
-    Class containing XPath locators for support block elements.
-    """
     
     # Block container
     div_block_support = "//div[@class='block block-man-support']"

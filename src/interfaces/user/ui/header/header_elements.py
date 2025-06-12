@@ -31,23 +31,3 @@ class HeaderElements:
     i_caret = "//button[@class='select-language']/i[@class='caret']"
     div_language_list_wrapper = "//div[@class='language-list-wrapper'][@id='languageList']"
     ul_language_list = "//ul[@class='list-unstyled language-list']"
-    
-    @staticmethod
-    def get_language_item(language_code):
-        """
-        Returns XPath for a language item by its code
-        
-        Args:
-            language_code: The language code (e.g., 'en', 'id', 'th')
-        """
-        return f"//a[@class='language-item'][@data-option='{language_code}']"
-    
-    @staticmethod
-    def get_language_flag(language_code):
-        """
-        Returns XPath for a language flag by its code
-        
-        Args:
-            language_code: The language code (e.g., 'en', 'id', 'th')
-        """
-        return f"//a[@data-option='{language_code}']/i[@class='flag']" 

@@ -1,4 +1,5 @@
 class AccountModalElements:
+    
     # Modal container for Add Existed Account
     mdl_account = "//div[@class='modal-dialog']"
     mdl_content = "//div[@class='modal-content']"

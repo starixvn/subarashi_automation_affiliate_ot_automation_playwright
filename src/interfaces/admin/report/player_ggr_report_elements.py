@@ -1,4 +1,5 @@
 class PlayerGgrReportElements:
+    
     # Filter container elements
     inp_affiliate = "//input[@id='Affiliate']"
     lbl_affiliate = "//label[@for='Affiliate']"

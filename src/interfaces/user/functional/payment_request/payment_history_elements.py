@@ -1,9 +1,5 @@
 class PaymentHistoryElements:
-    """
-    Class containing XPath locators for the Payment History section.
-    These elements are for the recent payment history table and year filter.
-    """
-
+    
     # Payment list section
     div_payment_list = "//div[@id='paymentList']"
     
@@ -44,51 +40,3 @@ class PaymentHistoryElements:
     # JavaScript resources
     script_resource_lang = "//script[contains(text(), 'resourceLang')]"
     script_payment_request = "//script[contains(@src, 'payment-request.js')]"
-    
-    def get_year_option(self, year):
-        """Get year option by value"""
-        return f"//select[@id='year']/option[@value='{year}']"
-    
-    def get_row_by_index(self, index):
-        """Get table row by index (1-based)"""
-        return f"//div[@id='payment-history']/table/tbody/tr[{index}]"
-    
-    def get_row_by_ref_no(self, ref_no):
-        """Get table row by reference number"""
-        return f"//div[@id='payment-history']/table/tbody/tr[./td[1][text()='{ref_no}']]"
-    
-    def get_cell(self, row_index, col_index):
-        """Get table cell by row and column index (both 1-based)"""
-        return f"//div[@id='payment-history']/table/tbody/tr[{row_index}]/td[{col_index}]"
-    
-    def get_ref_no(self, row_index):
-        """Get reference number from row by index"""
-        return f"//div[@id='payment-history']/table/tbody/tr[{row_index}]/td[1]"
-    
-    def get_request_date(self, row_index):
-        """Get request date from row by index"""
-        return f"//div[@id='payment-history']/table/tbody/tr[{row_index}]/td[2]"
-    
-    def get_request_amount(self, row_index):
-        """Get request amount from row by index"""
-        return f"//div[@id='payment-history']/table/tbody/tr[{row_index}]/td[3]"
-    
-    def get_payment_method(self, row_index):
-        """Get payment method from row by index"""
-        return f"//div[@id='payment-history']/table/tbody/tr[{row_index}]/td[4]"
-    
-    def get_completed_date(self, row_index):
-        """Get completed date from row by index"""
-        return f"//div[@id='payment-history']/table/tbody/tr[{row_index}]/td[5]"
-    
-    def get_status(self, row_index):
-        """Get status from row by index"""
-        return f"//div[@id='payment-history']/table/tbody/tr[{row_index}]/td[6]"
-    
-    def get_description(self, row_index):
-        """Get description from row by index"""
-        return f"//div[@id='payment-history']/table/tbody/tr[{row_index}]/td[7]"
-    
-    def get_rows_by_status(self, status):
-        """Get all rows with specific status"""
-        return f"//div[@id='payment-history']/table/tbody/tr[./td[6][contains(text(), '{status}')]]" 

@@ -1,13 +1,5 @@
 class HomeElements:
-    """
-    Home page element selectors for the admin interface.
-    
-    Follows these criteria:
-    - Each XPath selector targets a unique element
-    - Uses IDs and unique classes where available
-    - Avoids selectors that rely on text content
-    - Follows a clear DOM structure
-    """
+
     # App container and header
     div_intro_text = "//div[@class='pt-2 pb-2']"
     

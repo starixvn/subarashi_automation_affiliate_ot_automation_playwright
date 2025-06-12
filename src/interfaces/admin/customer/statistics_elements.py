@@ -1,4 +1,5 @@
 class StatisticsElements:
+    
     # Main container
     div_customer_statistics = "//div[@class='customer-statistics']"
     div_app_container = "//div[@class='customer-statistics']/div[@class='app-container']"

@@ -1,15 +1,15 @@
-# get data baseline marketing page yesterday at 2025-06-11 16:33:05 +0800 (GMT+8)
+# get data baseline marketing page yesterday at 2025-06-12 10:21:18 +0800 (GMT+8)
 
 class DataMarketingPagesYesterday:
     data_marketing_pages_yesterday = {
     "metadata": {
-        "collected_at": "2025-06-11 16:33:05 +0800",
+        "collected_at": "2025-06-12 10:21:18 +0800",
         "period": {
-            "from_date": "06-10-2025",
-            "to_date": "06-10-2025"
+            "from_date": "06-11-2025",
+            "to_date": "06-11-2025"
         },
         "filters": {
-            "username": "12BETAFF16615",
+            "username": "12BETAFF16505",
             "language": "All",
             "include_inactive_tracking": False
         },
@@ -17,23 +17,23 @@ class DataMarketingPagesYesterday:
     },
     "channels_data": [
         {
-            "channel_name": "MKTcomm",
+            "channel_name": "Others",
             "language": "-",
-            "total_click": 192,
-            "unique_click": 123,
-            "signups": 39,
-            "fdm": 6
+            "total_click": 0,
+            "unique_click": 0,
+            "signups": 7,
+            "fdm": 1
         }
     ],
     "channel_details_data": {
-        "1 - MKTcomm": [
+        "1 - Others": [
             {
-                "url": "https://goto.12bvnlink7.com/join/31074/th/mktcomm/index.html",
-                "language": "Thai",
-                "total_clicks": 192,
-                "unique_clicks": 123,
-                "signups": 39,
-                "fdm": 6
+                "url": "",
+                "language": None,
+                "total_clicks": 0,
+                "unique_clicks": 0,
+                "signups": 7,
+                "fdm": 1
             }
         ]
     }

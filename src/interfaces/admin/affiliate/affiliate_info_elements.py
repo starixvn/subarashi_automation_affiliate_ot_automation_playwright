@@ -1,14 +1,4 @@
 class AffiliateInfoElements:
-    """
-    Element selectors for the Affiliate Info page in the admin interface.
-    
-    Follows these criteria:
-    - Each XPath selector targets a unique element
-    - Uses IDs and unique classes where available
-    - Avoids selectors that rely on text content
-    - Follows a clear DOM structure
-    - Simple and direct XPath without unnecessary conditions
-    """
     # Loader elements
     div_loader = "//div[@class='loader']"
     div_backdrop = "//div[@class='backdrop']"

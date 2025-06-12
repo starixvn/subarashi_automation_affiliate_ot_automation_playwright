@@ -1,8 +1,4 @@
 class ReferrersFilterElements:
-    """
-    Class containing XPath locators for the referrers statistics filter section.
-    These elements are for filtering the referrers statistics by date range and device type.
-    """
     
     # Main container
     div_main_panel = "//div[@id='mainPanel']"
@@ -39,17 +35,3 @@ class ReferrersFilterElements:
     
     # Submit button
     button_submit = "//button[@id='btnStatisticsSubmit']"
-    
-    def is_device_selected(self, value):
-        """Check if device option is selected"""
-        return f"//select[@id='DeviceType']/option[@value='{value}' and @selected]"
-    
-    def set_date_range(self, from_date, to_date):
-        """Set the date range for filtering"""
-        # This is a helper method that returns a dictionary of elements involved in setting date ranges
-        return {
-            "from_date_input": self.input_from_date,
-            "from_date_calendar": self.span_from_date_calendar_icon,
-            "to_date_input": self.input_to_date,
-            "to_date_calendar": self.span_to_date_calendar_icon
-        } 

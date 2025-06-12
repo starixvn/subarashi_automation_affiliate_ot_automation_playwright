@@ -1,8 +1,4 @@
 class RevenueReportFilterElements:
-    """
-    Class containing XPath locators for the Revenue Report filter section.
-    These elements are for the filter panel with year and base currency selectors.
-    """
 
     # Main container elements
     div_main_content = "//div[@class='main-content']"
@@ -50,23 +46,3 @@ class RevenueReportFilterElements:
     # Submit button
     div_form_group_button = "//form[@class='form-inline form-filter']/div[@class='form-group'][./button[@id='btnSubmit']]"
     button_submit = "//button[@id='btnSubmit']"
-    
-    def get_year_option(self, year):
-        """Get year option by value"""
-        return f"//select[@id='year']/option[@value='{year}']"
-    
-    def get_currency_option_by_value(self, value):
-        """Get currency option by value"""
-        return f"//select[@id='base-currency']/option[@value='{value}']"
-    
-    def get_currency_option_by_text(self, text):
-        """Get currency option by text"""
-        return f"//select[@id='base-currency']/option[text()='{text}']"
-    
-    def is_year_selected(self, year):
-        """Check if year is selected"""
-        return f"//select[@id='year']/option[@value='{year}' and @selected]"
-    
-    def is_currency_selected(self, value):
-        """Check if currency is selected"""
-        return f"//select[@id='base-currency']/option[@value='{value}' and @selected]" 

@@ -1,13 +1,4 @@
-"""
-Footer Elements
-
-This file contains XPath locators for footer elements.
-"""
-
 class FooterElements:
-    """
-    Class containing XPath locators for footer elements.
-    """
     
     # Footer container
     footer_container = "//footer[@class='footer']"
@@ -44,33 +35,3 @@ class FooterElements:
     div_social_link = "//footer[@class='footer']//div[@class='social-link']"
     ul_social_list = "//footer[@class='footer']//div[@class='social-link']/ul"
     li_social_items = "//footer[@class='footer']//div[@class='social-link']/ul/li"
-    
-    @staticmethod
-    def get_social_item_by_index(index):
-        """
-        Returns XPath for a social media link by its index
-        
-        Args:
-            index: The 1-based index of the social media item
-        """
-        return f"//footer[@class='footer']//div[@class='social-link']/ul/li[{index}]"
-    
-    @staticmethod
-    def get_social_link_by_index(index):
-        """
-        Returns XPath for a social media anchor by its index
-        
-        Args:
-            index: The 1-based index of the social media item
-        """
-        return f"//footer[@class='footer']//div[@class='social-link']/ul/li[{index}]/a"
-    
-    @staticmethod
-    def get_partner_logo_by_index(index):
-        """
-        Returns XPath for a partner logo by its index
-        
-        Args:
-            index: The 1-based index of the partner logo
-        """
-        return f"//footer[@class='footer']//div[@class='plg-wrapper']/a[{index}]/img" 

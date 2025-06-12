@@ -1,4 +1,5 @@
 class LoginElements:
+    
     # Root and container elements
     div_root = "//div[@id='root']"
     div_app_container = "//div[@class='app-container']"

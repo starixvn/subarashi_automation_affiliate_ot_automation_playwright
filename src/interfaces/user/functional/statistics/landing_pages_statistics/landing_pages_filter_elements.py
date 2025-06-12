@@ -1,8 +1,4 @@
 class LandingPagesFilterElements:
-    """
-    Class containing XPath locators for the landing pages statistics filter section.
-    These elements are for filtering the landing pages statistics by device, language, page, and date range.
-    """
     
     # Main container
     div_main_panel = "//div[@id='mainPanel']"
@@ -46,31 +42,3 @@ class LandingPagesFilterElements:
     
     # Submit button
     button_submit = "//button[@id='btnStatisticsSubmit']"
-    
-    def get_language_option_by_value(self, value):
-        """Get language option by value attribute"""
-        return f"//select[@id='Language']/option[@value='{value}']"
-    
-    def get_language_option_by_text(self, text):
-        """Get language option by displayed text"""
-        return f"//select[@id='Language']/option[text()='{text}']"
-    
-    def get_page_option_by_value(self, value):
-        """Get page option by value attribute"""
-        return f"//select[@id='SportCode']/option[@value='{value}']"
-    
-    def get_page_option_by_text(self, text):
-        """Get page option by displayed text"""
-        return f"//select[@id='SportCode']/option[text()='{text}']"
-    
-    def is_device_selected(self, value):
-        """Check if device option is selected"""
-        return f"//select[@id='DeviceType']/option[@value='{value}' and @selected]"
-    
-    def is_language_selected(self, value):
-        """Check if language option is selected"""
-        return f"//select[@id='Language']/option[@value='{value}' and @selected]"
-    
-    def is_page_selected(self, value):
-        """Check if page option is selected"""
-        return f"//select[@id='SportCode']/option[@value='{value}' and @selected]" 

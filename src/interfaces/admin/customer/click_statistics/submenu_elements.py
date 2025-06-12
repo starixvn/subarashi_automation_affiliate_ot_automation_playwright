@@ -1,4 +1,5 @@
 class SubmenuElements:
+    
     # Submenu container
     div_submenu = "//div[@class='sub-menu-container pt-1']"
     ul_nav = "//div[@class='sub-menu-container pt-1']/ul[@class='nav']"

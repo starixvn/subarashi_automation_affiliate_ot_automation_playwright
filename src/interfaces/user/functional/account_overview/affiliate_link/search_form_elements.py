@@ -1,7 +1,4 @@
 class SearchFormElements:
-    """
-    This class contains XPath locators for search form elements on the affiliate page.
-    """
     
     # Main container elements
     div_search_form = "//div[@id='searchForm']"
@@ -55,47 +52,3 @@ class SearchFormElements:
     label_none = "//label[@class='control-label none-label']"
     button_generate = "//button[@id='btnGenQRCode']"
     
-    # Helper methods to get specific options
-    def get_target_country_option(self, value):
-        """Get a target country option by its value."""
-        return f"//select[@id='TargetCountry']/option[@value='{value}']"
-    
-    def get_target_country_option_by_text(self, text):
-        """Get a target country option by its display text."""
-        return f"//select[@id='TargetCountry']/option[contains(text(), '{text}')]"
-    
-    def get_language_option(self, value):
-        """Get a language option by its value."""
-        return f"//select[@id='Language']/option[@value='{value}']"
-    
-    def get_language_option_by_text(self, text):
-        """Get a language option by its display text."""
-        return f"//select[@id='Language']/option[text()='{text}']"
-    
-    def get_domain_option(self, value):
-        """Get a domain option by its value."""
-        return f"//select[@id='Domain']/option[@value='{value}']"
-    
-    def get_domain_option_by_text(self, text):
-        """Get a domain option by its display text."""
-        return f"//select[@id='Domain']/option[contains(text(), '{text}')]"
-    
-    def get_page_option(self, value):
-        """Get a page option by its value."""
-        return f"//select[@id='Page']/option[@value='{value}']"
-    
-    def get_page_option_by_text(self, text):
-        """Get a page option by its display text."""
-        return f"//select[@id='Page']/option[text()='{text}']"
-    
-    def get_channel_option(self, value):
-        """Get a channel option by its value."""
-        return f"//select[@id='Channel']/option[@value='{value}']"
-    
-    def get_channel_option_by_text(self, text):
-        """Get a channel option by its display text."""
-        return f"//select[@id='Channel']/option[text()='{text}']"
-    
-    def get_add_new_channel_option(self):
-        """Get the 'Add new...' channel option."""
-        return "//select[@id='Channel']/option[@value='add-new']" 

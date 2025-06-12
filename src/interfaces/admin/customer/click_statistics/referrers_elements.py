@@ -1,4 +1,5 @@
 class ReferrersElements:
+    
     # Filter section
     div_filter_container = "//div[@class='filter-container']"
     div_form_inline = "//div[@class='filter-container']/div[@class='form-inline']"

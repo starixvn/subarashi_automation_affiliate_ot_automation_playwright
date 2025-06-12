@@ -1,4 +1,5 @@
 class LeftPanelElements:
+    
     # Search section
     div_search_container = "//div[@class='left-panel-container']/div[@class='']"
     inp_aff_name = "//input[@name='affName']"

@@ -1,13 +1,4 @@
-"""
-Product Elements
-
-This file contains XPath locators for the products and providers section elements.
-"""
-
 class ProductElements:
-    """
-    Class containing XPath locators for the product section elements.
-    """
     
     # Section container
     div_block_our_product = "//div[@class='block block-our-product']"
@@ -39,73 +30,3 @@ class ProductElements:
     div_swiper_button_next = "//div[@class='swiper mini-block-banner']//div[@class='swiper-button-next']"
     div_swiper_button_prev = "//div[@class='swiper mini-block-banner']//div[@class='swiper-button-prev']"
     div_swiper_pagination = "//div[@class='swiper mini-block-banner']//div[@class='swiper-pagination']"
-    
-    @staticmethod
-    def get_product_item(index):
-        """
-        Returns XPath for a specific product item by index
-        
-        Args:
-            index: The 1-based index of the product item
-        """
-        return f"//div[@class='block-our-product']//div[@class='wrapper-block']/div[@class='items'][{index}]"
-    
-    @staticmethod
-    def get_product_link(index):
-        """
-        Returns XPath for a specific product link by index
-        
-        Args:
-            index: The 1-based index of the product item
-        """
-        return f"//div[@class='block-our-product']//div[@class='wrapper-block']/div[@class='items'][{index}]/a"
-    
-    @staticmethod
-    def get_product_image(index):
-        """
-        Returns XPath for a specific product image by index
-        
-        Args:
-            index: The 1-based index of the product item
-        """
-        return f"//div[@class='block-our-product']//div[@class='wrapper-block']/div[@class='items'][{index}]/a/img"
-    
-    @staticmethod
-    def get_product_name(index):
-        """
-        Returns XPath for a specific product name by index
-        
-        Args:
-            index: The 1-based index of the product item
-        """
-        return f"//div[@class='block-our-product']//div[@class='wrapper-block']/div[@class='items'][{index}]/a/span[@class='name-item']"
-    
-    @staticmethod
-    def get_provider_slide(index):
-        """
-        Returns XPath for a specific provider slide by index
-        
-        Args:
-            index: The 1-based index of the provider slide
-        """
-        return f"//div[@class='swiper mini-block-banner']/div[@class='swiper-wrapper']/div[@class='swiper-slide'][{index}]"
-    
-    @staticmethod
-    def get_provider_image(index):
-        """
-        Returns XPath for a specific provider image by index
-        
-        Args:
-            index: The 1-based index of the provider slide
-        """
-        return f"//div[@class='swiper mini-block-banner']/div[@class='swiper-wrapper']/div[@class='swiper-slide'][{index}]/img"
-    
-    @staticmethod
-    def get_pagination_bullet(index):
-        """
-        Returns XPath for a specific pagination bullet
-        
-        Args:
-            index: The 1-based index of the pagination bullet
-        """
-        return f"//div[@class='swiper mini-block-banner']//div[@class='swiper-pagination']/span[@class='swiper-pagination-bullet'][{index}]" 

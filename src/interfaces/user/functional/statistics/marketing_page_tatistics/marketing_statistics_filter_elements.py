@@ -1,8 +1,4 @@
 class MarketingStatisticsFilterElements:
-    """
-    Class containing XPath locators for the Marketing Statistics filter section.
-    These elements are for the filter panel with date range, language selector, and checkbox.
-    """
 
     # Main container elements
     div_main_panel = "//div[@id='mainPanel']"
@@ -58,24 +54,3 @@ class MarketingStatisticsFilterElements:
     
     # Submit button
     button_submit = "//button[@id='btnStatisticsSubmit']"
-    
-    def get_language_option_by_value(self, value):
-        """Get language option by value"""
-        return f"//select[@id='language']/option[@value='{value}']"
-    
-    def get_language_option_by_text(self, text):
-        """Get language option by text"""
-        return f"//select[@id='language']/option[text()='{text}']"
-    
-    def is_language_selected(self, value):
-        """Check if language is selected"""
-        return f"//select[@id='language']/option[@value='{value}' and @selected]"
-    
-    def set_date_range(self, from_date, to_date):
-        """Get elements needed to set date range"""
-        return {
-            "from_input": self.input_from_date,
-            "from_calendar": self.span_from_calendar_icon,
-            "to_input": self.input_to_date,
-            "to_calendar": self.span_to_calendar_icon
-        } 

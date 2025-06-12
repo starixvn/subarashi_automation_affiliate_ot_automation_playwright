@@ -1,13 +1,4 @@
-"""
-Moving Block Elements
-
-This file contains XPath locators for the moving block elements (scroll to top button).
-"""
-
 class MovingBlockElements:
-    """
-    Class containing XPath locators for the moving block elements.
-    """
     
     # Moving block container
     div_moving_block = "//div[@class='moving-block']"

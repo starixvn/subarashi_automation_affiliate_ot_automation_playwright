@@ -1,8 +1,4 @@
 class StatementHistoryElements:
-    """
-    Class containing XPath locators for the Statement History elements page.
-    These elements are for the main statement history section.
-    """
 
     # Main container elements
     div_sub_content = "//div[@class='sub-content']"
@@ -31,10 +27,3 @@ class StatementHistoryElements:
     # Hidden input elements
     input_is_click_breadcumb = "//input[@id='isClickBreadcumb']"
     
-    def get_currency_option_by_value(self, value):
-        """Get currency option by value"""
-        return f"//select[@id='base-currency']/option[@value='{value}']"
-    
-    def get_currency_option_by_text(self, text):
-        """Get currency option by text"""
-        return f"//select[@id='base-currency']/option[text()='{text}']" 

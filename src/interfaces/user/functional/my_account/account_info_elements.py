@@ -1,9 +1,5 @@
 class AccountInfoElements:
-    """
-    Class containing XPath locators for the Account Information section.
-    These elements are for the main account information fields.
-    """
-
+    
     # Main container elements
     div_account_information = "//div[@class='account-information']"
     div_page_title = "//div[@class='account-information']/div[@class='page-title']"
@@ -43,11 +39,3 @@ class AccountInfoElements:
     # Action buttons
     button_submit = "//button[@id='btnMyAccountSubmit']"
     button_cancel = "//button[@id='btnCancel']"
-    
-    def get_form_group_by_label(self, label_text):
-        """Get form group by label text"""
-        return f"//div[@class='form-group'][.//label[text()='{label_text}']]"
-    
-    def get_field_value_by_label(self, label_text):
-        """Get field value by label text"""
-        return f"//div[@class='form-group'][.//label[text()='{label_text}']]/div[2]/p" 

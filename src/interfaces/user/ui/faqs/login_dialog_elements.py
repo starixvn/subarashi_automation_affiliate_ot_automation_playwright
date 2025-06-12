@@ -1,13 +1,4 @@
-"""
-Login Dialog Elements
-
-This file contains XPath locators for login dialog elements.
-"""
-
 class LoginDialogElements:
-    """
-    Class containing XPath locators for login dialog elements.
-    """
     
     # Dialog container
     div_login_dialog = "//div[@class='modal fade login-dialog'][@id='loginDialog']"

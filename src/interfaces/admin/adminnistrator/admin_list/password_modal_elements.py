@@ -1,4 +1,5 @@
 class PasswordModalElements:
+    
     # Modal container
     mdl_password = "//div[@class='modal-dialog']"
     mdl_content = "//div[@class='modal-content']"

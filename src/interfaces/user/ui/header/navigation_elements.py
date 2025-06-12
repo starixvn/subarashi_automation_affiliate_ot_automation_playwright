@@ -1,13 +1,4 @@
-"""
-Navigation Elements
-
-This file contains XPath locators for navigation elements.
-"""
-
 class NavigationElements:
-    """
-    Class containing XPath locators for navigation elements.
-    """
     
     # Navigation container
     div_nav_container = "//div[@class='nav-container']"
@@ -45,33 +36,3 @@ class NavigationElements:
     # Support menu
     a_support = "//div[@class='nav-container']//a[@class='home-link']"
     a_live_chat = "//div[@class='nav-container']//a[@class='online-chat']"
-    
-    @staticmethod
-    def get_menu_item_by_index(index):
-        """
-        Returns XPath for a menu item by its index
-        
-        Args:
-            index: The 1-based index of the menu item
-        """
-        return f"//nav[@class='main-menu']/ul/li[{index}]"
-    
-    @staticmethod
-    def get_menu_link_by_index(index):
-        """
-        Returns XPath for a menu link by its index
-        
-        Args:
-            index: The 1-based index of the menu item
-        """
-        return f"//nav[@class='main-menu']/ul/li[{index}]/a"
-    
-    @staticmethod
-    def get_menu_item_by_text(text):
-        """
-        Returns XPath for a menu item by its text
-        
-        Args:
-            text: The text of the menu item
-        """
-        return f"//nav[@class='main-menu']/ul/li/a[contains(text(), '{text}')]/parent::li" 

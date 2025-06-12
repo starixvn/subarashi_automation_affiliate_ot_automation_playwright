@@ -1,13 +1,4 @@
-"""
-Table Header Elements
-
-This file contains XPath locators for the table header elements.
-"""
-
 class TableHeaderElements:
-    """
-    Class containing XPath locators for table header elements.
-    """
     
     # Header row
     tr_header = "//table[@id='player-detail-table']/thead/tr[@class='player-detail-table-header']"
@@ -61,68 +52,3 @@ class TableHeaderElements:
     span_caret_desc_turnover = "//table[@id='player-detail-table']/thead/tr/th[@data-name='Turnover']/div[@class='th-wrapper']/div[@class='icon-container']/span[@class='caret desc']"
     span_default_sorting_turnover = "//table[@id='player-detail-table']/thead/tr/th[@data-name='Turnover']/div[@class='th-wrapper']/div[@class='icon-container']/span[@id='defaultSorting']"
     
-    @staticmethod
-    def get_header_cell_by_name(data_name):
-        """
-        Get the XPath for a specific header cell by its data-name attribute.
-        
-        Args:
-            data_name (str): The data-name attribute value (Username, RegisteredDate, FdmDate, etc.).
-            
-        Returns:
-            str: XPath locator for the specified header cell.
-        """
-        return f"//table[@id='player-detail-table']/thead/tr/th[@data-name='{data_name}']"
-    
-    @staticmethod
-    def get_header_cell_title_by_name(data_name):
-        """
-        Get the XPath for a specific header cell title span by data-name attribute.
-        
-        Args:
-            data_name (str): The data-name attribute value (Username, RegisteredDate, FdmDate, etc.).
-            
-        Returns:
-            str: XPath locator for the title span of the specified header cell.
-        """
-        return f"//table[@id='player-detail-table']/thead/tr/th[@data-name='{data_name}']/div[@class='th-wrapper']/span"
-    
-    @staticmethod
-    def get_sort_asc_by_column_name(data_name):
-        """
-        Get the XPath for the ascending sort icon of a specific column by data-name attribute.
-        
-        Args:
-            data_name (str): The data-name attribute value (Username, RegisteredDate, FdmDate, etc.).
-            
-        Returns:
-            str: XPath locator for the ascending sort icon of the specified column.
-        """
-        return f"//table[@id='player-detail-table']/thead/tr/th[@data-name='{data_name}']/div[@class='th-wrapper']/div[@class='icon-container']/span[@class='caret asc']"
-    
-    @staticmethod
-    def get_sort_desc_by_column_name(data_name):
-        """
-        Get the XPath for the descending sort icon of a specific column by data-name attribute.
-        
-        Args:
-            data_name (str): The data-name attribute value (Username, RegisteredDate, FdmDate, etc.).
-            
-        Returns:
-            str: XPath locator for the descending sort icon of the specified column.
-        """
-        return f"//table[@id='player-detail-table']/thead/tr/th[@data-name='{data_name}']/div[@class='th-wrapper']/div[@class='icon-container']/span[@class='caret desc']"
-    
-    @staticmethod
-    def get_current_sort_by_column_name(data_name):
-        """
-        Get the XPath for the current sort icon of a specific column by data-name attribute.
-        
-        Args:
-            data_name (str): The data-name attribute value (Username, RegisteredDate, FdmDate, etc.).
-            sort_direction (str): The sort direction ('asc' or 'desc').
-            
-        Returns:
-            str: XPath locator for the current sort icon of the specified column.
-        """
-        return f"//table[@id='player-detail-table']/thead/tr/th[@data-name='{data_name}']/div[@class='th-wrapper']/div[@class='icon-container']/span[contains(@class, 'current')]" 

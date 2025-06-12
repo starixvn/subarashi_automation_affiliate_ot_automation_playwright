@@ -1,13 +1,4 @@
-"""
-Hot News Elements
-
-This file contains XPath locators for hot news elements.
-"""
-
 class HotNewsElements:
-    """
-    Class containing XPath locators for hot news elements.
-    """
     
     # Hot news container
     div_hot_news = "//div[@class='hot-news']"
@@ -29,13 +20,3 @@ class HotNewsElements:
     
     # News items
     span_news_dot = "//div[@class='hot-news']//div[@class='running-text']/span[@class='dot']"
-    
-    @staticmethod
-    def get_news_item_by_index(index):
-        """
-        Returns XPath for a news item by its index
-        
-        Args:
-            index: The 1-based index of the news item
-        """
-        return f"//div[@class='hot-news']//div[@class='running-text']/span[contains(@class, 'hn-item')][{index}]" 

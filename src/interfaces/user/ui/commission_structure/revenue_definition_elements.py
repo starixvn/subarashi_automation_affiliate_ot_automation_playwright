@@ -1,13 +1,4 @@
-"""
-Revenue Definition Elements
-
-This file contains XPath locators for the revenue definition section elements.
-"""
-
 class RevenueDefinitionElements:
-    """
-    Class containing XPath locators for revenue definition section elements.
-    """
     
     # Section container
     div_block_text = "//div[@class='block block-text']"
