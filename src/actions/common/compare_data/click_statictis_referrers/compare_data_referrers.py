@@ -58,14 +58,23 @@ class CompareDataReferrers(GetDataCustomer):
             for current_site in current_site_urls:
                 if current_site["site_url"].lower() == site_url.lower():
                     site_found = True
-                    if int(current_site["total_click"]) != baseline_site_data["total_click"]:
-                        mismatches.append(f"Total clicks mismatch for site {site_url}. Baseline: {baseline_site_data['total_click']}, Current: {current_site['total_click']}")
-                    if int(current_site["unique_click"]) != baseline_site_data["unique_click"]:
-                        mismatches.append(f"Unique clicks mismatch for site {site_url}. Baseline: {baseline_site_data['unique_click']}, Current: {current_site['unique_click']}")
-                    if int(current_site["signups"]) != baseline_site_data["signups"]:
-                        mismatches.append(f"Signups mismatch for site {site_url}. Baseline: {baseline_site_data['signups']}, Current: {current_site['signups']}")
-                    if int(current_site["fdm"]) != baseline_site_data["fdm"]:
-                        mismatches.append(f"FDM mismatch for site {site_url}. Baseline: {baseline_site_data['fdm']}, Current: {current_site['fdm']}")
+                    baseline_total_click = self.parse_int(baseline_site_data["total_click"])
+                    current_total_click = self.parse_int(current_site["total_click"])
+                    baseline_unique_click = self.parse_int(baseline_site_data["unique_click"])
+                    current_unique_click = self.parse_int(current_site["unique_click"])
+                    baseline_signups = self.parse_int(baseline_site_data["signups"])
+                    current_signups = self.parse_int(current_site["signups"])
+                    baseline_fdm = self.parse_int(baseline_site_data["fdm"])
+                    current_fdm = self.parse_int(current_site["fdm"])
+                    
+                    if current_total_click != baseline_total_click:
+                        mismatches.append(f"Total clicks mismatch for site {site_url}. Baseline: {baseline_total_click}, Current: {current_total_click}")
+                    if current_unique_click != baseline_unique_click:
+                        mismatches.append(f"Unique clicks mismatch for site {site_url}. Baseline: {baseline_unique_click}, Current: {current_unique_click}")
+                    if current_signups != baseline_signups:
+                        mismatches.append(f"Signups mismatch for site {site_url}. Baseline: {baseline_signups}, Current: {current_signups}")
+                    if current_fdm != baseline_fdm:
+                        mismatches.append(f"FDM mismatch for site {site_url}. Baseline: {baseline_fdm}, Current: {current_fdm}")
                     break
             
             if not site_found and site_url.lower() != "none" and site_url.strip() != "":
@@ -74,43 +83,55 @@ class CompareDataReferrers(GetDataCustomer):
         return mismatches
     
     def _compare_website_urls(self, baseline_website_urls_data, current_website_urls_data):
+        consolidated_baseline, baseline_consolidation_stats = self._consolidate_website_urls_data(baseline_website_urls_data)
+        consolidated_current, current_consolidation_stats = self._consolidate_website_urls_data(current_website_urls_data)
+        
         mismatches = []
         
-        for site_url, baseline_website_urls in baseline_website_urls_data.items():
+        for site_url, baseline_website_urls in consolidated_baseline.items():
             if site_url.lower() == "none":
                 continue
             
-            if site_url not in current_website_urls_data:
+            if site_url not in consolidated_current:
                 mismatches.append(f"Website URLs for site '{site_url}' not found in current data")
                 continue
             
-            current_website_urls = current_website_urls_data[site_url]
+            current_website_urls = consolidated_current[site_url]
             
             if len(baseline_website_urls) != len(current_website_urls):
-                mismatches.append(f"Number of website URLs mismatch for site {site_url}. Baseline: {len(baseline_website_urls)}, Current: {len(current_website_urls)}")
+                current_website_urls_list = [w.get("website_url", "unknown") for w in current_website_urls] if current_website_urls else []
+                baseline_website_urls_list = [w.get("website_url", "unknown") for w in baseline_website_urls] if baseline_website_urls else []
+                mismatches.append(f"Number of website URLs mismatch for site {site_url}. Baseline: {len(baseline_website_urls)} URLs {baseline_website_urls_list[:3]}{'...' if len(baseline_website_urls_list) > 3 else ''}, Current: {len(current_website_urls)} URLs {current_website_urls_list[:3]}{'...' if len(current_website_urls_list) > 3 else ''}")
             
             for baseline_website in baseline_website_urls:
                 website_found = False
                 for current_website in current_website_urls:
                     if current_website["website_url"] == baseline_website["website_url"]:
                         website_found = True
-                        if int(current_website["total_clicks"]) != baseline_website["total_clicks"]:
-                            mismatches.append(f"Total clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['total_clicks']}, Current: {current_website['total_clicks']}")
-                        if int(current_website["unique_clicks"]) != baseline_website["unique_clicks"]:
-                            mismatches.append(f"Unique clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['unique_clicks']}, Current: {current_website['unique_clicks']}")
+                        baseline_total_clicks = self.parse_int(baseline_website["total_clicks"])
+                        current_total_clicks = self.parse_int(current_website["total_clicks"])
+                        baseline_unique_clicks = self.parse_int(baseline_website["unique_clicks"])
+                        current_unique_clicks = self.parse_int(current_website["unique_clicks"])
                         
-                        baseline_signups = baseline_website["signups"]
+                        baseline_signups = 0
+                        if "signups" in baseline_website:
+                            baseline_signups = self.parse_int(baseline_website["signups"])
+                        
                         current_signups = 0
-                        if "signups" in current_website:
-                            current_signups = int(current_website["signups"])
-                        elif "sign_up" in current_website:
-                            current_signups = int(current_website["sign_up"])
+                        if "sign_up" in current_website:
+                            current_signups = self.parse_int(current_website["sign_up"])
                         
+                        baseline_fdm = self.parse_int(baseline_website["fdm"])
+                        current_fdm = self.parse_int(current_website["fdm"])
+                        
+                        if current_total_clicks != baseline_total_clicks:
+                            mismatches.append(f"Total clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_total_clicks}, Current: {current_total_clicks}")
+                        if current_unique_clicks != baseline_unique_clicks:
+                            mismatches.append(f"Unique clicks mismatch for website {baseline_website['website_url']}. Baseline: {baseline_unique_clicks}, Current: {current_unique_clicks}")
                         if current_signups != baseline_signups:
                             mismatches.append(f"Signups mismatch for website {baseline_website['website_url']}. Baseline: {baseline_signups}, Current: {current_signups}")
-                        
-                        if int(current_website["fdm"]) != baseline_website["fdm"]:
-                            mismatches.append(f"FDM mismatch for website {baseline_website['website_url']}. Baseline: {baseline_website['fdm']}, Current: {current_website['fdm']}")
+                        if current_fdm != baseline_fdm:
+                            mismatches.append(f"FDM mismatch for website {baseline_website['website_url']}. Baseline: {baseline_fdm}, Current: {current_fdm}")
                         break
                 
                 if not website_found:
@@ -135,6 +156,81 @@ class CompareDataReferrers(GetDataCustomer):
             return {"unique": 0, "total": 0}
         except Exception:
             return {"unique": 0, "total": 0}
+    
+    def _consolidate_website_urls_data(self, website_urls_data):
+        """
+        Consolidate duplicate website URLs by summing their metrics for Referrers.
+        Input: {site_url: [website_data_list]}
+        Output: ({site_url: [consolidated_website_data_list]}, consolidation_stats)
+        """
+        consolidated_data = {}
+        consolidation_stats = {
+            "total_original_websites": 0,
+            "total_consolidated_websites": 0,
+            "sites_with_duplicates": 0,
+            "duplicate_urls_found": []
+        }
+        
+        for site_url, website_list in website_urls_data.items():
+            if not isinstance(website_list, list):
+                consolidated_data[site_url] = website_list
+                continue
+                
+            original_count = len(website_list)
+            consolidation_stats["total_original_websites"] += original_count
+            
+            url_groups = {}
+            for website_data in website_list:
+                url = website_data.get("website_url", "")
+                if url not in url_groups:
+                    url_groups[url] = []
+                url_groups[url].append(website_data)
+            
+            site_has_duplicates = False
+            for url, group in url_groups.items():
+                if len(group) > 1:
+                    site_has_duplicates = True
+                    consolidation_stats["duplicate_urls_found"].append({
+                        "site": site_url,
+                        "url": url,
+                        "duplicate_count": len(group)
+                    })
+            
+            if site_has_duplicates:
+                consolidation_stats["sites_with_duplicates"] += 1
+            
+            consolidated_websites = []
+            for url, group in url_groups.items():
+                if len(group) == 1:
+                    consolidated_websites.append(group[0])
+                else:
+                    consolidated_website = {
+                        "website_url": url,
+                        "total_clicks": 0,
+                        "unique_clicks": 0,
+                        "signups": 0,
+                        "fdm": 0
+                    }
+                    
+                    for website_data in group:
+                        consolidated_website["total_clicks"] += self.parse_int(website_data.get("total_clicks", 0))
+                        consolidated_website["unique_clicks"] += self.parse_int(website_data.get("unique_clicks", 0))
+                        
+                        signups_value = 0
+                        if "signups" in website_data:
+                            signups_value = self.parse_int(website_data["signups"])
+                        elif "sign_up" in website_data:
+                            signups_value = self.parse_int(website_data["sign_up"])
+                        consolidated_website["signups"] += signups_value
+                        
+                        consolidated_website["fdm"] += self.parse_int(website_data.get("fdm", 0))
+                    
+                    consolidated_websites.append(consolidated_website)
+            
+            consolidated_data[site_url] = consolidated_websites
+            consolidation_stats["total_consolidated_websites"] += len(consolidated_websites)
+        
+        return consolidated_data, consolidation_stats
     
     def _get_username_for_period_device(self, period, device_type, fallback_username):
         
@@ -238,36 +334,68 @@ class CompareDataReferrers(GetDataCustomer):
             ]
             
             for period_name, baseline_key in date_tests:
+                subAutoTestCase += f"\n\n   → Testing {period_name} Date Range:"
+                
                 baseline_data = Data[baseline_key]
                 cache_key = baseline_to_cache_mapping[baseline_key]
                 
                 baseline_username = baseline_data["metadata"]["filters"]["username"]
-
                 current_data = cache["referrers"][cache_key]
                 
                 baseline_has_data = baseline_data["metadata"].get("has_data", True)
                 current_has_data = current_data.get("has_data", True)
                 
+                subAutoTestCase += f"\n     + Username: {baseline_username}"
+                subAutoTestCase += f"\n     + From Date: {baseline_data['metadata']['period']['from_date']}"
+                subAutoTestCase += f"\n     + To Date: {baseline_data['metadata']['period']['to_date']}"
+                
                 if not baseline_has_data and not current_has_data:
-                    subAutoTestCase += f"\n     + {period_name}: No data expected - verified no data is present"
+                    subAutoTestCase += f"\n     + Result: No data expected - verified no data is present"
                 elif not baseline_has_data and current_has_data:
                     raise Exception(f"{period_name}: Baseline data has no results but current query returned data. This suggests a data inconsistency.")
                 elif baseline_has_data and not current_has_data:
                     raise Exception(f"{period_name}: No current data found but baseline data exists")
                 else:
+                    baseline_sites_count = len(baseline_data["site_urls_data"])
+                    current_sites_count = len(current_data["site_urls_data"])
+                    baseline_websites_count = sum(len(websites) for websites in baseline_data["website_urls_data"].values())
+                    current_websites_count = sum(len(websites) for websites in current_data["website_urls_data"].values())
+                    
+                    consolidated_baseline, baseline_consolidation_stats = self._consolidate_website_urls_data(baseline_data["website_urls_data"])
+                    consolidated_current, current_consolidation_stats = self._consolidate_website_urls_data(current_data["website_urls_data"])
+                    
+                    subAutoTestCase += f"\n     + Data Summary: Baseline={baseline_sites_count} sites, {baseline_websites_count} websites | Current={current_sites_count} sites, {current_websites_count} websites"
+                    
+                    if baseline_consolidation_stats["sites_with_duplicates"] > 0 or current_consolidation_stats["sites_with_duplicates"] > 0:
+                        subAutoTestCase += f"\n     + Duplicate URLs Handling: Baseline consolidated {baseline_consolidation_stats['total_original_websites']}→{baseline_consolidation_stats['total_consolidated_websites']} websites"
+                        subAutoTestCase += f" | Current consolidated {current_consolidation_stats['total_original_websites']}→{current_consolidation_stats['total_consolidated_websites']} websites"
+                    
                     site_mismatches = self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
                     website_mismatches = self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
                     
                     all_mismatches = site_mismatches + website_mismatches
                     
                     if all_mismatches:
-                        subAutoTestCase += f"\n     + {period_name}: Data mismatches found ({len(all_mismatches)} issues) for Username: {baseline_username}"
-                        for i, mismatch in enumerate(all_mismatches[:5]):
+                        total_clicks_errors = [m for m in all_mismatches if "total clicks" in m.lower()]
+                        unique_clicks_errors = [m for m in all_mismatches if "unique clicks" in m.lower()]
+                        signups_errors = [m for m in all_mismatches if "signups" in m.lower()]
+                        fdm_errors = [m for m in all_mismatches if "fdm" in m.lower()]
+                        other_errors = [m for m in all_mismatches if not any(keyword in m.lower() for keyword in ["total clicks", "unique clicks", "signups", "fdm"])]
+                        
+                        subAutoTestCase += f"\n     + Result: FAILED - {len(all_mismatches)} mismatches found"
+                        subAutoTestCase += f"\n       • Total Clicks errors: {len(total_clicks_errors)}"
+                        subAutoTestCase += f"\n       • Unique Clicks errors: {len(unique_clicks_errors)}"
+                        subAutoTestCase += f"\n       • Signups errors: {len(signups_errors)}"
+                        subAutoTestCase += f"\n       • FDM errors: {len(fdm_errors)}"
+                        subAutoTestCase += f"\n       • Other errors: {len(other_errors)}"
+                        
+                        subAutoTestCase += f"\n     + Sample mismatches (first 4):"
+                        for i, mismatch in enumerate(all_mismatches[:4]):
                             subAutoTestCase += f"\n       - {mismatch}"
-                        if len(all_mismatches) > 5:
-                            subAutoTestCase += f"\n       - ... and {len(all_mismatches) - 5} more mismatches"
+                        if len(all_mismatches) > 4:
+                            subAutoTestCase += f"\n       - ... and {len(all_mismatches) - 4} more mismatches"
                     else:
-                        subAutoTestCase += f"\n     + {period_name}: Successfully verified data (Username: {baseline_username})"
+                        subAutoTestCase += f"\n     + Result: PASSED - All data matches between baseline and current"
             
             self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0], sheet_name=Checklist_Sheet_Name)
             indexChl += 1
@@ -284,35 +412,70 @@ class CompareDataReferrers(GetDataCustomer):
             ]
             
             for device_period_name, baseline_key in device_tests:
+                subAutoTestCase += f"\n\n   → Testing Device Filter: {device_period_name}"
+                
                 baseline_data = Data[baseline_key]
                 cache_key = baseline_to_cache_mapping[baseline_key]
                 baseline_username = baseline_data["metadata"]["filters"]["username"]
+                device_type = baseline_data["metadata"]["filters"]["device_type"]
                 
                 current_data = cache["referrers"][cache_key]
                 
                 baseline_has_data = baseline_data["metadata"].get("has_data", True)
                 current_has_data = current_data.get("has_data", True)
                 
+                subAutoTestCase += f"\n     + Username: {baseline_username}"
+                subAutoTestCase += f"\n     + Device Type: {device_type}"
+                subAutoTestCase += f"\n     + From Date: {baseline_data['metadata']['period']['from_date']}"
+                subAutoTestCase += f"\n     + To Date: {baseline_data['metadata']['period']['to_date']}"
+                
                 if not baseline_has_data and not current_has_data:
-                    subAutoTestCase += f"\n     + {device_period_name}: No data expected - verified no data is present"
+                    subAutoTestCase += f"\n     + Result: No data expected - verified no data is present"
                 elif not baseline_has_data and current_has_data:
                     raise Exception(f"{device_period_name}: Baseline data has no results but current query returned data. This suggests a data inconsistency.")
                 elif baseline_has_data and not current_has_data:
                     raise Exception(f"{device_period_name}: No current data found but baseline data exists")
                 else:
+                    baseline_sites_count = len(baseline_data["site_urls_data"])
+                    current_sites_count = len(current_data["site_urls_data"])
+                    baseline_websites_count = sum(len(websites) for websites in baseline_data["website_urls_data"].values())
+                    current_websites_count = sum(len(websites) for websites in current_data["website_urls_data"].values())
+                    
+                    consolidated_baseline, baseline_consolidation_stats = self._consolidate_website_urls_data(baseline_data["website_urls_data"])
+                    consolidated_current, current_consolidation_stats = self._consolidate_website_urls_data(current_data["website_urls_data"])
+                    
+                    subAutoTestCase += f"\n     + Data Summary: Baseline={baseline_sites_count} sites, {baseline_websites_count} websites | Current={current_sites_count} sites, {current_websites_count} websites"
+                    
+                    if baseline_consolidation_stats["sites_with_duplicates"] > 0 or current_consolidation_stats["sites_with_duplicates"] > 0:
+                        subAutoTestCase += f"\n     + Duplicate URLs Handling: Baseline consolidated {baseline_consolidation_stats['total_original_websites']}→{baseline_consolidation_stats['total_consolidated_websites']} websites"
+                        subAutoTestCase += f" | Current consolidated {current_consolidation_stats['total_original_websites']}→{current_consolidation_stats['total_consolidated_websites']} websites"
+                    
                     site_mismatches = self._compare_site_urls(baseline_data["site_urls_data"], current_data["site_urls_data"])
                     website_mismatches = self._compare_website_urls(baseline_data["website_urls_data"], current_data["website_urls_data"])
                     
                     all_mismatches = site_mismatches + website_mismatches
                     
                     if all_mismatches:
-                        subAutoTestCase += f"\n     + {device_period_name}: Data mismatches found ({len(all_mismatches)} issues) for Username: {baseline_username}"
-                        for i, mismatch in enumerate(all_mismatches[:5]):
+                        total_clicks_errors = [m for m in all_mismatches if "total clicks" in m.lower()]
+                        unique_clicks_errors = [m for m in all_mismatches if "unique clicks" in m.lower()]
+                        signups_errors = [m for m in all_mismatches if "signups" in m.lower()]
+                        fdm_errors = [m for m in all_mismatches if "fdm" in m.lower()]
+                        other_errors = [m for m in all_mismatches if not any(keyword in m.lower() for keyword in ["total clicks", "unique clicks", "signups", "fdm"])]
+                        
+                        subAutoTestCase += f"\n     + Result: FAILED - {len(all_mismatches)} mismatches found"
+                        subAutoTestCase += f"\n       • Total Clicks errors: {len(total_clicks_errors)}"
+                        subAutoTestCase += f"\n       • Unique Clicks errors: {len(unique_clicks_errors)}"
+                        subAutoTestCase += f"\n       • Signups errors: {len(signups_errors)}"
+                        subAutoTestCase += f"\n       • FDM errors: {len(fdm_errors)}"
+                        subAutoTestCase += f"\n       • Other errors: {len(other_errors)}"
+                        
+                        subAutoTestCase += f"\n     + Sample mismatches (first 4):"
+                        for i, mismatch in enumerate(all_mismatches[:4]):
                             subAutoTestCase += f"\n       - {mismatch}"
-                        if len(all_mismatches) > 5:
-                            subAutoTestCase += f"\n       - ... and {len(all_mismatches) - 5} more mismatches"
+                        if len(all_mismatches) > 4:
+                            subAutoTestCase += f"\n       - ... and {len(all_mismatches) - 4} more mismatches"
                     else:
-                        subAutoTestCase += f"\n     + {device_period_name}: Successfully verified data (Username: {baseline_username})"
+                        subAutoTestCase += f"\n     + Result: PASSED - All data matches between baseline and current"
             
             self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[indexChl], testcase, subAutoTestCase, Data["TestCase_Auto_Status"][0], sheet_name=Checklist_Sheet_Name)
             
@@ -913,26 +1076,33 @@ class CompareDataReferrers(GetDataCustomer):
                         subAutoTestCase += f"\n     + No data found for Referrers."
                         continue
                     
+                    consolidated_website_urls_data, consolidation_stats = self._consolidate_website_urls_data(data_referrers["website_urls_data"])
+                    
+                    if consolidation_stats["sites_with_duplicates"] > 0:
+                        subAutoTestCase += f"\n     + Consolidation Applied: {consolidation_stats['sites_with_duplicates']} sites had duplicate URLs"
+                        subAutoTestCase += f"\n       - Original websites: {consolidation_stats['total_original_websites']}, After consolidation: {consolidation_stats['total_consolidated_websites']}"
+                        subAutoTestCase += f"\n       - Sample duplicates: {consolidation_stats['duplicate_urls_found'][:2] if consolidation_stats['duplicate_urls_found'] else 'None'}"
+                    
                     mismatches = []
+                    validation_details = []
+                    
                     for site_data in data_referrers["site_urls_data"]:
                         site_url = site_data["site_url"]
                         if site_url.lower() == "none" or site_url.strip() == "":
                             continue
                         
-                        if site_url not in data_referrers["website_urls_data"]:
+                        if site_url not in consolidated_website_urls_data:
                             mismatches.append(f"No website URLs data found for site '{site_url}'")
                             continue
                         
-                        website_urls = data_referrers["website_urls_data"][site_url]
+                        website_urls = consolidated_website_urls_data[site_url]
                         
                         website_total_clicks = 0
-                        website_unique_clicks = 0
                         website_signups = 0
                         website_fdm = 0
                         
                         for website_data in website_urls:
                             website_total_clicks += self.parse_int(website_data["total_clicks"])
-                            website_unique_clicks += self.parse_int(website_data["unique_clicks"])
                             
                             if "signups" in website_data:
                                 website_signups += self.parse_int(website_data["signups"])
@@ -942,30 +1112,34 @@ class CompareDataReferrers(GetDataCustomer):
                             website_fdm += self.parse_int(website_data["fdm"])
                         
                         site_total_click = self.parse_int(site_data["total_click"])
-                        site_unique_click = self.parse_int(site_data["unique_click"])
                         site_signups = self.parse_int(site_data["signups"])
                         site_fdm = self.parse_int(site_data["fdm"])
                         
-                        if website_total_clicks != site_total_click:
-                            mismatches.append(f"Total clicks mismatch for site '{site_url}': Site value={site_total_click}, Sum of website values={website_total_clicks}")
+                        validation_details.append(f"Site '{site_url}': Total Clicks (Site={site_total_click}, Sum={website_total_clicks}), Signups (Site={site_signups}, Sum={website_signups}), FDM (Site={site_fdm}, Sum={website_fdm})")
                         
-                        if website_unique_clicks != site_unique_click:
-                            mismatches.append(f"Unique clicks mismatch for site '{site_url}': Site value={site_unique_click}, Sum of website values={website_unique_clicks}")
+                        if website_total_clicks != site_total_click:
+                            mismatches.append(f"Total clicks mismatch for site '{site_url}': Site value={site_total_click}, Sum of consolidated website values={website_total_clicks}")
                         
                         if website_signups != site_signups:
-                            mismatches.append(f"Signups mismatch for site '{site_url}': Site value={site_signups}, Sum of website values={website_signups}")
+                            mismatches.append(f"Signups mismatch for site '{site_url}': Site value={site_signups}, Sum of consolidated website values={website_signups}")
                         
                         if website_fdm != site_fdm:
-                            mismatches.append(f"FDM mismatch for site '{site_url}': Site value={site_fdm}, Sum of website values={website_fdm}")
+                            mismatches.append(f"FDM mismatch for site '{site_url}': Site value={site_fdm}, Sum of consolidated website values={website_fdm}")
+                    
+                    subAutoTestCase += f"\n     + Comparison Details ({len(validation_details)} sites checked, excluding unique clicks):"
+                    for detail in validation_details[:4]:
+                        subAutoTestCase += f"\n       • {detail}"
+                    if len(validation_details) > 4:
+                        subAutoTestCase += f"\n       • ... and {len(validation_details) - 4} more sites"
                     
                     if mismatches:
-                        subAutoTestCase += f"\n     + Failed: {len(mismatches)} mismatches found:"
-                        for mismatch in mismatches[:3]:
+                        subAutoTestCase += f"\n     + Result: FAILED - {len(mismatches)} mismatches found:"
+                        for mismatch in mismatches[:4]:
                             subAutoTestCase += f"\n       - {mismatch}"
-                        if len(mismatches) > 3:
-                            subAutoTestCase += f"\n       - ... and {len(mismatches) - 3} more"
+                        if len(mismatches) > 4:
+                            subAutoTestCase += f"\n       - ... and {len(mismatches) - 4} more mismatches"
                     else:
-                        subAutoTestCase += f"\n     + Verified: All Website URL sums match their corresponding Site URL values."
+                        subAutoTestCase += f"\n     + Result: PASSED - All {len(data_referrers['site_urls_data'])} sites data validation completed (excluding unique clicks check)."
             
             self.utils.update_result_to_ggsheet(
                 Data["TestCase_spread_sheet_id"], 
@@ -1204,7 +1378,9 @@ class CompareDataReferrers(GetDataCustomer):
                             if unique_clicks == 0:
                                 violations.append(f"Site URL '{site_url}' has Total Clicks ({total_clicks}) but no Unique Clicks")
                     
-                    for site_url, website_urls in data_referrers["website_urls_data"].items():
+                    consolidated_website_urls_data, consolidation_stats = self._consolidate_website_urls_data(data_referrers["website_urls_data"])
+                    
+                    for site_url, website_urls in consolidated_website_urls_data.items():
                         for website_data in website_urls:
                             website_url = website_data["website_url"]
                             total_clicks = self.parse_int(website_data["total_clicks"])

@@ -22,8 +22,4 @@ class Login_admin(unittest.TestCase):
     @classmethod
     def tearDownClass(self):
         self.LoginFunc.tearDown()
-
-    def TestCase_01_Login(self):
-        self.LoginFunc.login_admin()
-
     

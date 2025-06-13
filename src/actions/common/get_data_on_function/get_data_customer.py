@@ -353,7 +353,7 @@ class GetDataCustomer(Common):
             time.sleep(3)
             super().select_month_picker(elm_statistics.inp_month, month_date)
             self.utils.page.wait_load_page()
-            time.sleep(3)
+            time.sleep(6)
             
             new_signups_month = self.utils.page.get_text(elm_statistics.td_new_signups_month)
             new_signups_total = self.utils.page.get_text(elm_statistics.td_new_signups_total)
