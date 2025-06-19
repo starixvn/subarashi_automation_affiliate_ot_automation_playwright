@@ -14,10 +14,10 @@ from src.interfaces.admin.customer.click_statistics.marketing_page_elements impo
 from src.interfaces.admin.customer.statement_history.statement_history_elements import StatementHistoryElements as elm_statement_history
 from src.interfaces.admin.customer.adjustment.adjustment_elements import AdjustmentElements as elm_adjustment
 from src.interfaces.admin.customer.edit.edit_elements import EditElements as elm_edit_customer
-from test_data.admin.customer.click_statistics.landing_pages.landing_pages import LANDING_PAGE_STATISTICS_API, LANDING_PAGE_DETAILS_API, DEVICE_TYPE_MAPPING, REQUIRED_HEADERS, REQUEST_BODY_TEMPLATE, DETAILS_REQUEST_BODY_TEMPLATE
-from test_data.admin.customer.affiliate_info import AFFILIATE_INFO_API, AFFILIATE_INFO_HEADERS, AFFILIATE_INFO_REQUEST_TEMPLATE
-from test_data.admin.customer.click_statistics.referrers.referrers import REFERRERS_API, REFERRERS_DETAILS_API, REFERRERS_REQUIRED_HEADERS, REFERRERS_REQUEST_BODY_TEMPLATE, REFERRERS_DETAILS_REQUEST_BODY_TEMPLATE
-from test_data.admin.customer.click_statistics.marketing_page.marketing_pages import MARKETING_PAGES_API, MARKETING_PAGES_REQUIRED_HEADERS, MARKETING_PAGES_REQUEST_BODY_TEMPLATE
+from src.test_data.admin.customer.landing_pages import LANDING_PAGE_STATISTICS_API, LANDING_PAGE_DETAILS_API, DEVICE_TYPE_MAPPING, REQUIRED_HEADERS, REQUEST_BODY_TEMPLATE, DETAILS_REQUEST_BODY_TEMPLATE
+from src.test_data.admin.customer.affiliate_info import AFFILIATE_INFO_API, AFFILIATE_INFO_HEADERS, AFFILIATE_INFO_REQUEST_TEMPLATE
+from src.test_data.admin.customer.referrers import REFERRERS_API, REFERRERS_DETAILS_API, REFERRERS_REQUIRED_HEADERS, REFERRERS_REQUEST_BODY_TEMPLATE, REFERRERS_DETAILS_REQUEST_BODY_TEMPLATE
+from src.test_data.admin.customer.marketing_pages import MARKETING_PAGES_API, MARKETING_PAGES_REQUIRED_HEADERS, MARKETING_PAGES_REQUEST_BODY_TEMPLATE
 
 class GetDataCustomer(Common):
     
@@ -265,7 +265,7 @@ class GetDataCustomer(Common):
                     channel_row_number = first_cell
                     channel_name = self.utils.page.get_text(f"{row_selector}/td[2]").strip()
                     time.sleep(0.2)
-                    language = self.utils.page.get_text(f"{row_selector}/td[3]").strip()
+                    channel_language = self.utils.page.get_text(f"{row_selector}/td[3]").strip()
                     time.sleep(0.2)
                     total_click = self.utils.page.get_text(f"{row_selector}/td[4]").strip()
                     time.sleep(0.2)
@@ -279,7 +279,7 @@ class GetDataCustomer(Common):
                     
                     channel_data = {
                         "channel_name": channel_name,
-                        "language": language,
+                        "language": channel_language,
                         "total_click": total_click,
                         "unique_click": unique_click,
                         "signups": signups,
@@ -303,17 +303,17 @@ class GetDataCustomer(Common):
                             for j in range(1, details_count + 1):
                                 detail_row_selector = f"{elm_marketing_page.tbl_marketing}//tbody/tr[not(contains(@class, 'first-row'))][{i + j}]"
                                 
-                                url = self.utils.page.get_text(f"{detail_row_selector}/td[1]").strip()
+                                url = self.utils.page.get_text(f"{detail_row_selector}/td[2]").strip()
                                 time.sleep(0.2)
-                                url_language = self.utils.page.get_text(f"{detail_row_selector}/td[2]").strip()
+                                url_language = self.utils.page.get_text(f"{detail_row_selector}/td[3]").strip()
                                 time.sleep(0.2)
-                                url_total_clicks = self.utils.page.get_text(f"{detail_row_selector}/td[3]").strip()
+                                url_total_clicks = self.utils.page.get_text(f"{detail_row_selector}/td[4]").strip()
                                 time.sleep(0.2)
-                                url_unique_clicks = self.utils.page.get_text(f"{detail_row_selector}/td[4]").strip()
+                                url_unique_clicks = self.utils.page.get_text(f"{detail_row_selector}/td[5]").strip()
                                 time.sleep(0.2)
-                                url_signups = self.utils.page.get_text(f"{detail_row_selector}/td[5]").strip()
+                                url_signups = self.utils.page.get_text(f"{detail_row_selector}/td[6]").strip()
                                 time.sleep(0.2)
-                                url_fdm = self.utils.page.get_text(f"{detail_row_selector}/td[6]").strip()
+                                url_fdm = self.utils.page.get_text(f"{detail_row_selector}/td[7]").strip()
                                 
                                 url_data = {
                                     "url": url,

@@ -1,9 +1,9 @@
-# get data baseline marketing page yesterday at 2025-06-13 10:19:08 +0800 (GMT+8)
+# get data baseline marketing page yesterday at 2025-06-13 14:49:51 +0800 (GMT+8)
 
 class DataMarketingPagesYesterday:
     data_marketing_pages_yesterday = {
     "metadata": {
-        "collected_at": "2025-06-13 10:19:08 +0800",
+        "collected_at": "2025-06-13 14:49:51 +0800",
         "period": {
             "from_date": "06-12-2025",
             "to_date": "06-12-2025"

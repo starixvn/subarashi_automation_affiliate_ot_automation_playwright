@@ -1,15 +1,15 @@
-# get data baseline landing page yesterday by mobile at 2025-06-13 10:18:56 +0800 (GMT+8)
+# get data baseline landing page yesterday by mobile at 2025-06-13 17:13:43 +0800 (GMT+8)
 
 class DataLandingPagesYesterdayByMobile:
     data_landing_pages_yesterday_by_mobile = {
     "metadata": {
-        "collected_at": "2025-06-13 10:18:56 +0800",
+        "collected_at": "2025-06-13 17:13:43 +0800",
         "period": {
             "from_date": "06-12-2025",
             "to_date": "06-12-2025"
         },
         "filters": {
-            "username": "12BETAFF16657",
+            "username": "12BETAFF13065",
             "page_name": "All",
             "language": "All",
             "device_type": "Mobile"
@@ -18,21 +18,28 @@ class DataLandingPagesYesterdayByMobile:
     },
     "pages_data": [
         {
-            "page_name": "myr-12join",
-            "language": "en-US",
-            "total_click": "22",
-            "unique_click": "15",
-            "signups": "5",
+            "page_name": "join",
+            "language": "zh-CN",
+            "total_click": "2",
+            "unique_click": "2",
+            "signups": "0",
             "fdm": "0"
         }
     ],
     "website_urls_data": {
-        "myr-12join - en-US": [
+        "join - zh-CN": [
             {
-                "website_url": "https://12betmy.alltpro.com/",
-                "total_clicks": 22,
-                "unique_clicks": 15,
-                "signups": 5,
+                "website_url": "https://m.hibet588.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "none",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
                 "fdm": 0
             }
         ]

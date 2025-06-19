@@ -47,14 +47,20 @@ class Common():
 
     def sso_login(self, affiliatename):
         try:
-            super().selectMenu("Customer")
+            self.selectMenu("Customer")
             self.utils.page.input(elm_left_panel.inp_aff_name, affiliatename)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_for_element_ready(elm_left_panel.div_affiliate_label, visible=True, enabled=True)
             time.sleep(2)
             self.utils.page.open_new_page_by_click(elm_left_panel.lnk_affiliate)
+            time.sleep(2)
             self.utils.page.new_pages.wait_for_element_ready(elm_header.a_my_account, visible=True, enabled=True)
-            username_text = re.sub(r'\b([A-Z0-9]{10,})\b', self.utils.page.get_text(elm_header.a_my_account)).group(1)
+            text_username = self.utils.page.new_pages.get_text(elm_header.a_my_account)
+            match = re.search(r'\b([A-Z0-9]{10,})\b', text_username)
+            if match:
+                username_text = match.group(1)
+            else:
+                username_text = None
             self.utils.should_be_equal(username_text, affiliatename)
 
         except Exception as e:
@@ -93,6 +99,30 @@ class Common():
             day_selector = f"{element}//div[contains(@class, 'rdr-Days')]//span[contains(@class, 'rdr-Day') and not(contains(@class, 'is-passive')) and text()='{int(day)}']"
             self.utils.page.click(day_selector)
             self.utils.page.wait_load_page()
+            time.sleep(1)
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)
+
+    def select_date_picker_user_site(self, element, date_value='05-16-2025'):
+        try:
+            month = date_value.split("-")[0]
+            day = date_value.split("-")[1]
+            year = date_value.split("-")[2]
+            
+            self.utils.page.new_pages.click(element)
+            self.utils.page.new_pages.wait_for_element_ready(element, visible=True, enabled=True)
+            time.sleep(1)
+            
+            year_selector = f"//div[contains(@class, 'pika-single') and not(contains(@class, 'is-hidden'))]//*[@class='pika-select pika-select-year']"
+            self.utils.page.new_pages.select_options(year_selector, year)
+            time.sleep(1)
+            month_selector = f"//div[contains(@class, 'pika-single') and not(contains(@class, 'is-hidden'))]//*[@class='pika-select pika-select-month']"
+            month_index = int(month) - 1
+            self.utils.page.new_pages.select_options(month_selector, str(month_index))
+            time.sleep(1)
+            day_selector = f"//div[contains(@class, 'pika-single') and not(contains(@class, 'is-hidden'))]//button[@class='pika-button pika-day'][@data-pika-year='{year}'][@data-pika-month='{month_index}'][@data-pika-day='{int(day)}']"
+            self.utils.page.new_pages.click(day_selector)
+            self.utils.page.new_pages.wait_load_page()
             time.sleep(1)
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
@@ -146,18 +176,17 @@ class Common():
 
     def select_option(self, dropdown_element, option_value):
         try:
-            try:
-                self.utils.page.select_options(dropdown_element, option_value)
-            except Exception:
-                self.utils.page.click(dropdown_element)
-                self.utils.page.wait_load_page()
-                
-                option_element = f"//select[@id='{dropdown_element.replace('#', '')}' or @name='{dropdown_element.replace('#', '')}']//option[text()='{option_value}' or @value='{option_value}']"
-                self.utils.page.click(option_element)
-            
+            self.utils.page.select_options(dropdown_element, option_value)
             self.utils.page.wait_load_page()
         except Exception as e:
             self.utils.page.extract_TestCaseFailed(e)
+    
+    def select_option_user_site(self, dropdown_element, option_value):
+        try:
+            self.utils.page.new_pages.select_options(dropdown_element, option_value)
+            self.utils.page.new_pages.wait_load_page()
+        except Exception as e:
+            self.utils.page.new_pages.extract_TestCaseFailed(e)
 
     def go_to_next_page(self, pagination_container=".page-container"):
         try:

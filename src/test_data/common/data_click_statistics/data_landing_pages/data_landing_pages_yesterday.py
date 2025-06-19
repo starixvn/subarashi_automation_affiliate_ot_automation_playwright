@@ -1,15 +1,15 @@
-# get data baseline landing page yesterday at 2025-06-13 10:18:55 +0800 (GMT+8)
+# get data baseline landing page yesterday at 2025-06-13 17:13:42 +0800 (GMT+8)
 
 class DataLandingPagesYesterday:
     data_landing_pages_yesterday = {
     "metadata": {
-        "collected_at": "2025-06-13 10:18:55 +0800",
+        "collected_at": "2025-06-13 17:13:42 +0800",
         "period": {
             "from_date": "06-12-2025",
             "to_date": "06-12-2025"
         },
         "filters": {
-            "username": "12BETAFF16657",
+            "username": "12BETAFF13065",
             "page_name": "All",
             "language": "All",
             "device_type": "All"
@@ -18,29 +18,81 @@ class DataLandingPagesYesterday:
     },
     "pages_data": [
         {
-            "page_name": "myr-12join",
-            "language": "en-US",
-            "total_click": "40",
-            "unique_click": "31",
-            "signups": "5",
+            "page_name": "join",
+            "language": "zh-CN",
+            "total_click": "11",
+            "unique_click": "11",
+            "signups": "0",
             "fdm": "0"
+        },
+        {
+            "page_name": "none",
+            "language": "none",
+            "total_click": "0",
+            "unique_click": "0",
+            "signups": "1",
+            "fdm": "1"
         }
     ],
     "website_urls_data": {
-        "myr-12join - en-US": [
+        "join - zh-CN": [
             {
-                "website_url": "https://12betmy.alltpro.com/",
-                "total_clicks": 22,
-                "unique_clicks": 15,
-                "signups": 5,
+                "website_url": "http://hibet.cc/company-detail?id=497",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://hibet.cc/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://hibet588.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://m.hibet588.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://pics55.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
                 "fdm": 0
             },
             {
                 "website_url": "none",
-                "total_clicks": 18,
-                "unique_clicks": 16,
+                "total_clicks": 5,
+                "unique_clicks": 5,
                 "signups": 0,
                 "fdm": 0
+            },
+            {
+                "website_url": "none",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            }
+        ],
+        "none - none": [
+            {
+                "website_url": "none",
+                "total_clicks": 0,
+                "unique_clicks": 0,
+                "signups": 1,
+                "fdm": 1
             }
         ]
     }
