@@ -1,15 +1,15 @@
-# get data baseline marketing page yesterday at 2025-06-13 14:49:51 +0800 (GMT+8)
+# get data baseline marketing page yesterday at 2025-06-19 18:33:58 +0800 (GMT+8)
 
 class DataMarketingPagesYesterday:
     data_marketing_pages_yesterday = {
     "metadata": {
-        "collected_at": "2025-06-13 14:49:51 +0800",
+        "collected_at": "2025-06-19 18:33:58 +0800",
         "period": {
-            "from_date": "06-12-2025",
-            "to_date": "06-12-2025"
+            "from_date": "06-18-2025",
+            "to_date": "06-18-2025"
         },
         "filters": {
-            "username": "12BETAFF16007",
+            "username": "12BETAFF16696",
             "language": "All",
             "include_inactive_tracking": False
         },
@@ -17,91 +17,23 @@ class DataMarketingPagesYesterday:
     },
     "channels_data": [
         {
-            "channel_name": "FB",
+            "channel_name": "12betsignup",
             "language": "-",
-            "total_click": 7,
-            "unique_click": 7,
-            "signups": 1,
+            "total_click": 203,
+            "unique_click": 176,
+            "signups": 9,
             "fdm": 1
-        },
-        {
-            "channel_name": "MKTccn",
-            "language": "-",
-            "total_click": 530,
-            "unique_click": 314,
-            "signups": 46,
-            "fdm": 11
-        },
-        {
-            "channel_name": "Others",
-            "language": "-",
-            "total_click": 2,
-            "unique_click": 2,
-            "signups": 0,
-            "fdm": 0
         }
     ],
     "channel_details_data": {
-        "1 - FB": [
+        "1 - 12betsignup": [
             {
-                "url": "https://go.12winball.com/join/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 3,
-                "unique_clicks": 3,
-                "signups": 1,
+                "url": "https://goto.12Bix24.com/join/14925/hien/12betsignup/index.html",
+                "language": "English (India)",
+                "total_clicks": 203,
+                "unique_clicks": 176,
+                "signups": 9,
                 "fdm": 1
-            },
-            {
-                "url": "https://goto.b125292.com/home/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "url": "https://goto.elv520.com/home/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "url": "https://goto.gyg77.com/home/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "url": "https://goto.nix68.com/home/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "2 - MKTccn": [
-            {
-                "url": "https://goto.12bvnlink6.com/vnd-12join/15411/vn/mktccn/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 530,
-                "unique_clicks": 314,
-                "signups": 46,
-                "fdm": 11
-            }
-        ],
-        "3 - Others": [
-            {
-                "url": "https://go.qwerty5678.com/92043095/signup/vn/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 2,
-                "unique_clicks": 2,
-                "signups": 0,
-                "fdm": 0
             }
         ]
     }

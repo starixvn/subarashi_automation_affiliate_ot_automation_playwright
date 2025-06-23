@@ -64,6 +64,9 @@ class GetDataMarketingPages(Common):
                 }
                 result["channels_data"].append(channel_data)
             
+            if get_detail:
+                result["channel_details_data"] = self._extract_channel_details_data()
+            
             return result
             
         except Exception as e:
@@ -72,6 +75,63 @@ class GetDataMarketingPages(Common):
                 "has_data": False,
                 "error": str(e)
             }
+    
+    def _extract_channel_details_data(self):
+        channel_details_data = {}
+        
+        try:
+            number_of_rows = self.utils.page.new_pages.count_element("", f"{elm_table.tr_parent_rows}")
+            
+            for i in range(1, number_of_rows + 1):
+                row_selector = f"({elm_table.tr_parent_rows})[{i}]"
+                
+                channel_name = self.utils.page.new_pages.get_text(f"{row_selector}/td[2]//span[@class='flex-0']")
+                
+                toggle_button_selector = f"{row_selector}/td[2]//button[@class='btn btn-transparent']"
+                if self.utils.page.new_pages.does_element_exist(toggle_button_selector):
+                    self.utils.page.new_pages.click(toggle_button_selector)
+                    time.sleep(2)
+                    
+                    detail_rows = self.utils.page.new_pages.count_element("", f"//table[@class='row-toogleable-table']/tbody/tr[not(@class='parent-item') and position() > {i}]")
+                    
+                    urls_data = []
+                    detail_row_count = 0
+                    
+                    for j in range(i + 1, number_of_rows + detail_rows + 1):
+                        detail_row_selector = f"(//table[@class='row-toogleable-table']/tbody/tr)[{j}]"
+                        
+                        if self.utils.page.new_pages.does_element_exist(f"{detail_row_selector}[@class='parent-item']"):
+                            break
+                        
+                        url = self.utils.page.new_pages.get_text(f"{detail_row_selector}/td[2]")
+                        language = self.utils.page.new_pages.get_text(f"{detail_row_selector}/td[3]")
+                        total_clicks = self.utils.page.new_pages.get_text(f"{detail_row_selector}/td[4]")
+                        unique_clicks = self.utils.page.new_pages.get_text(f"{detail_row_selector}/td[5]")
+                        signups = self.utils.page.new_pages.get_text(f"{detail_row_selector}/td[6]")
+                        fdm = self.utils.page.new_pages.get_text(f"{detail_row_selector}/td[7]")
+                        
+                        url_data = {
+                            "url": url,
+                            "language": language,
+                            "total_clicks": total_clicks,
+                            "unique_clicks": unique_clicks,
+                            "signups": signups,
+                            "fdm": fdm
+                        }
+                        urls_data.append(url_data)
+                        detail_row_count += 1
+                    
+                    channel_key = f"{i} - {channel_name}"
+                    channel_details_data[channel_key] = urls_data
+                    
+                    if self.utils.page.new_pages.does_element_exist(toggle_button_selector):
+                        self.utils.page.new_pages.click(toggle_button_selector)
+                        time.sleep(1)
+            
+        except Exception as e:
+            pass
+        
+        return channel_details_data
     
     def navigate_to_marketing_pages_page(self):
         try:

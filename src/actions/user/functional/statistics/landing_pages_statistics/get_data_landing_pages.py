@@ -35,6 +35,9 @@ class GetDataLandingPages(Common):
                 "has_data": True
             }
             
+            if get_detail:
+                result["website_urls_data"] = {}
+            
             no_data_elements = self.utils.page.new_pages.count_element("", "//*[contains(text(), 'No data') or contains(text(), 'There is no information') or contains(text(), 'No records found')]")
             if no_data_elements > 0:
                 result["has_data"] = False
@@ -71,6 +74,25 @@ class GetDataLandingPages(Common):
                     "fdm": fdm
                 }
                 result["pages_data"].append(page_data)
+                
+                if get_detail and page_name.lower() != "none" and page_name.strip():
+                    try:
+                        page_key = f"{page_name} - {language}"
+                        page_link_selector = f"{row_selector}/td[1]/a"
+                        
+                        if self.utils.page.new_pages.does_element_exist(page_link_selector):
+                            self.utils.page.new_pages.click(page_link_selector)
+                            time.sleep(2)
+                            
+                            website_urls_data = self._extract_website_urls_data()
+                            result["website_urls_data"][page_key] = website_urls_data
+                            
+                            self.utils.page.new_pages.go_back()
+                            time.sleep(2)
+                        else:
+                            result["website_urls_data"][page_key] = []
+                    except Exception as e:
+                        result["website_urls_data"][page_key] = []
             
             return result
             
@@ -80,6 +102,37 @@ class GetDataLandingPages(Common):
                 "has_data": False,
                 "error": str(e)
             }
+    
+    def _extract_website_urls_data(self):
+        website_urls_data = []
+        try:
+            if not self.utils.page.new_pages.does_element_exist(elm_table.tbody):
+                return website_urls_data
+            
+            number_of_rows = self.utils.page.new_pages.count_element("", f"{elm_table.tr_rows}")
+            
+            for i in range(1, number_of_rows + 1):
+                row_selector = f"{elm_table.tbody}/tr[{i}]"
+                
+                website_url = self.utils.page.new_pages.get_text(f"{row_selector}/td[1]")
+                total_clicks = self.utils.page.new_pages.get_text(f"{row_selector}/td[2]")
+                unique_clicks = self.utils.page.new_pages.get_text(f"{row_selector}/td[3]")
+                signups = self.utils.page.new_pages.get_text(f"{row_selector}/td[4]")
+                fdm = self.utils.page.new_pages.get_text(f"{row_selector}/td[5]")
+                
+                website_data = {
+                    "website_url": website_url,
+                    "total_clicks": self.parse_int(total_clicks),
+                    "unique_clicks": self.parse_int(unique_clicks),
+                    "signups": self.parse_int(signups),
+                    "fdm": self.parse_int(fdm)
+                }
+                website_urls_data.append(website_data)
+                
+        except Exception as e:
+            self.utils.page.extract_TestCaseFailed(e)
+            
+        return website_urls_data
     
     def navigate_to_landing_pages_page(self):
         try:

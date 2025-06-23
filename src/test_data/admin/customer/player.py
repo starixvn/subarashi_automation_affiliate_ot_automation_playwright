@@ -1,8 +1,8 @@
-PLAYER_API = "/Admin/Player/GetData"
+PLAYER_API = "/Portal/Player/GetMemberList"
 
 PLAYER_HEADERS = {
-    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-    "X-Requested-With": "XMLHttpRequest"
+    "content-type": "application/json;charset=UTF-8",
+    "accept": "application/json, text/plain, */*"
 }
 
 PLAYER_REQUEST_TEMPLATE = {
@@ -11,5 +11,5 @@ PLAYER_REQUEST_TEMPLATE = {
     "IbcUserName": "",
     "IsIncludeRemovedPlayer": False,
     "PageIndex": 1,
-    "PageSize": 100
+    "PageSize": 20
 } 

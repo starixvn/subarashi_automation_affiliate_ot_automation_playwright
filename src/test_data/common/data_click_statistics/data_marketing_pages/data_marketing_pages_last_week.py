@@ -1,15 +1,15 @@
-# get data baseline marketing page last_week at 2025-06-13 14:49:52 +0800 (GMT+8)
+# get data baseline marketing page last_week at 2025-06-19 18:33:58 +0800 (GMT+8)
 
 class DataMarketingPagesLastWeek:
     data_marketing_pages_last_week = {
     "metadata": {
-        "collected_at": "2025-06-13 14:49:52 +0800",
+        "collected_at": "2025-06-19 18:33:58 +0800",
         "period": {
-            "from_date": "06-02-2025",
-            "to_date": "06-08-2025"
+            "from_date": "06-09-2025",
+            "to_date": "06-15-2025"
         },
         "filters": {
-            "username": "12BETAFF16007",
+            "username": "12BETAFF16696",
             "language": "All",
             "include_inactive_tracking": False
         },
@@ -17,113 +17,29 @@ class DataMarketingPagesLastWeek:
     },
     "channels_data": [
         {
-            "channel_name": "FB",
+            "channel_name": "12betsignup",
             "language": "-",
-            "total_click": 37,
-            "unique_click": 20,
-            "signups": 0,
-            "fdm": 1
-        },
-        {
-            "channel_name": "MKTccn",
-            "language": "-",
-            "total_click": 3652,
-            "unique_click": 1264,
-            "signups": 314,
-            "fdm": 80
-        },
-        {
-            "channel_name": "Others",
-            "language": "-",
-            "total_click": 4,
-            "unique_click": 4,
-            "signups": 1,
-            "fdm": 0
+            "total_click": 83,
+            "unique_click": 58,
+            "signups": 14,
+            "fdm": 2
         }
     ],
     "channel_details_data": {
-        "1 - FB": [
+        "1 - 12betsignup": [
             {
-                "url": "https://go.12winball.com/join/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 13,
-                "unique_clicks": 12,
-                "signups": 0,
-                "fdm": 1
+                "url": "https://goto.12Bix24.com/join/14925/hien/12betsignup/index.html",
+                "language": "English (India)",
+                "total_clicks": 81,
+                "unique_clicks": 57,
+                "signups": 14,
+                "fdm": 2
             },
             {
-                "url": "https://goto.b125292.com/home/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 6,
-                "unique_clicks": 2,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "url": "https://goto.elv520.com/home/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 6,
-                "unique_clicks": 2,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "url": "https://goto.gyg77.com/home/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 6,
-                "unique_clicks": 2,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "url": "https://goto.nix68.com/home/15411/vn/fb/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 6,
-                "unique_clicks": 2,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "2 - MKTccn": [
-            {
-                "url": "https://go.12winball.com/vnd-12join/15411/vn/mktccn/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 11,
-                "unique_clicks": 5,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "url": "https://goto.12bvnlink6.com/vnd-12join/15411/vn/mktccn/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 3641,
-                "unique_clicks": 1259,
-                "signups": 314,
-                "fdm": 80
-            }
-        ],
-        "3 - Others": [
-            {
-                "url": "",
-                "language": None,
-                "total_clicks": 0,
-                "unique_clicks": 0,
-                "signups": 1,
-                "fdm": 0
-            },
-            {
-                "url": "https://go.qwerty5678.com/92043095/signup/vn/index.html",
-                "language": "Vietnamese",
+                "url": "https://goto.12Bix24.com/join/14925/hitg/12betsignup/index.html",
+                "language": "Telugu",
                 "total_clicks": 2,
-                "unique_clicks": 2,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "url": "https://partner.2345qwe.com/92043095/home/vn/index.html",
-                "language": "Vietnamese",
-                "total_clicks": 2,
-                "unique_clicks": 2,
+                "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             }

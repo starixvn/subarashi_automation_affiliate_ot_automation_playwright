@@ -29,9 +29,8 @@ class CompareDataWithAdminSite(Common):
     _cache_data = None
     _cache_username = None
     
-    def __init__(self, utils=None):
+    def __init__(self):
         super().__init__()
-        self.utils = utils
         self.baseline_data = self.load_baseline_data()
 
     @staticmethod
