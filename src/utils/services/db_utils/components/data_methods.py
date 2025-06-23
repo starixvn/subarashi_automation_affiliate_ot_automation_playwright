@@ -5,9 +5,9 @@ from src.utils.core import (
     monitor_performance,
     validate_not_none,
     validate_not_empty,
-    validate_type
+    validate_type,
+    ExtractTestCaseFailed
 )
-from src.utils.services.db_utils.components.extract_testcase_failed import ExtractTestCaseFailed
 
 logger = get_logger(__name__)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) + "\\"

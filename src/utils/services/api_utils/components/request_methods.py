@@ -1,9 +1,9 @@
 from src.utils.core import (
     get_logger,
     log_exceptions,
-    monitor_performance
+    monitor_performance,
+    ExtractTestCaseFailed
 )
-from src.utils.services.api_utils.components.extract_testcase_failed import ExtractTestCaseFailed
 
 logger = get_logger(__name__)
 

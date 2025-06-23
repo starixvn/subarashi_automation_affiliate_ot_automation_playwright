@@ -5,9 +5,9 @@ from src.utils.core import (
     monitor_performance,
     validate_not_none,
     validate_type,
-    validate_not_empty
+    validate_not_empty,
+    ExtractTestCaseFailed
 )
-from src.utils.services.page_utils.components.extract_testcase_failed import ExtractTestCaseFailed
 
 logger = get_logger(__name__)
 

@@ -13,13 +13,14 @@ from src.utils.core import (
     ValidationException,
     validate_not_none,
     validate_type,
-    validate_not_empty
+    validate_not_empty,
+    ExtractTestCaseFailed,
+    TC_NAME
 )
 
 from src.utils.services.db_utils.components.connection_methods import ConnectionMethods
 from src.utils.services.db_utils.components.query_methods import QueryMethods
 from src.utils.services.db_utils.components.data_methods import DataMethods
-from src.utils.services.db_utils.components.extract_testcase_failed import TC_NAME,ExtractTestCaseFailed
 
 logger = get_logger(__name__)
 

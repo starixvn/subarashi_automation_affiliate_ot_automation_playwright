@@ -1,15 +1,15 @@
-# get data baseline marketing page last_week at 2025-06-19 18:33:58 +0800 (GMT+8)
+# get data baseline marketing page last_week at 2025-06-23 15:43:13 +0800 (GMT+8)
 
 class DataMarketingPagesLastWeek:
     data_marketing_pages_last_week = {
     "metadata": {
-        "collected_at": "2025-06-19 18:33:58 +0800",
+        "collected_at": "2025-06-23 15:43:13 +0800",
         "period": {
-            "from_date": "06-09-2025",
-            "to_date": "06-15-2025"
+            "from_date": "06-16-2025",
+            "to_date": "06-22-2025"
         },
         "filters": {
-            "username": "12BETAFF16696",
+            "username": "12BETAFF14351",
             "language": "All",
             "include_inactive_tracking": False
         },
@@ -17,31 +17,31 @@ class DataMarketingPagesLastWeek:
     },
     "channels_data": [
         {
-            "channel_name": "12betsignup",
+            "channel_name": "ID03IDNA12BETNA",
             "language": "-",
-            "total_click": 83,
-            "unique_click": 58,
-            "signups": 14,
-            "fdm": 2
+            "total_click": 3335,
+            "unique_click": 1946,
+            "signups": 236,
+            "fdm": 140
         }
     ],
     "channel_details_data": {
-        "1 - 12betsignup": [
+        "1 - ID03IDNA12BETNA": [
             {
-                "url": "https://goto.12Bix24.com/join/14925/hien/12betsignup/index.html",
-                "language": "English (India)",
-                "total_clicks": 81,
-                "unique_clicks": 57,
-                "signups": 14,
-                "fdm": 2
+                "url": "https://goto.168sure.com/join/13011/id/id03idna12betna/index.html",
+                "language": "Indonesian",
+                "total_clicks": 890,
+                "unique_clicks": 571,
+                "signups": 65,
+                "fdm": 40
             },
             {
-                "url": "https://goto.12Bix24.com/join/14925/hitg/12betsignup/index.html",
-                "language": "Telugu",
-                "total_clicks": 2,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
+                "url": "https://goto.5689fun.com/join/13011/id/id03idna12betna/index.html",
+                "language": "Indonesian",
+                "total_clicks": 2445,
+                "unique_clicks": 1375,
+                "signups": 171,
+                "fdm": 100
             }
         ]
     }

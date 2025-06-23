@@ -14,13 +14,14 @@ from src.utils.core import (
     retry,
     validate_not_none,
     validate_url,
-    validate_type
+    validate_type,
+    ExtractTestCaseFailed,
+    TC_NAME
 )
 
 from src.utils.services.api_utils.components.request_methods import RequestMethods
 from src.utils.services.api_utils.components.assertion_methods import AssertionMethods
 from src.utils.services.api_utils.components.extraction_methods import ExtractionMethods
-from src.utils.services.api_utils.components.extract_testcase_failed import TC_NAME,ExtractTestCaseFailed
 
 logger = get_logger(__name__)
 

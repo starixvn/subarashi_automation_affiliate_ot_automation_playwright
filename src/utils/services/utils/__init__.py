@@ -27,7 +27,9 @@ from src.utils.core import (
     ensure_directory_exists,
     truncate_string,
     load_json_file,
-    save_json_file
+    save_json_file,
+    ExtractTestCaseFailed,
+    TC_NAME
 )
 
 from src.utils.services.utils.components.browser_methods import BrowserMethods
@@ -36,7 +38,6 @@ from src.utils.services.utils.components.file_methods import FileMethods
 from src.utils.services.utils.components.google_methods import GoogleMethods
 from src.utils.services.utils.components.report_methods import ReportMethods
 from src.utils.services.utils.components.crypto_methods import CryptoMethods
-from src.utils.services.utils.components.extract_testcase_failed import TC_NAME
 
 logger = get_logger(__name__)
 

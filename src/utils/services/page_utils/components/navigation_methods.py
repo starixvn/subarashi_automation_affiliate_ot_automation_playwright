@@ -4,13 +4,13 @@ from src.utils.core import (
     monitor_performance,
     validate_not_none,
     validate_url,
-    validate_type
+    validate_type,
+    ExtractTestCaseFailed
 )
 
 from config.constants.settings import (
     TIMEOUT
 )
-from src.utils.services.page_utils.components.extract_testcase_failed import ExtractTestCaseFailed
 
 logger = get_logger(__name__)
 

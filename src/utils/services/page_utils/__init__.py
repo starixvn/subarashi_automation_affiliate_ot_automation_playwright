@@ -19,7 +19,9 @@ from src.utils.core import (
     validate_url,
     validate_not_empty,
     truncate_string,
-    FileException
+    FileException,
+    ExtractTestCaseFailed,
+    TC_NAME
 )
 site = SITE.upper()
 from os.path import dirname as d
@@ -27,7 +29,6 @@ from os.path import abspath, join
 root_dir = d(d(abspath(__file__)))
 from playwright.sync_api import Page, expect
 
-from src.utils.services.page_utils.components.extract_testcase_failed import ExtractTestCaseFailed, TC_NAME
 from src.utils.services.page_utils.components.navigation_methods import NavigationMethods
 from src.utils.services.page_utils.components.element_methods import ElementMethods
 from src.utils.services.page_utils.components.extraction_methods import ExtractionMethods

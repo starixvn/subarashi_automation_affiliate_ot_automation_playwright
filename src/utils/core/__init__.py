@@ -70,6 +70,12 @@ from src.utils.core.utils import (
     Singleton,
 )
 
+from src.utils.core.test_tracker import (
+    TestCaseTracker,
+    ExtractTestCaseFailed,
+    TC_NAME
+)
+
 __all__ = [
     'AutomationException',
     'ValidationException',
@@ -128,6 +134,9 @@ __all__ = [
     'wait_until',
     'retry_on_exception',
     'Singleton',
+    'TestCaseTracker',
+    'ExtractTestCaseFailed',
+    'TC_NAME',
 ]
 
 

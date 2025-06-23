@@ -3,9 +3,10 @@ import os
 from src.utils.core import (
     get_logger,
     log_exceptions,
-    validate_not_none
+    validate_not_none,
+    ExtractTestCaseFailed,
+    TC_NAME
 )
-from src.utils.services.utils.components.extract_testcase_failed import ExtractTestCaseFailed, TC_NAME
 
 logger = get_logger(__name__)
 
