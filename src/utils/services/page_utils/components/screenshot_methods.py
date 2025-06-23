@@ -1,9 +1,9 @@
 import datetime
 from src.utils.core import (
     get_logger,
-    log_exceptions
+    log_exceptions,
+    ExtractTestCaseFailed
 )
-from src.utils.services.page_utils.components.extract_testcase_failed import ExtractTestCaseFailed
 
 logger = get_logger(__name__)
 

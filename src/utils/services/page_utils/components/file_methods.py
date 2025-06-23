@@ -5,9 +5,9 @@ from src.utils.core import (
     monitor_performance,
     validate_not_none,
     validate_not_empty,
-    FileException
+    FileException,
+    ExtractTestCaseFailed
 )
-from src.utils.services.page_utils.components.extract_testcase_failed import ExtractTestCaseFailed
 from os.path import dirname as d
 from os.path import abspath, join
 root_dir = d(d(abspath(__file__)))

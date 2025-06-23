@@ -12,9 +12,9 @@ from src.utils.core import (
     validate_not_empty,
     FileException,
     ensure_directory_exists,
-    truncate_string
+    truncate_string,
+    ExtractTestCaseFailed
 )
-from src.utils.services.utils.components.extract_testcase_failed import ExtractTestCaseFailed
 
 logger = get_logger(__name__)
 root_dir = d(d(abspath(__file__)))

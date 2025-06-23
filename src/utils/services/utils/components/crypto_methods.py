@@ -7,7 +7,8 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from src.utils.core import (
     get_logger,
     log_exceptions,
-    validate_not_none
+    validate_not_none,
+    ExtractTestCaseFailed
 )
 
 logger = get_logger(__name__)
@@ -16,7 +17,7 @@ KDF_ALGORITHM = hashes.SHA256()
 KDF_LENGTH = 32
 KDF_ITERATIONS = 120000
 
-class CryptoMethods:
+class CryptoMethods(ExtractTestCaseFailed):
     @staticmethod
     @log_exceptions(log_level="DEBUG")
     def decrypt(ciphertext, password, salt):

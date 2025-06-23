@@ -8,10 +8,10 @@ from config.constants.settings import (
 from src.utils.core import (
     get_logger,
     log_exceptions,
-    monitor_performance,
-    NotificationException
+    NotificationException,
+    ExtractTestCaseFailed,
+    TC_NAME
 )
-from src.utils.services.utils.components.extract_testcase_failed import ExtractTestCaseFailed, TC_NAME
 from slack_sdk import WebClient
 
 logger = get_logger(__name__)

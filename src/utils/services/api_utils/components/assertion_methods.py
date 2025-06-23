@@ -6,9 +6,9 @@ from src.utils.core import (
     log_exceptions,
     validate_not_none,
     validate_type,
-    APIException
+    APIException,
+    ExtractTestCaseFailed
 )
-from src.utils.services.api_utils.components.extract_testcase_failed import ExtractTestCaseFailed
 
 logger = get_logger(__name__)
 

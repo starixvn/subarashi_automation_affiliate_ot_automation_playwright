@@ -2,11 +2,9 @@ from src.utils.core import (
     get_logger,
     log_exceptions,
     validate_not_none,
-    validate_type
+    validate_type,
+    ExtractTestCaseFailed
 )
-from typing import Optional, Union, Any
-from playwright.sync_api import Locator, Page
-from src.utils.services.page_utils.components.extract_testcase_failed import ExtractTestCaseFailed
 import time
 
 logger = get_logger(__name__)

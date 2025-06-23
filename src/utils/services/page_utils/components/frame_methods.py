@@ -4,9 +4,9 @@ from src.utils.core import (
     monitor_performance,
     validate_not_none,
     validate_type,
-    truncate_string
+    truncate_string,
+    ExtractTestCaseFailed
 )
-from src.utils.services.page_utils.components.extract_testcase_failed import ExtractTestCaseFailed
 import time
 
 logger = get_logger(__name__)
