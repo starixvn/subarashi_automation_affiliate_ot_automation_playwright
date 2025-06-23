@@ -1,0 +1,11 @@
+class MenuList:
+    lnk_account_overview = "//a[@id='menuAccountOverview']"
+    lnk_statement_history= "//a[@id='menuStatementHistory']"
+    lnk_my_account = "//a[@id='menuMyAccount']"
+    lnk_payment_request = "//a[@id='menuPaymentRequest']"
+    lnk_revenue_share = "//a[@id='menuRevenueShare']"
+    lnk_revenue_report = "//a[@id='menuRevenueReport']"
+    lnk_statistics = "//*[@id='mainMenu']/li[6]"
+    lnk_referrers = "//a[@id='menuReferrersStatistics']"
+    lnk_landing_pages = "//a[@id='menuLandingPageStatistics']"
+    lnk_marketing_pages = "//a[@id='menuMarketingLinkStatistics']"

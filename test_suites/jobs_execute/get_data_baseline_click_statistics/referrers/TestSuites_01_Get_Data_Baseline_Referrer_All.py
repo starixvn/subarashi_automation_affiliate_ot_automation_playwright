@@ -8,7 +8,7 @@ import unittest
 unittest.TestLoader.testMethodPrefix = "TestCase"
 unittest.TestLoader.sortTestMethodsUsing = None
 
-from jobs.common.get_data_baseline_click_statistics.referrers.get_data_baseline_referrer_all import GetDataBaselineReferrerAll
+from src.jobs.common.get_data_baseline_click_statistics.referrers.get_data_baseline_referrer_all import GetDataBaselineReferrerAll
 
 
 class TestSuites_Get_Data_Baseline_Referrer_All(unittest.TestCase):

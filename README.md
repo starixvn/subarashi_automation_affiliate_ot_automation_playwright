@@ -1,93 +1,418 @@
-# OT_Automation_Playwright 
+# AFF 12B Automation Framework
 
+A comprehensive Python automation testing framework built with Playwright, designed for web UI testing, API testing, and database validation with integrated reporting capabilities.
 
+## 📋 Table of Contents
 
-## Getting started
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Features](#features)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Framework Components](#framework-components)
+- [Testing](#testing)
+- [Reporting](#reporting)
+- [Contributing](#contributing)
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 🎯 Overview
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+This automation framework provides a robust, scalable testing solution for the AFF 12BET platform. It supports multiple testing types including:
 
-## Add your files
+- **Web UI Automation** using Playwright
+- **API Testing** with comprehensive request/response validation
+- **Database Testing** with SQL Server integration
+- **Multi-environment Support** (local, UAT, production)
+- **Integrated Reporting** via Telegram, MS Teams, and Slack
+- **Google Sheets Integration** for test result tracking
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## ✨ Features
+
+### Core Features
+- **Multi-Browser Support**: Chrome, Firefox, Safari via Playwright
+- **Headless/Headed Mode**: Configurable browser execution
+- **Auto-retry Mechanisms**: Configurable retry logic with backoff
+- **Performance Monitoring**: Execution time tracking and reporting
+- **Comprehensive Logging**: Multi-level logging with file and console output
+- **Error Handling**: Structured exception hierarchy with context
+- **Test Tracing**: Playwright trace collection for debugging
+
+### Testing Capabilities
+- **UI Testing**: Element interactions, form filling, navigation
+- **API Testing**: REST API validation with JSON/XML support
+- **Database Testing**: SQL Server query execution and validation
+- **Cross-Frame Testing**: iFrame and nested frame support
+- **File Operations**: Upload/download testing, Excel processing
+- **Screenshot Capture**: Automatic screenshot on failures
+
+### Reporting & Integration
+- **Multi-Channel Notifications**: Telegram, MS Teams, Slack
+- **Google Sheets Integration**: Real-time test result updates
+- **HTML Reports**: Detailed test execution reports
+- **Duration Tracking**: Test execution time measurement
+- **Failure Analytics**: Failed test case extraction and reporting
+
+## 🚀 Installation
+
+### Prerequisites
+- Python 3.13+
+- UV package manager
+
+### Setup Instructions
+
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd AFF_12B_Automation_Python_Playwright
+```
+
+2. **Install dependencies using UV**
+```bash
+# Install UV if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Sync project dependencies
+uv sync
+```
+
+3. **Install Playwright browsers**
+```bash
+uv run playwright install
+```
+
+4. **Configure environment variables**
+Create necessary configuration files in `config/secrets/` directory.
+
+## ⚙️ Configuration
+
+### Project Configuration (`pyproject.toml`)
+```toml
+[project]
+name = "aff-12b-automation-python-playwright"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "pytest",
+    "playwright",
+    "pandas",
+    "pyodbc",
+    # ... other dependencies
+]
+```
+
+### Pytest Configuration (`pytest.ini`)
+```ini
+[pytest]
+python_files = TestSuites_*.py
+testpaths = test_suites
+addopts = --cache-clear --html=reports/report.html --self-contained-html -v --capture=tee-sys
+pythonpath = src .
+```
+
+### Application Settings (`config/constants/settings.py`)
+Configure environments, credentials, and integration settings:
+
+```python
+ENVIRONMENT = 'local'  # local, uat, prod
+SITE = 'admin'        # admin, user
+BROWSER = 'chromium'   # chromium, firefox, webkit
+HEADLESS_MODE = False
+TIMEOUT = 30
+```
+
+### Command Line Options (`conftest.py`)
+```bash
+--env        # Environment (local/uat/prod)
+--site       # Site type (admin/user)
+--browser    # Browser choice
+--headless   # Headless mode
+--debug_mode # Debug mode
+```
+
+## 📖 Usage
+
+### Running Tests
+
+#### Basic Test Execution
+```bash
+# Run all tests
+uv run pytest
+
+# Run specific test suite
+uv run pytest test_suites/functional_testing/
+
+# Run with specific environment
+uv run pytest --env=uat --site=admin --browser=chromium
+```
+
+#### Advanced Options
+```bash
+# Run in headless mode
+uv run pytest --headless=true
+
+# Run with debug mode
+uv run pytest --debug_mode=true
+
+# Run specific test file
+uv run pytest test_suites/functional_testing/admin/TestSuites_01_Admin_Login.py
+```
+
+### Framework Usage Examples
+
+#### UI Testing
+```python
+from src.utils.services.page_utils import ui
+from src.utils.services.utils import utils
+
+class TestExample:
+    def setup_method(self):
+        self.utils = utils(debug=False)
+        self.utils.initialize_browser()
+        self.page = self.utils.page
+    
+    def test_login(self):
+        self.page.navigate("https://example.com")
+        self.page.input("#username", "testuser")
+        self.page.input("#password", "testpass")
+        self.page.click("#login-button")
+        self.page.verify_element_exist("#dashboard")
+```
+
+#### API Testing
+```python
+from src.utils.services.api_utils import api
+
+class TestAPI:
+    def setup_method(self):
+        self.utils = utils(debug=False)
+        self.utils.initialize_browser()
+        self.api = self.utils.api
+    
+    def test_api_endpoint(self):
+        response = self.api.get("https://api.example.com/users")
+        self.api.assert_status_code(response, 200)
+        data = self.api.extract_response_json(response)
+        assert len(data) > 0
+```
+
+#### Database Testing
+```python
+from src.utils.services.db_utils import db
+
+class TestDatabase:
+    def setup_method(self):
+        self.db = db()
+        self.db.connect("server_name", "database_name")
+    
+    def test_data_validation(self):
+        result = self.db.query("SELECT COUNT(*) FROM users")
+        assert result[0][0] > 0
+```
+
+## 🧩 Framework Components
+
+### Core Utilities (`src/utils/core/`)
+
+#### Decorators (`decorators.py`)
+- **`@retry`**: Automatic retry with exponential backoff
+- **`@log_exceptions`**: Exception logging and handling
+- **`@monitor_performance`**: Execution time monitoring
+- **`@convert_exceptions`**: Exception type conversion
+
+```python
+@retry(max_attempts=3, delay_seconds=1.0)
+@log_exceptions(log_level="ERROR")
+@monitor_performance()
+def example_function():
+    # Your test logic here
+    pass
+```
+
+#### Exception Handling (`exceptions.py`)
+Comprehensive exception hierarchy:
+- `AutomationException`: Base exception class
+- `ValidationException`: Input validation errors
+- `BrowserException`: Browser-related errors
+- `ElementException`: Element interaction errors
+- `APIException`: API testing errors
+- `DatabaseException`: Database operation errors
+
+#### Logging System (`logging.py`)
+Multi-level logging with custom levels:
+```python
+from src.utils.core import get_logger
+
+logger = get_logger(__name__)
+logger.trace("Detailed trace information")
+logger.debug("Debug information")
+logger.info("General information")
+logger.notice("Important notice")
+logger.success("Success message")
+logger.warning("Warning message")
+logger.error("Error message")
+```
+
+#### Validation (`validation.py`)
+Input validation utilities:
+```python
+from src.utils.core import validate_not_none, validate_type, validate_url
+
+validate_not_none(value, "parameter_name")
+validate_type(value, str, "parameter_name")
+validate_url(url, "URL parameter")
+```
+
+### Service Components
+
+#### API Utils (`src/utils/services/api_utils/`)
+- **Request Methods**: GET, POST, PUT, DELETE operations
+- **Assertion Methods**: Response validation and verification
+- **Extraction Methods**: Data extraction from responses
+- **JSONPath Support**: Complex data extraction
+
+#### Database Utils (`src/utils/services/db_utils/`)
+- **Connection Management**: SQL Server connections
+- **Query Execution**: SELECT, INSERT, UPDATE, DELETE operations
+- **Data Methods**: Bulk operations and data manipulation
+- **Transaction Support**: Commit/rollback operations
+
+#### Page Utils (`src/utils/services/page_utils/`)
+- **Element Interactions**: Click, input, select operations
+- **Navigation**: Page navigation and URL handling
+- **Frame Support**: iFrame and nested frame operations
+- **Verification**: Element existence and state validation
+- **File Operations**: Upload/download functionality
+- **Screenshot Capture**: Automated screenshot collection
+
+#### General Utils (`src/utils/services/utils/`)
+- **Browser Management**: Browser lifecycle management
+- **File Operations**: Excel, JSON, and file processing
+- **Google Sheets**: Integration for result tracking
+- **Crypto Operations**: Encryption/decryption utilities
+- **Reporting**: Multi-channel notification system
+
+## 📊 Testing
+
+### Test Structure
+Tests follow the naming convention `TestSuites_*.py` and are organized by functionality:
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.nexdev.net/subarashi/automation/affiliate/ot_automation_playwright.git
-git branch -M main
-git push -uf origin main
+test_suites/
+├── functional_testing/
+│   ├── admin/
+│   └── common/
+├── smoke_test/
+└── jobs_execute/
 ```
 
-## Integrate with your tools
+### Test Execution Flow
+1. **Setup**: Browser initialization, configuration loading
+2. **Execution**: Test steps with automatic logging
+3. **Validation**: Assertions and verifications
+4. **Cleanup**: Resource cleanup and result reporting
+5. **Reporting**: Multi-channel notifications
 
-- [ ] [Set up project integrations](https://gitlab.nexdev.net/subarashi/automation/affiliate/ot_automation_playwright/-/settings/integrations)
+### Performance Monitoring
+All test methods are automatically tracked for execution time:
+```python
+@measure_test_execution_time
+def test_example(self):
+    # Test implementation
+    pass
+```
 
-## Collaborate with your team
+## 📈 Reporting
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### Supported Channels
+- **Telegram**: Real-time notifications via bot
+- **MS Teams**: Integration via webhook
+- **Slack**: Channel-based reporting
+- **Google Sheets**: Live test result updates
+- **HTML Reports**: Detailed execution reports
 
-## Test and Deploy
+### Report Content
+- Test execution timestamp
+- Environment and configuration details
+- Pass/fail status with failure details
+- Execution duration
+- Failed test case listings
+- Error details and stack traces
 
-Use the built-in continuous integration in GitLab.
+### Google Sheets Integration
+Real-time test result tracking with:
+- Test case status updates
+- Execution duration recording
+- Environment-specific results
+- Historical tracking
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## 🤝 Contributing
 
-***
+### Development Setup
+1. Fork the repository
+2. Create a feature branch
+3. Install development dependencies: `uv sync --group dev`
+4. Make your changes
+5. Run tests: `uv run pytest`
+6. Submit a pull request
 
-# Editing this README
+### Code Style
+- Follow PEP 8 guidelines
+- Use type hints where applicable
+- Maintain comprehensive logging
+- Include proper error handling
+- Write descriptive docstrings
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Testing Guidelines
+- All test files must follow `TestSuites_*.py` naming
+- Use proper setup/teardown methods
+- Include comprehensive assertions
+- Add appropriate decorators for retry/logging
+- Maintain test isolation
 
-## Suggestions for a good README
+## 📝 License
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+This project is proprietary software for AFF 12BET automation testing.
 
-## Name
-Choose a self-explaining name for your project.
+## 🔧 Troubleshooting
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+### Common Issues
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+1. **Module Import Errors**
+   - Ensure `pythonpath = src .` is in `pytest.ini`
+   - Run `uv sync` to install dependencies
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+2. **Browser Launch Failures**
+   - Install browsers: `uv run playwright install`
+   - Check headless mode settings
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+3. **Database Connection Issues**
+   - Verify SQL Server connectivity
+   - Check credentials in settings
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+4. **Google Sheets Integration**
+   - Ensure service account file exists
+   - Verify sheet permissions
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Debug Mode
+Enable debug mode for detailed logging:
+```bash
+uv run pytest --debug_mode=true
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### Trace Collection
+Enable trace collection for debugging:
+```python
+ENABLE_TRACE = True
+TRACE_PATH = "Trace/trace.zip"
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+## 📞 Support
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+For support and questions, please contact the automation team or create an issue in the repository.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+---
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+**Framework Version**: 0.1.0  
+**Last Updated**: 2025-06-12  
+**Python Version**: 3.13+  
+**Playwright Version**: Latest

@@ -5,7 +5,7 @@ from src.utils.services.utils import utilities
 from config.constants.settings import *
 from src.actions.common.action_common import Common
 from src.interfaces.admin.player.player_elements import PlayerElements as elm_player
-from src.test_data.admin.customer.player.player import PLAYER_API, PLAYER_HEADERS, PLAYER_REQUEST_TEMPLATE
+from src.test_data.admin.customer.player import PLAYER_API, PLAYER_HEADERS, PLAYER_REQUEST_TEMPLATE
 
 class GetDataPlayer(Common):
 

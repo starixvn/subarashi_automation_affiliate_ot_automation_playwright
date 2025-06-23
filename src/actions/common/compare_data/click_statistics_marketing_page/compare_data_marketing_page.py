@@ -73,14 +73,15 @@ class CompareDataMarketingPage(GetDataCustomer):
                 
                 if current_channel["channel_name"].lower() == channel_name.lower() and current_language_code == language_code:
                     channel_found = True
-                    baseline_total_click = self.parse_int(baseline_channel_data["total_click"])
-                    current_total_click = self.parse_int(current_channel["total_click"])
-                    baseline_unique_click = self.parse_int(baseline_channel_data["unique_click"])
-                    current_unique_click = self.parse_int(current_channel["unique_click"])
-                    baseline_signups = self.parse_int(baseline_channel_data["signups"])
-                    current_signups = self.parse_int(current_channel["signups"])
-                    baseline_fdm = self.parse_int(baseline_channel_data["fdm"])
-                    current_fdm = self.parse_int(current_channel["fdm"])
+                    
+                    baseline_total_click = baseline_channel_data["total_click"]
+                    current_total_click = current_channel["total_click"]
+                    baseline_unique_click = baseline_channel_data["unique_click"]
+                    current_unique_click = current_channel["unique_click"]
+                    baseline_signups = baseline_channel_data["signups"]
+                    current_signups = current_channel["signups"]
+                    baseline_fdm = baseline_channel_data["fdm"]
+                    current_fdm = current_channel["fdm"]
                     
                     if current_total_click != baseline_total_click:
                         mismatches.append(f"Total clicks mismatch for channel {channel_name} - {language}. Baseline: {baseline_total_click}, Current: {current_total_click}")
@@ -115,21 +116,48 @@ class CompareDataMarketingPage(GetDataCustomer):
             
             for baseline_url in baseline_urls:
                 url_found = False
+                baseline_url_value = baseline_url.get("url", "").strip()
+                
+                is_empty_url = baseline_url_value == "" or baseline_url_value.lower() == "none"
+                
                 for current_url in current_urls:
-                    if current_url["url"] == baseline_url["url"]:
+                    current_url_value = current_url.get("url", "").strip()
+                    current_is_empty_url = current_url_value == "" or current_url_value.lower() == "none"
+                    
+                    url_match = False
+                    if is_empty_url and current_is_empty_url:
+                        url_match = True
+                    elif not is_empty_url and not current_is_empty_url and current_url_value == baseline_url_value:
+                        url_match = True
+                    
+                    if url_match:
                         url_found = True
-                        if self.parse_int(current_url["total_clicks"]) != baseline_url["total_clicks"]:
-                            mismatches.append(f"Total clicks mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['total_clicks']}, Current: {current_url['total_clicks']}")
-                        if self.parse_int(current_url["unique_clicks"]) != baseline_url["unique_clicks"]:
-                            mismatches.append(f"Unique clicks mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['unique_clicks']}, Current: {current_url['unique_clicks']}")
-                        if self.parse_int(current_url["signups"]) != baseline_url["signups"]:
-                            mismatches.append(f"Signups mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['signups']}, Current: {current_url['signups']}")
-                        if self.parse_int(current_url["fdm"]) != baseline_url["fdm"]:
-                            mismatches.append(f"FDM mismatch for URL {baseline_url['url']}. Baseline: {baseline_url['fdm']}, Current: {current_url['fdm']}")
+                        
+                        baseline_total_clicks = self.parse_int(baseline_url.get("total_clicks", 0))
+                        current_total_clicks = self.parse_int(current_url.get("total_clicks", 0))
+                        baseline_unique_clicks = self.parse_int(baseline_url.get("unique_clicks", 0))
+                        current_unique_clicks = self.parse_int(current_url.get("unique_clicks", 0))
+                        baseline_signups = self.parse_int(baseline_url.get("signups", 0))
+                        current_signups = self.parse_int(current_url.get("signups", 0))
+                        baseline_fdm = self.parse_int(baseline_url.get("fdm", 0))
+                        current_fdm = self.parse_int(current_url.get("fdm", 0))
+                        
+                        url_identifier = baseline_url_value if baseline_url_value else f"[empty URL in channel {channel_key}]"
+                        
+                        if current_total_clicks != baseline_total_clicks:
+                            mismatches.append(f"Total clicks mismatch for URL {url_identifier}. Baseline: {baseline_total_clicks}, Current: {current_total_clicks}")
+                        if current_unique_clicks != baseline_unique_clicks:
+                            mismatches.append(f"Unique clicks mismatch for URL {url_identifier}. Baseline: {baseline_unique_clicks}, Current: {current_unique_clicks}")
+                        if current_signups != baseline_signups:
+                            mismatches.append(f"Signups mismatch for URL {url_identifier}. Baseline: {baseline_signups}, Current: {current_signups}")
+                        if current_fdm != baseline_fdm:
+                            mismatches.append(f"FDM mismatch for URL {url_identifier}. Baseline: {baseline_fdm}, Current: {current_fdm}")
                         break
                 
-                if not url_found and baseline_url["url"].lower() != "none" and baseline_url["url"].strip() != "":
-                    mismatches.append(f"URL '{baseline_url['url']}' not found in current data for channel {channel_key}")
+                if not url_found and not is_empty_url:
+                    mismatches.append(f"URL '{baseline_url_value}' not found in current data for channel {channel_key}")
+                elif not url_found and is_empty_url:
+                    mismatches.append(f"Empty URL entry not found in current data for channel {channel_key}")
         
         return mismatches
     
@@ -334,8 +362,13 @@ class CompareDataMarketingPage(GetDataCustomer):
                 elif baseline_has_data and not current_has_data:
                     raise Exception(f"{period_name}: No current data found for user {username} from {from_date} to {to_date} with language {language}, but baseline data exists")
                 else:
-                    channel_mismatches = self._compare_channels_data(baseline_data["channels_data"], current_data["channels_data"])
-                    detail_mismatches = self._compare_channel_details(baseline_data["channel_details_data"], current_data["channel_details_data"])
+                    normalized_baseline_channels = self._normalize_channels_data_for_comparison(baseline_data["channels_data"])
+                    normalized_current_channels = self._normalize_channels_data_for_comparison(current_data["channels_data"])
+                    normalized_baseline_details = self._normalize_channel_details_for_comparison(baseline_data["channel_details_data"])
+                    normalized_current_details = self._normalize_channel_details_for_comparison(current_data["channel_details_data"])
+                    
+                    channel_mismatches = self._compare_channels_data(normalized_baseline_channels, normalized_current_channels)
+                    detail_mismatches = self._compare_channel_details(normalized_baseline_details, normalized_current_details)
                     
                     all_mismatches = channel_mismatches + detail_mismatches
                     
@@ -361,62 +394,55 @@ class CompareDataMarketingPage(GetDataCustomer):
             languages = set()
             for channel_key, url_details in baseline_data["channel_details_data"].items():
                 for url_data in url_details:
-                    if url_data["language"] and url_data["language"].lower() not in ["none", "-"] and url_data["language"].strip() != "":
+                    if url_data["language"] and url_data["language"].lower() not in ["none", "-", "null"] and url_data["language"].strip() != "":
                         languages.add(url_data["language"])
             
             if languages:
-                language = next(iter(languages))
+                test_language = next(iter(languages))
+                subAutoTestCase += f"\n     + Testing language filter with: '{test_language}'"
                 
-                language_mapping = {
-                    "chinese simplified": "zh-cn",
-                    "english": "en-us",
-                    "bengali": "bn-in",
-                    "english (india)": "en-in",
-                    "indonesian": "id-id",
-                    "japanese": "ja-jp",
-                    "korean": "ko-kr",
-                    "thai": "th-th",
-                    "vietnamese": "vi-vn",
-                    "telugu": "te-in"
-                }
+                current_data_filtered = self.get_data_marketing_pages_in_customer(username, test_language, from_date, to_date, include_inactive)
                 
-                language_lower = language.lower()
-                if language_lower in language_mapping:
-                    language_code_to_select = language_mapping[language_lower]
+                if not current_data_filtered.get("has_data", True):
+                    subAutoTestCase += f"\n     + No data found when filtering for language '{test_language}'"
                 else:
-                    language_code_to_select = language_lower
-                
-                current_data = self.get_data_marketing_pages_in_customer(username, language, from_date, to_date, include_inactive)
-                
-                if current_data.get("has_data", True):
-                    language_code = language_code_to_select
-                    
-                    language_found = False
+                    language_verification_passed = True
                     mismatched_languages = []
+                    total_urls_checked = 0
+                    matching_urls = 0
                     
-                    for channel_key, url_details in current_data["channel_details_data"].items():
+                    for channel_key, url_details in current_data_filtered["channel_details_data"].items():
                         for url_data in url_details:
-                            if url_data["language"] and url_data["language"].lower() not in ["none", "-"] and url_data["language"].strip() != "":
-                                current_language_lower = url_data["language"].lower()
-                                if current_language_lower in language_mapping:
-                                    current_language_code = language_mapping[current_language_lower]
+                            total_urls_checked += 1
+                            url_language = url_data.get("language", "").strip()
+                            
+                            if url_language and url_language.lower() not in ["none", "-", "null"] and url_language != "":
+                                if url_language.lower() == test_language.lower():
+                                    matching_urls += 1
                                 else:
-                                    current_language_code = current_language_lower
-                                    
-                                if current_language_code == language_code:
-                                    language_found = True
-                                else:
-                                    mismatched_languages.append(f"{url_data['language']} (code: {current_language_code})")
+                                    language_verification_passed = False
+                                    mismatched_languages.append(f"URL '{url_data.get('url', '')}' has language '{url_language}' instead of '{test_language}'")
+                            else:
+                                matching_urls += 1
                     
-                    if language_found:
-                        if mismatched_languages:
-                            subAutoTestCase += f"\n     + Language filter partially verified for '{language}' but found some mismatched languages: {', '.join(set(mismatched_languages))}"
+                    if language_verification_passed:
+                        subAutoTestCase += f"\n     + Language filter verification passed: Found {matching_urls}/{total_urls_checked} URLs with correct language filter"
+                        
+                        baseline_language_data = self._extract_baseline_language_data(baseline_data, test_language)
+                        if baseline_language_data:
+                            filter_comparison_result = self._compare_language_filtered_data(baseline_language_data, current_data_filtered)
+                            if filter_comparison_result:
+                                subAutoTestCase += f"\n     + Language filter data comparison: {filter_comparison_result}"
+                            else:
+                                subAutoTestCase += f"\n     + Successfully verified: Language filtered data matches expected baseline structure"
                         else:
-                            subAutoTestCase += f"\n     + Successfully verified Language filter for '{language}'"
+                            subAutoTestCase += f"\n     + Note: No baseline data found for language '{test_language}' to compare against"
                     else:
-                        subAutoTestCase += f"\n     + Language filter test failed: No URLs found with the filtered language '{language}' (code: {language_code})"
-                else:
-                    subAutoTestCase += f"\n     + No data found when filtering for language '{language}'"
+                        subAutoTestCase += f"\n     + Language filter verification failed: Found {len(mismatched_languages)} mismatched languages"
+                        for mismatch in mismatched_languages[:5]:  # Show first 5 mismatches
+                            subAutoTestCase += f"\n       - {mismatch}"
+                        if len(mismatched_languages) > 5:
+                            subAutoTestCase += f"\n       - ... and {len(mismatched_languages) - 5} more mismatches"
             else:
                 subAutoTestCase += "\n     + No valid language found in baseline data to test the filter"
             
@@ -432,78 +458,200 @@ class CompareDataMarketingPage(GetDataCustomer):
                     self.utils.update_result_to_ggsheet(Data["TestCase_spread_sheet_id"], mainChecklist[i], testcase, "", Data["TestCase_Auto_Status"][2], sheet_name=Checklist_Sheet_Name)
             self.utils.page.extract_TestCaseFailed(e)
 
-    def check_data_marketing_pages_collapsed_expanded_match(self, testcase):
-        cache, username = self.preload_all_data()
+    def _normalize_channels_data_for_comparison(self, channels_data):
+        normalized = []
+        for channel in channels_data:
+            normalized_channel = {
+                "channel_name": channel["channel_name"],
+                "language": channel["language"],
+                "total_click": self.parse_int(channel["total_click"]),
+                "unique_click": self.parse_int(channel["unique_click"]),
+                "signups": self.parse_int(channel["signups"]),
+                "fdm": self.parse_int(channel["fdm"])
+            }
+            normalized.append(normalized_channel)
+        return normalized
+
+    def _normalize_channel_details_for_comparison(self, channel_details_data):
+        normalized = {}
         
+        for channel_key, url_details in channel_details_data.items():
+            if " - " in channel_key:
+                parts = channel_key.split(" - ", 1)
+                if parts[0].isdigit():
+                    normalized_key = channel_key
+                else:
+                    normalized_key = channel_key
+            else:
+                normalized_key = channel_key
+            
+            normalized_urls = []
+            for url_data in url_details:
+                normalized_url = {
+                    "url": url_data.get("url", ""),
+                    "language": url_data.get("language", ""),
+                    "total_clicks": self.parse_int(url_data.get("total_clicks", 0)),
+                    "unique_clicks": self.parse_int(url_data.get("unique_clicks", 0)),
+                    "signups": self.parse_int(url_data.get("signups", 0)),
+                    "fdm": self.parse_int(url_data.get("fdm", 0))
+                }
+                normalized_urls.append(normalized_url)
+            
+            normalized[normalized_key] = normalized_urls
+        
+        return normalized
+
+    def _extract_baseline_language_data(self, baseline_data, target_language):
+        language_data = {
+            "channels_data": [],
+            "channel_details_data": {}
+        }
+        
+        for channel in baseline_data["channels_data"]:
+            channel_name = channel["channel_name"]
+            channel_language = channel["language"]
+            
+            channel_key_candidates = [
+                f"1 - {channel_name}",
+                f"2 - {channel_name}",
+                f"{channel_name} - {channel_language}",
+                f"{channel_name} - {target_language}"
+            ]
+            
+            has_target_language = False
+            for key_candidate in channel_key_candidates:
+                if key_candidate in baseline_data["channel_details_data"]:
+                    for url_data in baseline_data["channel_details_data"][key_candidate]:
+                        if url_data.get("language", "").lower() == target_language.lower():
+                            has_target_language = True
+                            break
+                    if has_target_language:
+                        break
+            
+            if has_target_language:
+                language_data["channels_data"].append(channel)
+        
+        for channel_key, url_details in baseline_data["channel_details_data"].items():
+            filtered_urls = []
+            for url_data in url_details:
+                if url_data.get("language", "").lower() == target_language.lower():
+                    filtered_urls.append(url_data)
+            
+            if filtered_urls:
+                language_data["channel_details_data"][channel_key] = filtered_urls
+        
+        return language_data if language_data["channels_data"] or language_data["channel_details_data"] else None
+
+    def _compare_language_filtered_data(self, baseline_language_data, current_filtered_data):
+        issues = []
+        
+        baseline_url_count = sum(len(urls) for urls in baseline_language_data["channel_details_data"].values())
+        current_url_count = sum(len(urls) for urls in current_filtered_data.get("channel_details_data", {}).values())
+        
+        if baseline_url_count != current_url_count:
+            issues.append(f"URL count mismatch - Baseline: {baseline_url_count}, Current: {current_url_count}")
+        
+        baseline_total_clicks = sum(self.parse_int(ch["total_click"]) for ch in baseline_language_data["channels_data"])
+        current_total_clicks = sum(self.parse_int(ch["total_click"]) for ch in current_filtered_data.get("channels_data", []))
+        
+        if baseline_total_clicks != current_total_clicks:
+            issues.append(f"Total clicks mismatch - Baseline: {baseline_total_clicks}, Current: {current_total_clicks}")
+        
+        return "; ".join(issues) if issues else None
+
+    def check_data_marketing_pages_collapsed_expanded_match(self, testcase):
+        subAutoTestCase = '- Verify that the sum of the collapsed data equals the data in the expanded section'
         mainChecklist = ["Verify that the sum of the collapsed data equals the data in the expanded section."]
         indexChl = 0
         
         try:
-            subAutoTestCase = '- Verify that the sum of the collapsed data equals the data in the expanded section'
+            if "Marketing_Pages_Last_Month" not in Data or not Data["Marketing_Pages_Last_Month"]:
+                raise Exception("Baseline data not found. Please run the job to collect baseline data first.")
             
-            periods = ["last_month", "last_week", "yesterday"]
+            baseline_data_map = {
+                "Last Month": Data["Marketing_Pages_Last_Month"],
+                "Last Week": Data["Marketing_Pages_Last_Week"],
+                "Yesterday": Data["Marketing_Pages_Yesterday"]
+            }
             
-            for period in periods:
-                if period not in cache:
+            for period_name, baseline_data in baseline_data_map.items():
+                if not baseline_data or not baseline_data.get("metadata", {}).get("has_data", True):
                     continue
                     
-                period_display = period.replace("_", " ")
-                
-                if subAutoTestCase:
+                if subAutoTestCase and not subAutoTestCase.endswith('section'):
                     subAutoTestCase += '\n\n'
                 
-                subAutoTestCase += f"- Verify for {period_display} that channel totals match the sum of their detail URLs"
+                period_lower = period_name.lower().replace(" ", "_")
+                subAutoTestCase += f"- Verify for {period_lower} that channel totals match the sum of their detail URLs"
                 
-                data_marketing_pages = cache["marketing_pages"][period]
+                username = baseline_data["metadata"]["filters"]["username"]
+                from_date = baseline_data["metadata"]["period"]["from_date"]
+                to_date = baseline_data["metadata"]["period"]["to_date"]
                 
-                if not data_marketing_pages.get("has_data", True):
-                    subAutoTestCase += f"\n     + No data found for Marketing Pages in {period_display}."
-                    continue
-                
-                current_username = self._get_username_for_period(period, username)
-                subAutoTestCase += f"\n     + Username: {current_username}"
-                subAutoTestCase += f"\n     + From Date: {cache[period]['date_range']['from_date']}"
-                subAutoTestCase += f"\n     + To Date: {cache[period]['date_range']['to_date']}"
+                subAutoTestCase += f"\n     + Username: {username}"
+                subAutoTestCase += f"\n     + From Date: {from_date}"
+                subAutoTestCase += f"\n     + To Date: {to_date}"
                 
                 mismatches = []
                 
-                for channel_data in data_marketing_pages["channels_data"]:
+                for channel_data in baseline_data["channels_data"]:
                     channel_name = channel_data["channel_name"]
-                    language = channel_data["language"]
-                    channel_key = f"{channel_name} - {language}"
                     
-                    if channel_key not in data_marketing_pages["channel_details_data"]:
+                    matching_channel_key = None
+                    for detail_key in baseline_data["channel_details_data"].keys():
+                        if detail_key.endswith(f" - {channel_name}"):
+                            matching_channel_key = detail_key
+                            break
+                    
+                    if not matching_channel_key:
+                        for detail_key in baseline_data["channel_details_data"].keys():
+                            if channel_name.lower() in detail_key.lower():
+                                matching_channel_key = detail_key
+                                break
+                    
+                    if not matching_channel_key:
+                        mismatches.append(f"Channel details not found for channel '{channel_name}'. Available keys: {list(baseline_data['channel_details_data'].keys())}")
                         continue
                     
-                    channel_details = data_marketing_pages["channel_details_data"][channel_key]
+                    channel_details = baseline_data["channel_details_data"][matching_channel_key]
+                    
+                    if not channel_details:
+                        mismatches.append(f"Channel '{channel_name}' (key: {matching_channel_key}) has empty detail data")
+                        continue
                     
                     detail_total_clicks = 0
                     detail_unique_clicks = 0
                     detail_signups = 0
                     detail_fdm = 0
                     
+                    url_count = 0
                     for url_data in channel_details:
-                        detail_total_clicks += self.parse_int(url_data["total_clicks"])
-                        detail_unique_clicks += self.parse_int(url_data["unique_clicks"])
-                        detail_signups += self.parse_int(url_data["signups"])
-                        detail_fdm += self.parse_int(url_data["fdm"])
+                        url_count += 1
+                        detail_total_clicks += self.parse_int(url_data.get("total_clicks", 0))
+                        detail_unique_clicks += self.parse_int(url_data.get("unique_clicks", 0))
+                        detail_signups += self.parse_int(url_data.get("signups", 0))
+                        detail_fdm += self.parse_int(url_data.get("fdm", 0))
                     
                     channel_total_click = self.parse_int(channel_data["total_click"])
                     channel_unique_click = self.parse_int(channel_data["unique_click"])
                     channel_signups = self.parse_int(channel_data["signups"])
                     channel_fdm = self.parse_int(channel_data["fdm"])
                     
+                    debug_info = f"[DEBUG] Channel '{channel_name}' (key: {matching_channel_key}): {url_count} URLs found. "
+                    debug_info += f"Channel totals: TC={channel_total_click}, UC={channel_unique_click}, S={channel_signups}, F={channel_fdm}. "
+                    debug_info += f"Sum of details: TC={detail_total_clicks}, UC={detail_unique_clicks}, S={detail_signups}, F={detail_fdm}"
+                    
                     if detail_total_clicks != channel_total_click:
-                        mismatches.append(f"Total clicks mismatch for channel '{channel_key}': Channel={channel_total_click}, Sum of details={detail_total_clicks}")
+                        mismatches.append(f"Total clicks mismatch for channel '{channel_name}': Channel={channel_total_click}, Sum of details={detail_total_clicks}. {debug_info}")
                     
                     if detail_unique_clicks != channel_unique_click:
-                        mismatches.append(f"Unique clicks mismatch for channel '{channel_key}': Channel={channel_unique_click}, Sum of details={detail_unique_clicks}")
+                        mismatches.append(f"Unique clicks mismatch for channel '{channel_name}': Channel={channel_unique_click}, Sum of details={detail_unique_clicks}. {debug_info}")
                     
                     if detail_signups != channel_signups:
-                        mismatches.append(f"Signups mismatch for channel '{channel_key}': Channel={channel_signups}, Sum of details={detail_signups}")
+                        mismatches.append(f"Signups mismatch for channel '{channel_name}': Channel={channel_signups}, Sum of details={detail_signups}. {debug_info}")
                     
                     if detail_fdm != channel_fdm:
-                        mismatches.append(f"FDM mismatch for channel '{channel_key}': Channel={channel_fdm}, Sum of details={detail_fdm}")
+                        mismatches.append(f"FDM mismatch for channel '{channel_name}': Channel={channel_fdm}, Sum of details={detail_fdm}. {debug_info}")
                 
                 if mismatches:
                     subAutoTestCase += f"\n     + Failed: {len(mismatches)} mismatches found:"
