@@ -19,9 +19,9 @@ from src.utils.core import (
     TC_NAME
 )
 
-from src.utils.services.api_utils.components.request_methods import RequestMethods
-from src.utils.services.api_utils.components.assertion_methods import AssertionMethods
-from src.utils.services.api_utils.components.extraction_methods import ExtractionMethods
+from src.utils.services.api_utils.request_methods import RequestMethods
+from src.utils.services.api_utils.assertion_methods import AssertionMethods
+from src.utils.services.api_utils.extraction_methods import ExtractionMethods
 
 logger = get_logger(__name__)
 

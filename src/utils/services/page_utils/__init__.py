@@ -29,13 +29,13 @@ from os.path import abspath, join
 root_dir = d(d(abspath(__file__)))
 from playwright.sync_api import Page, expect
 
-from src.utils.services.page_utils.components.navigation_methods import NavigationMethods
-from src.utils.services.page_utils.components.element_methods import ElementMethods
-from src.utils.services.page_utils.components.extraction_methods import ExtractionMethods
-from src.utils.services.page_utils.components.frame_methods import FrameMethods
-from src.utils.services.page_utils.components.verification_methods import VerificationMethods
-from src.utils.services.page_utils.components.file_methods import FileMethods
-from src.utils.services.page_utils.components.screenshot_methods import ScreenshotMethods
+from src.utils.services.page_utils.navigation_methods import NavigationMethods
+from src.utils.services.page_utils.element_methods import ElementMethods
+from src.utils.services.page_utils.extraction_methods import ExtractionMethods
+from src.utils.services.page_utils.frame_methods import FrameMethods
+from src.utils.services.page_utils.verification_methods import VerificationMethods
+from src.utils.services.page_utils.file_methods import FileMethods
+from src.utils.services.page_utils.screenshot_methods import ScreenshotMethods
 
 logger = get_logger(__name__)
 
