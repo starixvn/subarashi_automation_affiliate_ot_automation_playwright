@@ -1,9 +1,9 @@
-# get data baseline referrer last_month by mobile at 2025-06-19 18:34:27 +0800 (GMT+8)
+# get data baseline referrer last_month by mobile at 2025-06-23 16:31:54 +0800 (GMT+8)
 
 class DataReferrersLastMonthByMobile:
     data_referrers_last_month_by_mobile = {
     "metadata": {
-        "collected_at": "2025-06-19 18:34:27 +0800",
+        "collected_at": "2025-06-23 16:31:54 +0800",
         "period": {
             "from_date": "05-01-2025",
             "to_date": "05-31-2025"

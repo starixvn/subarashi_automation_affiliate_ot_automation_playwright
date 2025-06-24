@@ -1,12 +1,12 @@
-# get data baseline referrer last_week at 2025-06-19 18:34:11 +0800 (GMT+8)
+# get data baseline referrer last_week at 2025-06-23 16:31:37 +0800 (GMT+8)
 
 class DataReferrersLastWeek:
     data_referrers_last_week = {
     "metadata": {
-        "collected_at": "2025-06-19 18:34:11 +0800",
+        "collected_at": "2025-06-23 16:31:37 +0800",
         "period": {
-            "from_date": "06-09-2025",
-            "to_date": "06-15-2025"
+            "from_date": "06-16-2025",
+            "to_date": "06-22-2025"
         },
         "filters": {
             "username": "12BETAFF16007",
@@ -16,8 +16,8 @@ class DataReferrersLastWeek:
     },
     "site_urls_data": [
         {
-            "site_url": "adsmanager.facebook.com",
-            "total_click": 3,
+            "site_url": "facebook.com",
+            "total_click": 1,
             "unique_click": 1,
             "signups": 0,
             "fdm": 0
@@ -31,59 +31,59 @@ class DataReferrersLastWeek:
         },
         {
             "site_url": "instagram.com",
-            "total_click": 14,
-            "unique_click": 14,
-            "signups": 2,
+            "total_click": 18,
+            "unique_click": 16,
+            "signups": 4,
             "fdm": 0
         },
         {
             "site_url": "l.facebook.com",
-            "total_click": 35,
-            "unique_click": 30,
-            "signups": 7,
-            "fdm": 1
+            "total_click": 63,
+            "unique_click": 51,
+            "signups": 14,
+            "fdm": 2
         },
         {
-            "site_url": "lm.facebook.com",
-            "total_click": 1,
+            "site_url": "m.facebook.com",
+            "total_click": 1491,
+            "unique_click": 1226,
+            "signups": 307,
+            "fdm": 41
+        },
+        {
+            "site_url": "meta.com",
+            "total_click": 2,
             "unique_click": 1,
             "signups": 0,
             "fdm": 0
         },
         {
-            "site_url": "m.facebook.com",
-            "total_click": 1511,
-            "unique_click": 1228,
-            "signups": 377,
-            "fdm": 78
-        },
-        {
             "site_url": "none",
-            "total_click": 2734,
-            "unique_click": 389,
-            "signups": 19,
-            "fdm": 8
+            "total_click": 1884,
+            "unique_click": 366,
+            "signups": 16,
+            "fdm": 5
         },
         {
             "site_url": "www.facebook.com",
-            "total_click": 72,
-            "unique_click": 65,
-            "signups": 18,
-            "fdm": 3
+            "total_click": 89,
+            "unique_click": 73,
+            "signups": 17,
+            "fdm": 4
         },
         {
             "site_url": "www.google.com",
-            "total_click": 33,
-            "unique_click": 7,
+            "total_click": 22,
+            "unique_click": 5,
             "signups": 0,
             "fdm": 0
         }
     ],
     "website_urls_data": {
-        "adsmanager.facebook.com": [
+        "facebook.com": [
             {
-                "website_url": "https://adsmanager.facebook.com/",
-                "total_clicks": 3,
+                "website_url": "https://facebook.com/",
+                "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
@@ -101,67 +101,67 @@ class DataReferrersLastWeek:
         "instagram.com": [
             {
                 "website_url": "http://instagram.com/",
-                "total_clicks": 14,
-                "unique_clicks": 14,
-                "signups": 2,
-                "fdm": 0
-            }
-        ],
-        "l.facebook.com": [
-            {
-                "website_url": "https://l.facebook.com/",
-                "total_clicks": 2,
-                "unique_clicks": 1,
-                "signups": 0,
+                "total_clicks": 17,
+                "unique_clicks": 15,
+                "signups": 4,
                 "fdm": 0
             },
             {
-                "website_url": "https://l.facebook.com/",
-                "total_clicks": 33,
-                "unique_clicks": 29,
-                "signups": 7,
-                "fdm": 1
-            }
-        ],
-        "lm.facebook.com": [
-            {
-                "website_url": "https://lm.facebook.com/",
+                "website_url": "https://instagram.com/",
                 "total_clicks": 1,
                 "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             }
         ],
+        "l.facebook.com": [
+            {
+                "website_url": "https://l.facebook.com/",
+                "total_clicks": 63,
+                "unique_clicks": 51,
+                "signups": 14,
+                "fdm": 2
+            }
+        ],
         "m.facebook.com": [
             {
                 "website_url": "http://m.facebook.com/",
-                "total_clicks": 2,
-                "unique_clicks": 2,
+                "total_clicks": 1,
+                "unique_clicks": 1,
                 "signups": 0,
                 "fdm": 0
             },
             {
                 "website_url": "http://m.facebook.com/",
-                "total_clicks": 1509,
+                "total_clicks": 1490,
                 "unique_clicks": 1226,
-                "signups": 377,
-                "fdm": 78
+                "signups": 307,
+                "fdm": 41
+            }
+        ],
+        "meta.com": [
+            {
+                "website_url": "https://meta.com/",
+                "total_clicks": 2,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
             }
         ],
         "www.facebook.com": [
             {
                 "website_url": "https://www.facebook.com/",
-                "total_clicks": 72,
-                "unique_clicks": 65,
-                "signups": 18,
-                "fdm": 3
+                "total_clicks": 89,
+                "unique_clicks": 73,
+                "signups": 17,
+                "fdm": 4
             }
         ],
         "www.google.com": [
             {
                 "website_url": "https://www.google.com/",
-                "total_clicks": 33,
-                "unique_clicks": 7,
+                "total_clicks": 22,
+                "unique_clicks": 5,
                 "signups": 0,
                 "fdm": 0
             }

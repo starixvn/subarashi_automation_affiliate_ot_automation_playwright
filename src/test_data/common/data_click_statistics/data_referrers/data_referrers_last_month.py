@@ -1,9 +1,9 @@
-# get data baseline referrer last_month at 2025-06-19 18:34:20 +0800 (GMT+8)
+# get data baseline referrer last_month at 2025-06-23 16:31:46 +0800 (GMT+8)
 
 class DataReferrersLastMonth:
     data_referrers_last_month = {
     "metadata": {
-        "collected_at": "2025-06-19 18:34:20 +0800",
+        "collected_at": "2025-06-23 16:31:46 +0800",
         "period": {
             "from_date": "05-01-2025",
             "to_date": "05-31-2025"
