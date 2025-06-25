@@ -32,12 +32,12 @@ from src.utils.core import (
     TC_NAME
 )
 
-from src.utils.services.utils.components.browser_methods import BrowserMethods
-from src.utils.services.utils.components.assertion_methods import AssertionMethods
-from src.utils.services.utils.components.file_methods import FileMethods
-from src.utils.services.utils.components.google_methods import GoogleMethods
-from src.utils.services.utils.components.report_methods import ReportMethods
-from src.utils.services.utils.components.crypto_methods import CryptoMethods
+from src.utils.services.utils.browser_methods import BrowserMethods
+from src.utils.services.utils.assertion_methods import AssertionMethods
+from src.utils.services.utils.file_methods import FileMethods
+from src.utils.services.utils.google_methods import GoogleMethods
+from src.utils.services.utils.report_methods import ReportMethods
+from src.utils.services.utils.crypto_methods import CryptoMethods
 
 logger = get_logger(__name__)
 

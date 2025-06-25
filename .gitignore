@@ -38,7 +38,7 @@ data/excel/
 data/duration.js
 config/environments/admin/
 config/environments/user/
-config/environments/mcp/
+config/environments/common/
 downloads/
 screenshots/
 element/

@@ -19,7 +19,6 @@ class Common():
         
     def setup(self):
         self.utils = utilities()
-        self.env = self.utils.env
         self.playwright = self.utils.page.page
         self.login_admin()
 
@@ -32,12 +31,12 @@ class Common():
     def login_admin(self):
         try:
             PASSWORD = utilities.decrypt(
-                ciphertext=ADMIN_12BET_ENCRYPTED_PASSWORD[self.env],
-                password=ADMIN_12BET_PASSWORD[self.env],
-                salt=ADMIN_12BET_SALT_PASSWORD[self.env]
+                ciphertext=ADMIN_12BET_ENCRYPTED_PASSWORD,
+                password=ADMIN_12BET_PASSWORD,
+                salt=ADMIN_12BET_SALT_PASSWORD
             )
-            self.utils.page.navigate(ADMIN_12BET_URL[self.env])
-            self.utils.page.input(elm_login_admin.inp_username, ADMIN_12BET_USERNAME[self.env])
+            self.utils.page.navigate(ADMIN_12BET_URL)
+            self.utils.page.input(elm_login_admin.inp_username, ADMIN_12BET_USERNAME)
             self.utils.page.input(elm_login_admin.inp_password, PASSWORD)
             self.utils.page.click(elm_login_admin.btn_login)
             self.utils.page.verify_element_exist(elm_menu.nav_menu_list)
@@ -51,9 +50,9 @@ class Common():
             self.utils.page.input(elm_left_panel.inp_aff_name, affiliatename)
             self.utils.page.click(elm_left_panel.btn_search)
             self.utils.page.wait_for_element_ready(elm_left_panel.div_affiliate_label, visible=True, enabled=True)
-            time.sleep(2)
+            self.utils.page.wait_for_element_ready(elm_left_panel.lnk_affiliate, visible=True, enabled=True)
             self.utils.page.open_new_page_by_click(elm_left_panel.lnk_affiliate)
-            time.sleep(2)
+            self.utils.page.new_pages.wait_load_page()
             self.utils.page.new_pages.wait_for_element_ready(elm_header.a_my_account, visible=True, enabled=True)
             text_username = self.utils.page.new_pages.get_text(elm_header.a_my_account)
             match = re.search(r'\b([A-Z0-9]{10,})\b', text_username)

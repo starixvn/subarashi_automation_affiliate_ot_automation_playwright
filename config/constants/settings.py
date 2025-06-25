@@ -1,30 +1,40 @@
-import sys
 import os
 import pytest
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent.parent
+CONFIG_DIR = Path(__file__).parent.parent
 
-try:
-    ENVIRONMENT = pytest.config.getoption('--env')
-    SITE = pytest.config.getoption('--site')
-    DEBUG_MODE = pytest.config.getoption('--debug_mode').lower() == 'true'
-    HEADLESS_MODE = pytest.config.getoption('--headless').lower() == 'true'
-    BROWSER = pytest.config.getoption('--browser')
-except (AttributeError, ValueError):
-    ENVIRONMENT = 'prod'
-    SITE = 'admin'
-    DEBUG_MODE = False
-    HEADLESS_MODE = False
-    BROWSER = 'chromium'
+ENVIRONMENT = os.getenv('PYTEST_ENV', 'local')
+SITE = os.getenv('PYTEST_SITE', 'admin')
+DEBUG_MODE = os.getenv('PYTEST_DEBUG_MODE', 'false').lower() == 'true'
+HEADLESS_MODE = os.getenv('PYTEST_HEADLESS', 'false').lower() == 'true'
+BROWSER = os.getenv('PYTEST_BROWSER', 'chromium')
 
+def load_env_config():
+    env_files = [
+        CONFIG_DIR / "environments" / "common" / f".env.{ENVIRONMENT}",
+        CONFIG_DIR / "environments" / SITE / f".env.{ENVIRONMENT}"
+    ]
+    
+    config = {}
+    for env_file in env_files:
+        if env_file.exists():
+            with open(env_file, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, value = line.split('=', 1)
+                        config[key.strip()] = value.strip()
+    
+    return config
+
+ENV_CONFIG = load_env_config()
 LANGUAGE = "en"
 TIMEOUT = 30
 ENABLE_BROWSER = True
 ENABLE_TRACE = True
 TRACE_PATH = "Trace\\trace.zip"
-
-
 PROJECT_ROOT = str(ROOT_DIR)
 LOG_LEVEL = "INFO"
 LOG_OUTPUT_DIR = os.path.join(PROJECT_ROOT, "logs")
@@ -33,70 +43,56 @@ LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 LOG_TO_CONSOLE = True
 LOG_TO_FILE = True
-
-
-TELEGRAM_BOT_TOKEN = "7209718301:AAFjWzuvx0y27X2GiaAyNac1dp0zC_TrBuY"
-TELEGRAM_CHAT_IDS = [5111377213]
-
-TEAMS_CONVERSATION_IDS = ["a:1K7NcW8nE2v-QmtKdO5A-QCWscNlYzLCP4K-pWnQbLNa53nXO3hS15q-n1kuR6nxBoJ4MOYn25ymdeqbXesooWLSmQ3U-IFr8F3wK3ofzUjqJ1UV9v7jPUBeaI8dYmUkv"]
-
-SLACK_CHANNEL_ID = ["C08USD10388"]
-SLACK_BOT_TOKEN = "xoxb-8352731735536-8948054884291-UtxoV2jErsvn0wMDOe9d8ZYt"
-
 ENABLE_DB = True
-DB_USERNAME = "vnTestAutomation"
-DB_PASSWORD = "@TestAutomation#"
 
-ADMIN_12BET_URL= {
-    "local": "http://aff-12b.nexdev.net/Admin",
-    "uat": "https://aff15.starixuat.com/Admin",
-    "prod": "https://affmanager.easymon5678.com/"}
+DB_USERNAME = ENV_CONFIG.get("DB_USERNAME", "default_user")
+DB_PASSWORD = ENV_CONFIG.get("DB_PASSWORD", "default_pass")
 
-ADMIN_12BET_USERNAME = {
-    "local": "AAautomationtesting",
-    "uat": "AAStarixQC02",
-    "prod": "AAStarixQC02"
-}
+TELEGRAM_BOT_TOKEN = ENV_CONFIG.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_IDS = [int(x.strip()) for x in ENV_CONFIG.get("TELEGRAM_CHAT_IDS", "").split(",") if x.strip()]
 
-ADMIN_12BET_PASSWORD = {
-    "local": "Nexcel-SUN",
-    "uat": "WhatIsPassword",
-    "prod": "WhatIsPassword"
-}
+TEAMS_CONVERSATION_IDS = [x.strip() for x in ENV_CONFIG.get("TEAMS_CONVERSATION_IDS", "").split(",") if x.strip()]
 
-ADMIN_12BET_SALT_PASSWORD = {
-    "local": b'\x88\x05\xa8\xe2\xab\x05/>\x16\x9b\x13\xdf\xba\xa3\xe79',
-    "uat": b'z`\xca\x1b\x95V\x11N\xaf\xd5\tn\xd6\xd9O\x08',
-    "prod": b'z`\xca\x1b\x95V\x11N\xaf\xd5\tn\xd6\xd9O\x08'
-}
-ADMIN_12BET_ENCRYPTED_PASSWORD = {
-    "local": b'gAAAAABmcl_WeYFYWquz9xURv9eSjs7wKqx9DBmt3GtoytZswEIbwCb_ouHnTE8D39_5uCcp4DRD2KtN0wzMZZuVHaeIS5cn1Q==',
-    "uat": b'gAAAAABoR6aqesTX-oZyln_nZPmYk3sYb2nRR4SnnV3olK1qYNat5YDKgLYt-89eWP5FpNgHogTKuIGjI1HseGbLMFKYtzzCWA==',
-    "prod": b'gAAAAABoR6aqesTX-oZyln_nZPmYk3sYb2nRR4SnnV3olK1qYNat5YDKgLYt-89eWP5FpNgHogTKuIGjI1HseGbLMFKYtzzCWA=='
-}
+SLACK_CHANNEL_ID = [x.strip() for x in ENV_CONFIG.get("SLACK_CHANNEL_IDS", "").split(",") if x.strip()]
+SLACK_BOT_TOKEN = ENV_CONFIG.get("SLACK_BOT_TOKEN", "")
 
-USER_12BET_URL = {
-    "local": "https://aff-12b.nexdev.net/UserAsian",
-    "uat": "https://aff15.starixuat.com/UserAsian",
-    "prod": "https://affiliate.easymon5678.com/"}
+# Environment-specific URLs
+if ENVIRONMENT == "prod":
+    ADMIN_12BET_URL = ENV_CONFIG.get("ADMIN_12BET_URL", "https://aff-12b.12bet.net/Admin")
+    USER_12BET_URL = ENV_CONFIG.get("USER_12BET_URL", "https://aff-12b.12bet.net")
+elif ENVIRONMENT == "staging":
+    ADMIN_12BET_URL = ENV_CONFIG.get("ADMIN_12BET_URL", "https://aff-12b-staging.12bet.net/Admin")
+    USER_12BET_URL = ENV_CONFIG.get("USER_12BET_URL", "https://aff-12b-staging.12bet.net")
+else:  # local
+    ADMIN_12BET_URL = ENV_CONFIG.get("ADMIN_12BET_URL", "http://aff-12b.nexdev.net/Admin")
+    USER_12BET_URL = ENV_CONFIG.get("USER_12BET_URL", "http://aff-12b.nexdev.net")
 
-USER_12BET_USERNAME = {
-    "local": "12betaff001",
-    "uat": "12betaff001",
-    "prod": "12betaff001"
-}
-USER_12BET_PASSWORD = {
-    "local": "1234aa",
-    "uat": "1234aa",
-    "prod": "1234aa"
-}
-USER_12BET_SALT_PASSWORD = {
-    "local": b'\x88\x05\xa8\xe2\xab\x05/>\x16\x9b\x13\xdf\xba\xa3\xe79',
-    "uat": b'\x88\x05\xa8\xe2\xab\x05/>\x16\x9b\x13\xdf\xba\xa3\xe79',
-    "prod": b'\x88\x05\xa8\xe2\xab\x05/>\x16\x9b\x13\xdf\xba\xa3\xe79'
-}
-USER_12BET_ENCRYPTED_PASSWORD = {
-    "local": b'gAAAAABmcl_WeYFYWquz9xURv9eSjs7wKqx9DBmt3GtoytZswEIbwCb_ouHnTE8D39_5uCcp4DRD2KtN0wzMZZuVHaeIS5cn1Q==',
-    "uat": b'gAAAAABmcl_WeYFYWquz9xURv9eSjs7wKqx9DBmt3GtoytZswEIbwCb_ouHnTE8D39_5uCcp4DRD2KtN0wzMZZuVHaeIS5cn1Q==',
-    "prod": b'gAAAAABmcl_WeYFYWquz9xURv9eSjs7wKqx9DBmt3GtoytZswEIbwCb_ouHnTE8D39_5uCcp4DRD2KtN0wzMZZuVHaeIS5cn1Q=='
-}
+ADMIN_12BET_USERNAME = ENV_CONFIG.get("ADMIN_12BET_USERNAME", "default_admin")
+ADMIN_12BET_PASSWORD = ENV_CONFIG.get("ADMIN_12BET_PASSWORD", "default_pass")
+ADMIN_12BET_SALT_PASSWORD = ENV_CONFIG.get("ADMIN_12BET_SALT_PASSWORD", "default_salt")
+ADMIN_12BET_ENCRYPTED_PASSWORD = ENV_CONFIG.get("ADMIN_12BET_ENCRYPTED_PASSWORD", "default_encrypted_password")
+
+USER_12BET_USERNAME = ENV_CONFIG.get("USER_12BET_USERNAME", "default_user")
+USER_12BET_PASSWORD = ENV_CONFIG.get("USER_12BET_PASSWORD", "default_pass")
+USER_12BET_SALT_PASSWORD = ENV_CONFIG.get("USER_12BET_SALT_PASSWORD", "default_salt")
+USER_12BET_ENCRYPTED_PASSWORD = ENV_CONFIG.get("USER_12BET_ENCRYPTED_PASSWORD", "default_encrypted_password")
+
+def get_config_summary():
+    return {
+        "environment": ENVIRONMENT,
+        "site": SITE,
+        "url": ADMIN_12BET_URL if SITE.lower() == "admin" else USER_12BET_URL,
+        "browser": BROWSER,
+        "headless": HEADLESS_MODE,
+        "debug": DEBUG_MODE,
+        "database_enabled": ENABLE_DB,
+        "env_files_loaded": len([f for f in [
+            CONFIG_DIR / "environments" / "common" / f".env.{ENVIRONMENT}",
+            CONFIG_DIR / "environments" / SITE / f".env.{ENVIRONMENT}"
+        ] if f.exists()])
+    }
+
+if DEBUG_MODE:
+    print("🔧 Configuration Summary:")
+    for key, value in get_config_summary().items():
+        print(f"   {key}: {value}")

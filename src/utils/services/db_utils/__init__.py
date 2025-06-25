@@ -18,9 +18,9 @@ from src.utils.core import (
     TC_NAME
 )
 
-from src.utils.services.db_utils.components.connection_methods import ConnectionMethods
-from src.utils.services.db_utils.components.query_methods import QueryMethods
-from src.utils.services.db_utils.components.data_methods import DataMethods
+from src.utils.services.db_utils.connection_methods import ConnectionMethods
+from src.utils.services.db_utils.query_methods import QueryMethods
+from src.utils.services.db_utils.data_methods import DataMethods
 
 logger = get_logger(__name__)
 

@@ -47,11 +47,17 @@ class ConnectionMethods(ExtractTestCaseFailed):
     @log_exceptions(log_level="DEBUG")
     def close(self):
         try:
-            if self.dbconnect is not None:
+            if hasattr(self, 'cursor') and self.cursor is not None:
+                logger.debug("Closing database cursor")
+                self.cursor.close()
+                self.cursor = None
+                
+            if hasattr(self, 'dbconnect') and self.dbconnect is not None:
                 logger.debug("Closing database connection")
-                self.dbcursor.close()
                 self.dbconnect.close()
-                logger.debug("Database connection closed")
+                self.dbconnect = None
+                
+            logger.debug("Database resources cleaned up successfully")
         except Exception as e:
             logger.error(f"Error closing database connection: {str(e)}")
             self.extract_TestCaseFailed(e)
