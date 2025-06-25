@@ -1,15 +1,15 @@
-# get data baseline landing page last_week at 2025-06-23 15:42:17 +0800 (GMT+8)
+# get data baseline landing page last_week at 2025-06-25 12:01:34 +0800 (GMT+8)
 
 class DataLandingPagesLastWeek:
     data_landing_pages_last_week = {
     "metadata": {
-        "collected_at": "2025-06-23 15:42:17 +0800",
+        "collected_at": "2025-06-25 12:01:34 +0800",
         "period": {
             "from_date": "06-16-2025",
             "to_date": "06-22-2025"
         },
         "filters": {
-            "username": "12BETAFF11384",
+            "username": "12BETAFF16612",
             "page_name": "All",
             "language": "All",
             "device_type": "All"
@@ -18,98 +18,43 @@ class DataLandingPagesLastWeek:
     },
     "pages_data": [
         {
-            "page_name": "home",
-            "language": "ko-KR",
-            "total_click": "22",
-            "unique_click": "18",
-            "signups": "1",
-            "fdm": "0"
-        },
-        {
             "page_name": "join",
-            "language": "ko-KR",
-            "total_click": "44",
-            "unique_click": "43",
-            "signups": "12",
-            "fdm": "0"
-        },
-        {
-            "page_name": "sports",
-            "language": "ko-KR",
-            "total_click": "1",
-            "unique_click": "1",
-            "signups": "0",
-            "fdm": "0"
+            "language": "vi-VN",
+            "total_click": "1898",
+            "unique_click": "485",
+            "signups": "307",
+            "fdm": "12"
         }
     ],
     "website_urls_data": {
-        "home - ko-KR": [
+        "join - vi-VN": [
             {
-                "website_url": "https://krbet.net/",
-                "total_clicks": 8,
-                "unique_clicks": 8,
-                "signups": 1,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://websites.godaddy.com/",
-                "total_clicks": 2,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://www.google.com/",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "none",
-                "total_clicks": 8,
-                "unique_clicks": 8,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "none",
-                "total_clicks": 3,
-                "unique_clicks": 1,
-                "signups": 0,
-                "fdm": 0
-            }
-        ],
-        "join - ko-KR": [
-            {
-                "website_url": "https://krbet.net/",
-                "total_clicks": 2,
-                "unique_clicks": 2,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "https://krbet.net/",
-                "total_clicks": 38,
-                "unique_clicks": 37,
-                "signups": 12,
-                "fdm": 0
-            },
-            {
-                "website_url": "none",
-                "total_clicks": 4,
+                "website_url": "android-app://org.telegram.messenger.web/",
+                "total_clicks": 6,
                 "unique_clicks": 4,
                 "signups": 0,
                 "fdm": 0
-            }
-        ],
-        "sports - ko-KR": [
+            },
+            {
+                "website_url": "android-app://org.telegram.messenger/",
+                "total_clicks": 10,
+                "unique_clicks": 7,
+                "signups": 2,
+                "fdm": 0
+            },
             {
                 "website_url": "none",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 0,
+                "total_clicks": 17,
+                "unique_clicks": 11,
+                "signups": 3,
                 "fdm": 0
+            },
+            {
+                "website_url": "none",
+                "total_clicks": 1865,
+                "unique_clicks": 474,
+                "signups": 302,
+                "fdm": 12
             }
         ]
     }

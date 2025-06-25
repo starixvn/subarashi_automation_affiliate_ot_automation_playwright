@@ -11,13 +11,13 @@ from src.interfaces.admin.customer.click_statistics.submenu_elements import Subm
 from src.interfaces.admin.customer.click_statistics.referrers_elements import ReferrersElements as elm_referrers
 from src.interfaces.admin.customer.click_statistics.landing_pages_elements import LandingPagesElements as elm_landing_pages
 from src.interfaces.admin.customer.click_statistics.marketing_page_elements import MarketingPageElements as elm_marketing_page
-from src.interfaces.admin.customer.statement_history.statement_history_elements import StatementHistoryElements as elm_statement_history
-from src.interfaces.admin.customer.adjustment.adjustment_elements import AdjustmentElements as elm_adjustment
-from src.interfaces.admin.customer.edit.edit_elements import EditElements as elm_edit_customer
-from src.test_data.admin.customer.landing_pages import LANDING_PAGE_STATISTICS_API, LANDING_PAGE_DETAILS_API, DEVICE_TYPE_MAPPING, REQUIRED_HEADERS, REQUEST_BODY_TEMPLATE, DETAILS_REQUEST_BODY_TEMPLATE
-from src.test_data.admin.customer.affiliate_info import AFFILIATE_INFO_API, AFFILIATE_INFO_HEADERS, AFFILIATE_INFO_REQUEST_TEMPLATE
-from src.test_data.admin.customer.referrers import REFERRERS_API, REFERRERS_DETAILS_API, REFERRERS_REQUIRED_HEADERS, REFERRERS_REQUEST_BODY_TEMPLATE, REFERRERS_DETAILS_REQUEST_BODY_TEMPLATE
-from src.test_data.admin.customer.marketing_pages import MARKETING_PAGES_API, MARKETING_PAGES_REQUIRED_HEADERS, MARKETING_PAGES_REQUEST_BODY_TEMPLATE
+from src.interfaces.admin.customer.statement_history_elements import StatementHistoryElements as elm_statement_history
+from src.interfaces.admin.customer.adjustment_elements import AdjustmentElements as elm_adjustment
+from src.interfaces.admin.customer.edit_elements import EditElements as elm_edit_customer
+from src.test_data.admin.customer.landing_pages import *
+from src.test_data.admin.customer.affiliate_info import *
+from src.test_data.admin.customer.referrers import *
+from src.test_data.admin.customer.marketing_pages import *
 
 class GetDataCustomer(Common):
     

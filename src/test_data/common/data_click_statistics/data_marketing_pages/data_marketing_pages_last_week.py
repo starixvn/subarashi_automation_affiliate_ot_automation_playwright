@@ -1,15 +1,15 @@
-# get data baseline marketing page last_week at 2025-06-23 15:43:13 +0800 (GMT+8)
+# get data baseline marketing page last_week at 2025-06-25 12:01:47 +0800 (GMT+8)
 
 class DataMarketingPagesLastWeek:
     data_marketing_pages_last_week = {
     "metadata": {
-        "collected_at": "2025-06-23 15:43:13 +0800",
+        "collected_at": "2025-06-25 12:01:47 +0800",
         "period": {
             "from_date": "06-16-2025",
             "to_date": "06-22-2025"
         },
         "filters": {
-            "username": "12BETAFF14351",
+            "username": "12BETAFF16671",
             "language": "All",
             "include_inactive_tracking": False
         },
@@ -17,31 +17,23 @@ class DataMarketingPagesLastWeek:
     },
     "channels_data": [
         {
-            "channel_name": "ID03IDNA12BETNA",
+            "channel_name": "MKTsoybeanLP",
             "language": "-",
-            "total_click": 3335,
-            "unique_click": 1946,
-            "signups": 236,
-            "fdm": 140
+            "total_click": 2615,
+            "unique_click": 1344,
+            "signups": 301,
+            "fdm": 25
         }
     ],
     "channel_details_data": {
-        "1 - ID03IDNA12BETNA": [
+        "1 - MKTsoybeanLP": [
             {
-                "url": "https://goto.168sure.com/join/13011/id/id03idna12betna/index.html",
-                "language": "Indonesian",
-                "total_clicks": 890,
-                "unique_clicks": 571,
-                "signups": 65,
-                "fdm": 40
-            },
-            {
-                "url": "https://goto.5689fun.com/join/13011/id/id03idna12betna/index.html",
-                "language": "Indonesian",
-                "total_clicks": 2445,
-                "unique_clicks": 1375,
-                "signups": 171,
-                "fdm": 100
+                "url": "https://goto.12bthlink7.com/thb-12join/60163/th/mktsoybeanlp/index.html",
+                "language": "Thai",
+                "total_clicks": 2615,
+                "unique_clicks": 1344,
+                "signups": 301,
+                "fdm": 25
             }
         ]
     }

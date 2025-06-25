@@ -1,4 +1,3 @@
-
 import os
 import pytest
 from pathlib import Path
@@ -6,18 +5,11 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent.parent.parent
 CONFIG_DIR = Path(__file__).parent.parent
 
-try:
-    ENVIRONMENT = pytest.config.getoption('--env')
-    SITE = pytest.config.getoption('--site')
-    DEBUG_MODE = pytest.config.getoption('--debug_mode').lower() == 'true'
-    HEADLESS_MODE = pytest.config.getoption('--headless').lower() == 'true'
-    BROWSER = pytest.config.getoption('--browser')
-except (AttributeError, ValueError):
-    ENVIRONMENT = 'local'
-    SITE = 'admin'
-    DEBUG_MODE = False
-    HEADLESS_MODE = False
-    BROWSER = 'chromium'
+ENVIRONMENT = os.getenv('PYTEST_ENV', 'local')
+SITE = os.getenv('PYTEST_SITE', 'admin')
+DEBUG_MODE = os.getenv('PYTEST_DEBUG_MODE', 'false').lower() == 'true'
+HEADLESS_MODE = os.getenv('PYTEST_HEADLESS', 'false').lower() == 'true'
+BROWSER = os.getenv('PYTEST_BROWSER', 'chromium')
 
 def load_env_config():
     env_files = [
@@ -64,13 +56,22 @@ TEAMS_CONVERSATION_IDS = [x.strip() for x in ENV_CONFIG.get("TEAMS_CONVERSATION_
 SLACK_CHANNEL_ID = [x.strip() for x in ENV_CONFIG.get("SLACK_CHANNEL_IDS", "").split(",") if x.strip()]
 SLACK_BOT_TOKEN = ENV_CONFIG.get("SLACK_BOT_TOKEN", "")
 
-ADMIN_12BET_URL = ENV_CONFIG.get("ADMIN_12BET_URL", "http://localhost:8080/admin")
+# Environment-specific URLs
+if ENVIRONMENT == "prod":
+    ADMIN_12BET_URL = ENV_CONFIG.get("ADMIN_12BET_URL", "https://aff-12b.12bet.net/Admin")
+    USER_12BET_URL = ENV_CONFIG.get("USER_12BET_URL", "https://aff-12b.12bet.net")
+elif ENVIRONMENT == "staging":
+    ADMIN_12BET_URL = ENV_CONFIG.get("ADMIN_12BET_URL", "https://aff-12b-staging.12bet.net/Admin")
+    USER_12BET_URL = ENV_CONFIG.get("USER_12BET_URL", "https://aff-12b-staging.12bet.net")
+else:  # local
+    ADMIN_12BET_URL = ENV_CONFIG.get("ADMIN_12BET_URL", "http://aff-12b.nexdev.net/Admin")
+    USER_12BET_URL = ENV_CONFIG.get("USER_12BET_URL", "http://aff-12b.nexdev.net")
+
 ADMIN_12BET_USERNAME = ENV_CONFIG.get("ADMIN_12BET_USERNAME", "default_admin")
 ADMIN_12BET_PASSWORD = ENV_CONFIG.get("ADMIN_12BET_PASSWORD", "default_pass")
 ADMIN_12BET_SALT_PASSWORD = ENV_CONFIG.get("ADMIN_12BET_SALT_PASSWORD", "default_salt")
 ADMIN_12BET_ENCRYPTED_PASSWORD = ENV_CONFIG.get("ADMIN_12BET_ENCRYPTED_PASSWORD", "default_encrypted_password")
 
-USER_12BET_URL = ENV_CONFIG.get("USER_12BET_URL", "http://localhost:8080/user")
 USER_12BET_USERNAME = ENV_CONFIG.get("USER_12BET_USERNAME", "default_user")
 USER_12BET_PASSWORD = ENV_CONFIG.get("USER_12BET_PASSWORD", "default_pass")
 USER_12BET_SALT_PASSWORD = ENV_CONFIG.get("USER_12BET_SALT_PASSWORD", "default_salt")

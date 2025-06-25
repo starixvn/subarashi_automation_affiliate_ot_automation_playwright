@@ -35,14 +35,24 @@ class TestCaseTracker:
         TC_NAME.clear()
 
 class ExtractTestCaseFailed:
-    def extract_TestCaseFailed(self, error: Exception):
+    def extract_TestCaseFailed(self, error):
         try:
+            if isinstance(error, str):
+                error = Exception(error)
+                
             logger.error(f"Test case failure: {error}")
             test_case = TestCaseTracker.extract_test_case_name()
             TestCaseTracker.add_failure(test_case)
             logger.error(f"Test case failed: {test_case}")
             logger.error(f"Error: {str(error)}")
-            raise AssertionError(f"Test case '{test_case}' failed: {str(error)}") from error
+            
+            if isinstance(error, BaseException):
+                raise AssertionError(f"Test case '{test_case}' failed: {str(error)}") from error
+            else:
+                raise AssertionError(f"Test case '{test_case}' failed: {str(error)}")
+                
+        except AssertionError:
+            raise
         except Exception as e:
             logger.critical(f"Failed in error handling: {str(e)}")
-            raise RuntimeError(f"Critical framework error: {str(e)}") from e 
+            raise RuntimeError(f"Critical framework error: {str(e)}") 
