@@ -8,12 +8,18 @@ from src.utils.core import (
     FileException,
     ExtractTestCaseFailed
 )
+from playwright.sync_api import Page
 from os.path import dirname as d
 from os.path import abspath, join
 root_dir = d(d(abspath(__file__)))
 logger = get_logger(__name__)
 
 class FileMethods(ExtractTestCaseFailed):
+    
+    def __init__(self, page: Page):
+        validate_not_none(page, "page")
+        self.page = page
+    
     @log_exceptions(log_level="DEBUG")
     @monitor_performance()
     def save_excel(self, element):

@@ -1,3 +1,5 @@
+import pyodbc
+from typing import Optional
 from src.utils.core import (
     get_logger,
     log_exceptions,
@@ -11,6 +13,11 @@ from src.utils.core import (
 logger = get_logger(__name__)
 
 class QueryMethods(ExtractTestCaseFailed):
+    
+    def __init__(self):
+        self.dbconnect: Optional[pyodbc.Connection] = None
+        self.cursor: Optional[pyodbc.Cursor] = None
+    
     @log_exceptions(log_level="DEBUG")
     @monitor_performance()
     def query(self, query, querytype = 'select'):

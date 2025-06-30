@@ -27,14 +27,21 @@ logger = get_logger(__name__)
 
 class api(RequestMethods, AssertionMethods, ExtractionMethods):
     TcName = TC_NAME
-    api: APIRequestContext
     
+    @log_exceptions(log_level="ERROR")
     def __init__(self, api: APIRequestContext):
         try:
             validate_not_none(api, "api")
             validate_type(api, APIRequestContext, "api")
-            browser_api = api
-            self.api = browser_api
+            
+            # Initialize all parent classes
+            RequestMethods.__init__(self)
+            AssertionMethods.__init__(self)
+            ExtractionMethods.__init__(self)
+            
+            # Set the API context for all classes
+            self.api = api
+            
             logger.debug("API client initialized")
         except Exception as e:
             logger.error(f"Failed to initialize API client: {str(e)}")

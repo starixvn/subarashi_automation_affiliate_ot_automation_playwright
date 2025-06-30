@@ -36,6 +36,7 @@ from src.utils.services.page_utils.frame_methods import FrameMethods
 from src.utils.services.page_utils.verification_methods import VerificationMethods
 from src.utils.services.page_utils.file_methods import FileMethods
 from src.utils.services.page_utils.screenshot_methods import ScreenshotMethods
+from src.utils.services.page_utils.waits import SmartWaits
 
 logger = get_logger(__name__)
 
@@ -46,7 +47,8 @@ class ui(
     FrameMethods,
     VerificationMethods,
     FileMethods,
-    ScreenshotMethods
+    ScreenshotMethods,
+    SmartWaits
 ):
     TcName = TC_NAME
     page: Page
@@ -57,10 +59,20 @@ class ui(
             validate_not_none(page, "page")
             validate_type(page, Page, "page")
             
-            self.page = page
+            # Initialize all parent classes with the same page instance
+            NavigationMethods.__init__(self, page)
+            ElementMethods.__init__(self, page)
+            ExtractionMethods.__init__(self, page)
+            FrameMethods.__init__(self, page)
+            VerificationMethods.__init__(self, page)
+            FileMethods.__init__(self, page)
+            ScreenshotMethods.__init__(self, page)
+            SmartWaits.__init__(self, page)
+            
+            # Configure page timeouts
             self.page.set_default_timeout(TIMEOUT*1000)
             self.page.set_default_navigation_timeout(TIMEOUT*1000)
-            logger.debug("UI handler initialized with configured timeouts")
+            logger.debug("UI handler initialized with configured timeouts and all method classes")
         except Exception as e:
             logger.error(f"Failed to initialize UI handler: {str(e)}")
             self.extract_TestCaseFailed(e)

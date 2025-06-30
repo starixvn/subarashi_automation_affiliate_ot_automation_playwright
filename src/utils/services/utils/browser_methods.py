@@ -1,4 +1,5 @@
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page
+from typing import Optional
 from config.constants.settings import (
     TIMEOUT,
     HEADLESS_MODE,
@@ -16,6 +17,15 @@ from src.utils.core import (
 logger = get_logger(__name__)
 
 class BrowserMethods(ExtractTestCaseFailed):
+    
+    def __init__(self):
+        self.playwright: Optional[any] = None
+        self.browser: Optional[Browser] = None
+        self.context: Optional[BrowserContext] = None
+        self.page: Optional[any] = None  # ui class instance
+        self.api: Optional[any] = None   # api class instance
+        self.debug: bool = False
+    
     @log_exceptions(log_level="INFO")
     def initialize_browser(self):
         try:

@@ -1,3 +1,5 @@
+from playwright.sync_api import APIRequestContext
+from typing import Optional
 from src.utils.core import (
     get_logger,
     log_exceptions,
@@ -8,6 +10,10 @@ from src.utils.core import (
 logger = get_logger(__name__)
 
 class RequestMethods(ExtractTestCaseFailed):
+    
+    def __init__(self):
+        self.api: Optional[APIRequestContext] = None
+    
     @log_exceptions(log_level="ERROR")
     @monitor_performance()
     def get(self, url, path=None, header=None, param=None, debug=None):

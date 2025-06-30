@@ -28,3 +28,18 @@ class db(ConnectionMethods, QueryMethods, DataMethods):
     dbconnect: Optional[pyodbc.Connection] = None
     dbcursor: Optional[pyodbc.Cursor] = None
     TcName = TC_NAME
+    
+    @log_exceptions(log_level="ERROR")
+    def __init__(self):
+        try:
+            # Initialize all parent classes
+            ConnectionMethods.__init__(self)
+            QueryMethods.__init__(self)
+            DataMethods.__init__(self)
+            
+            # Ensure all classes share the same connection attributes
+            # This is handled by the shared inheritance of the same attributes
+            logger.debug("Database handler initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize database handler: {str(e)}")
+            self.extract_TestCaseFailed(e)
