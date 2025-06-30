@@ -48,6 +48,10 @@ class utilities(BrowserMethods, AssertionMethods, FileMethods, GoogleMethods, Re
     @log_exceptions(log_level="INFO")
     def __init__(self):
         try:
+            logger.debug(f"Clearing TC_NAME. Previously had {len(TC_NAME)} failures: {TC_NAME}")
+            TC_NAME.clear()
+            logger.debug(f"TC_NAME cleared successfully. Now empty: {TC_NAME}")
+            
             self.FuncName = str(re.search('TestSuites_([0-9]{2}|DemoSite)_(.*).py', os.getenv('PYTEST_CURRENT_TEST')).group(2)).replace("_"," ")
             logger.info(f"Initializing utilities for test suite: {self.FuncName}")
             

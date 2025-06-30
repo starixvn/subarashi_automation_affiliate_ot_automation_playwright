@@ -15,7 +15,6 @@ from src.actions.common.compare_data.click_statictis_referrers.compare_data_refe
 from src.utils.core.decorators import measure_test_execution_time
 
 @pytest.mark.compare
-@pytest.mark.functional
 class TestSuites_01_Check_Data_Click_Statistics_Referrers(unittest.TestCase):
     @classmethod
     def setUpClass(self):

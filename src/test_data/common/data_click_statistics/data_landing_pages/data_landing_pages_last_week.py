@@ -1,15 +1,15 @@
-# get data baseline landing page last_week at 2025-06-25 12:01:34 +0800 (GMT+8)
+# get data baseline landing page last_week at 2025-06-25 12:10:29 +0800 (GMT+8)
 
 class DataLandingPagesLastWeek:
     data_landing_pages_last_week = {
     "metadata": {
-        "collected_at": "2025-06-25 12:01:34 +0800",
+        "collected_at": "2025-06-25 12:10:29 +0800",
         "period": {
             "from_date": "06-16-2025",
             "to_date": "06-22-2025"
         },
         "filters": {
-            "username": "12BETAFF16612",
+            "username": "12BETAFF16454",
             "page_name": "All",
             "language": "All",
             "device_type": "All"
@@ -18,43 +18,186 @@ class DataLandingPagesLastWeek:
     },
     "pages_data": [
         {
+            "page_name": "inr-12join",
+            "language": "en-IN",
+            "total_click": "347",
+            "unique_click": "251",
+            "signups": "16",
+            "fdm": "1"
+        },
+        {
             "page_name": "join",
-            "language": "vi-VN",
-            "total_click": "1898",
-            "unique_click": "485",
-            "signups": "307",
-            "fdm": "12"
+            "language": "en-IN",
+            "total_click": "2779",
+            "unique_click": "1574",
+            "signups": "227",
+            "fdm": "1"
         }
     ],
     "website_urls_data": {
-        "join - vi-VN": [
+        "inr-12join - en-IN": [
             {
-                "website_url": "android-app://org.telegram.messenger.web/",
-                "total_clicks": 6,
-                "unique_clicks": 4,
-                "signups": 0,
-                "fdm": 0
+                "website_url": "http://instagram.com/",
+                "total_clicks": 81,
+                "unique_clicks": 66,
+                "signups": 10,
+                "fdm": 1
             },
             {
-                "website_url": "android-app://org.telegram.messenger/",
-                "total_clicks": 10,
-                "unique_clicks": 7,
+                "website_url": "http://m.facebook.com/",
+                "total_clicks": 28,
+                "unique_clicks": 25,
                 "signups": 2,
                 "fdm": 0
             },
             {
-                "website_url": "none",
-                "total_clicks": 17,
-                "unique_clicks": 11,
-                "signups": 3,
+                "website_url": "http://www.google.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://facebook.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 1,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://google.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://l.facebook.com/",
+                "total_clicks": 3,
+                "unique_clicks": 3,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://www.google.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
                 "fdm": 0
             },
             {
                 "website_url": "none",
-                "total_clicks": 1865,
-                "unique_clicks": 474,
-                "signups": 302,
-                "fdm": 12
+                "total_clicks": 216,
+                "unique_clicks": 143,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "none",
+                "total_clicks": 15,
+                "unique_clicks": 13,
+                "signups": 3,
+                "fdm": 0
+            }
+        ],
+        "join - en-IN": [
+            {
+                "website_url": "http://instagram.com/",
+                "total_clicks": 3,
+                "unique_clicks": 3,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "http://instagram.com/",
+                "total_clicks": 674,
+                "unique_clicks": 611,
+                "signups": 139,
+                "fdm": 1
+            },
+            {
+                "website_url": "http://m.facebook.com/",
+                "total_clicks": 352,
+                "unique_clicks": 313,
+                "signups": 82,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://facebook.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://google.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://instagram.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://l.facebook.com/",
+                "total_clicks": 2,
+                "unique_clicks": 2,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://l.facebook.com/",
+                "total_clicks": 491,
+                "unique_clicks": 306,
+                "signups": 1,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://meta.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://www.facebook.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://www.google.com/",
+                "total_clicks": 2,
+                "unique_clicks": 2,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://www.google.com/",
+                "total_clicks": 2,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "none",
+                "total_clicks": 1220,
+                "unique_clicks": 311,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "none",
+                "total_clicks": 28,
+                "unique_clicks": 28,
+                "signups": 5,
+                "fdm": 0
             }
         ]
     }

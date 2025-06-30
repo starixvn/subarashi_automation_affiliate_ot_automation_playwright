@@ -21,17 +21,10 @@ class ReportMethods(ExtractTestCaseFailed):
     def prepare_message(self):
         try:
             logger.debug("Preparing test report message")
-            if bool(self.page.TcName):
-                for tc in self.page.TcName:
-                    TC_NAME.append(tc)
-            if bool(self.api.TcName):
-                for tc in self.api.TcName:
-                    TC_NAME.append(tc)
-            if bool(self.db.TcName):
-                for tc in self.db.TcName:
-                    TC_NAME.append(tc)
-                    
+            logger.debug(f"TC_NAME contains {len(TC_NAME)} failures: {TC_NAME}")
+            
             unique_failures = list(dict.fromkeys(TC_NAME))
+            logger.debug(f"Unique failures after deduplication: {len(unique_failures)} items: {unique_failures}")
             
             from datetime import datetime
             now = datetime.now()
@@ -41,8 +34,11 @@ class ReportMethods(ExtractTestCaseFailed):
             txt += f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             txt += f"📅 Date: {timestamp}\n"
             
-            txt += f"📋 Test Suite: {self.FuncName}\n"
-            txt += f"🌐 Environment: {self.env.upper()}\n"
+            func_name = getattr(self, 'FuncName', 'Unknown Test Suite')
+            env = getattr(self, 'env', 'unknown')
+            
+            txt += f"📋 Test Suite: {func_name}\n"
+            txt += f"🌐 Environment: {env.upper()}\n"
             
             if bool(unique_failures):
                 failure_count = len(unique_failures)
@@ -56,6 +52,7 @@ class ReportMethods(ExtractTestCaseFailed):
                 txt += f"✅ Status: PASSED (All test cases)\n"
             
             txt += f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            logger.debug(f"Generated report message successfully")
             return txt
         except Exception as e:
             logger.error(f"Error preparing message: {str(e)}")
