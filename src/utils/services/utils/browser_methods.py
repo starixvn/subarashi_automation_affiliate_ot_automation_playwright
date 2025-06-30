@@ -1,5 +1,5 @@
 from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from config.constants.settings import (
     TIMEOUT,
     HEADLESS_MODE,
@@ -14,6 +14,11 @@ from src.utils.core import (
     ExtractTestCaseFailed
 )
 
+# Type checking imports to avoid circular imports
+if TYPE_CHECKING:
+    from src.utils.services.page_utils import ui
+    from src.utils.services.api_utils import api
+
 logger = get_logger(__name__)
 
 class BrowserMethods(ExtractTestCaseFailed):
@@ -22,8 +27,8 @@ class BrowserMethods(ExtractTestCaseFailed):
         self.playwright: Optional[any] = None
         self.browser: Optional[Browser] = None
         self.context: Optional[BrowserContext] = None
-        self.page: Optional[any] = None  # ui class instance
-        self.api: Optional[any] = None   # api class instance
+        self.page: Optional['ui'] = None
+        self.api: Optional['api'] = None
         self.debug: bool = False
     
     @log_exceptions(log_level="INFO")

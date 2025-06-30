@@ -59,7 +59,6 @@ class ui(
             validate_not_none(page, "page")
             validate_type(page, Page, "page")
             
-            # Initialize all parent classes with the same page instance
             NavigationMethods.__init__(self, page)
             ElementMethods.__init__(self, page)
             ExtractionMethods.__init__(self, page)
@@ -69,7 +68,6 @@ class ui(
             ScreenshotMethods.__init__(self, page)
             SmartWaits.__init__(self, page)
             
-            # Configure page timeouts
             self.page.set_default_timeout(TIMEOUT*1000)
             self.page.set_default_navigation_timeout(TIMEOUT*1000)
             logger.debug("UI handler initialized with configured timeouts and all method classes")
