@@ -2,12 +2,20 @@ import datetime
 from src.utils.core import (
     get_logger,
     log_exceptions,
+    validate_not_none,
     ExtractTestCaseFailed
 )
+from playwright.sync_api import Page
+
 
 logger = get_logger(__name__)
 
 class ScreenshotMethods(ExtractTestCaseFailed):
+    
+    def __init__(self, page: Page):
+        validate_not_none(page, "page")
+        self.page = page
+    
     @log_exceptions(log_level="DEBUG")
     def screenshot(self, path=0):
         try:

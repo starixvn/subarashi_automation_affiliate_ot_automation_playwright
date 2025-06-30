@@ -5,11 +5,17 @@ from src.utils.core import (
     validate_type,
     ExtractTestCaseFailed
 )
+from playwright.sync_api import Page
 import time
 
 logger = get_logger(__name__)
 
 class VerificationMethods(ExtractTestCaseFailed):
+    
+    def __init__(self, page: Page):
+        validate_not_none(page, "page")
+        self.page = page
+    
     @log_exceptions(log_level="DEBUG")
     def does_element_exist(self, element):
         try:

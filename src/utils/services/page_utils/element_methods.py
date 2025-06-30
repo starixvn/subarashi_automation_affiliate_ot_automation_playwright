@@ -8,10 +8,16 @@ from src.utils.core import (
     validate_not_empty,
     ExtractTestCaseFailed
 )
+from playwright.sync_api import Page
 
 logger = get_logger(__name__)
 
 class ElementMethods(ExtractTestCaseFailed):
+    
+    def __init__(self, page: Page):
+        validate_not_none(page, "page")
+        self.page = page
+    
     @log_exceptions(log_level="DEBUG")
     @monitor_performance()
     def input(self, element, text):

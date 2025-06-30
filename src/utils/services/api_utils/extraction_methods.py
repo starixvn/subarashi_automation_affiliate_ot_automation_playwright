@@ -1,4 +1,5 @@
-from playwright.sync_api import APIResponse
+from playwright.sync_api import APIResponse, APIRequestContext
+from typing import Optional
 import json
 import re
 from jsonpath_ng import parse
@@ -14,6 +15,10 @@ from src.utils.core import (
 logger = get_logger(__name__)
 
 class ExtractionMethods(ExtractTestCaseFailed):
+    
+    def __init__(self):
+        self.api: Optional[APIRequestContext] = None
+    
     @log_exceptions(log_level="ERROR")
     def extract_text(self, res: APIResponse):
         try:

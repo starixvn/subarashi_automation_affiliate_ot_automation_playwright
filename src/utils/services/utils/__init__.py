@@ -3,6 +3,7 @@ import pytest
 import os
 import pandas as pd
 import re
+from typing import Optional, TYPE_CHECKING
 from config.constants.settings import (
     ENABLE_BROWSER,
     ENABLE_TRACE,
@@ -39,16 +40,39 @@ from src.utils.services.utils.google_methods import GoogleMethods
 from src.utils.services.utils.report_methods import ReportMethods
 from src.utils.services.utils.crypto_methods import CryptoMethods
 
+if TYPE_CHECKING:
+    from src.utils.services.page_utils import ui
+    from src.utils.services.api_utils import api
+    from src.utils.services.db_utils import db
+
 logger = get_logger(__name__)
 
 class utilities(BrowserMethods, AssertionMethods, FileMethods, GoogleMethods, ReportMethods):
     tcsF = TC_NAME
     FuncName = None
+    page: Optional['ui'] = None
+    api: Optional['api'] = None  
+    db: Optional['db'] = None
     
     @log_exceptions(log_level="INFO")
     def __init__(self):
         try:
-            self.FuncName = str(re.search('TestSuites_([0-9]{2}|DemoSite)_(.*).py', os.getenv('PYTEST_CURRENT_TEST')).group(2)).replace("_"," ")
+            BrowserMethods.__init__(self)
+            
+            logger.debug(f"Clearing TC_NAME. Previously had {len(TC_NAME)} failures: {TC_NAME}")
+            TC_NAME.clear()
+            logger.debug(f"TC_NAME cleared successfully. Now empty: {TC_NAME}")
+            
+            current_test = os.getenv('PYTEST_CURRENT_TEST')
+            if current_test:
+                match = re.search('TestSuites_([0-9]{2}|DemoSite)_(.*).py', current_test)
+                if match:
+                    self.FuncName = str(match.group(2)).replace("_"," ")
+                else:
+                    self.FuncName = "Unknown Test Suite"
+            else:
+                self.FuncName = "Direct Initialization"
+                
             logger.info(f"Initializing utilities for test suite: {self.FuncName}")
             
             self.env = ENVIRONMENT
@@ -85,11 +109,11 @@ class utilities(BrowserMethods, AssertionMethods, FileMethods, GoogleMethods, Re
             
             logger.debug("Clearing test case lists")
             self.tcsF.clear()
-            if hasattr(self, 'page'):
+            if hasattr(self, 'page') and self.page:
                 self.page.TcName.clear()
-            if hasattr(self, 'api'):
+            if hasattr(self, 'api') and self.api:
                 self.api.TcName.clear()
-            if hasattr(self, 'db'):
+            if hasattr(self, 'db') and self.db:
                 self.db.TcName.clear()
                 
             logger.info("Resources cleaned up successfully")

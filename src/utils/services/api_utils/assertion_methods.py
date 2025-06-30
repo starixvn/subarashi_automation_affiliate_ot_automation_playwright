@@ -1,4 +1,5 @@
-from playwright.sync_api import APIResponse
+from playwright.sync_api import APIResponse, APIRequestContext
+from typing import Optional
 import re
 
 from src.utils.core import (
@@ -13,6 +14,10 @@ from src.utils.core import (
 logger = get_logger(__name__)
 
 class AssertionMethods(ExtractTestCaseFailed):
+    
+    def __init__(self):
+        self.api: Optional[APIRequestContext] = None
+    
     def set_auth(self, token):
         try:
             validate_not_none(token, "token")

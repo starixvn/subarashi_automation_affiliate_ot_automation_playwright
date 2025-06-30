@@ -2,7 +2,7 @@ from google.oauth2 import service_account
 from googleapiclient import discovery
 import os
 from pathlib import Path
-from config.constants.settings import ENVIRONMENT
+from config.constants.settings import ENVIRONMENT, ROOT_DIR
 environment = ENVIRONMENT
 
 from src.utils.core.logging import get_logger
@@ -21,7 +21,7 @@ from datetime import datetime
 from src.utils.core.decorators import track_last_checklist
 
 logger = get_logger(__name__)
-project_root = str(Path(__file__).resolve().parents[5])
+project_root = str(ROOT_DIR)
 
 class GoogleMethods(ExtractTestCaseFailed):
     @log_exceptions(log_level="DEBUG")

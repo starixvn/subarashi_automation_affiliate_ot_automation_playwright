@@ -1,4 +1,6 @@
 import os
+import pyodbc
+from typing import Optional
 from src.utils.core import (
     get_logger,
     log_exceptions,
@@ -13,6 +15,11 @@ logger = get_logger(__name__)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) + "\\"
 
 class DataMethods(ExtractTestCaseFailed):
+    
+    def __init__(self):
+        self.dbconnect: Optional[pyodbc.Connection] = None
+        self.cursor: Optional[pyodbc.Cursor] = None
+    
     @log_exceptions(log_level="ERROR")
     @monitor_performance()
     def insert_data_to_table(self, table_name, params, debug = 0):

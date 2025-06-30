@@ -7,11 +7,17 @@ from src.utils.core import (
     truncate_string,
     ExtractTestCaseFailed
 )
+from playwright.sync_api import Page
 import time
 
 logger = get_logger(__name__)
 
 class FrameMethods(ExtractTestCaseFailed):
+    
+    def __init__(self, page: Page):
+        validate_not_none(page, "page")
+        self.page = page
+    
     @log_exceptions(log_level="DEBUG")
     @monitor_performance()
     def input_on_frame(self, frame_xpath, element, text, idxChildFrame=None):  

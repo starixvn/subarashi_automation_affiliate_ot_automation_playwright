@@ -104,18 +104,12 @@ class GetDataReferrers(Common):
                                     website_urls.append(url_data)
                                 
                                 result["website_urls_data"][site_url] = website_urls
-                            
-                            self.utils.page.new_pages.go_back()
                             time.sleep(2)
                             
                         except Exception as detail_error:
                             print(f"Warning: Cannot get detail for site {site_url}: {str(detail_error)}")
                             if "back" in str(detail_error).lower() or "navigate" in str(detail_error).lower():
-                                try:
-                                    self.utils.page.new_pages.go_back()
-                                    time.sleep(2)
-                                except:
-                                    pass
+                                time.sleep(2)
             
             return result
             

@@ -15,7 +15,6 @@ from src.actions.user.functional.statistics.landing_pages_statistics.compare_dat
 from src.utils.core.decorators import measure_test_execution_time
 
 @pytest.mark.compare
-@pytest.mark.functional
 class TestSuites_05_Check_Data_Click_Statistics_Landing_Pages_User_Site(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -1,15 +1,15 @@
-# get data baseline landing page yesterday at 2025-06-25 12:01:33 +0800 (GMT+8)
+# get data baseline landing page yesterday at 2025-06-25 12:10:27 +0800 (GMT+8)
 
 class DataLandingPagesYesterday:
     data_landing_pages_yesterday = {
     "metadata": {
-        "collected_at": "2025-06-25 12:01:33 +0800",
+        "collected_at": "2025-06-25 12:10:27 +0800",
         "period": {
             "from_date": "06-24-2025",
             "to_date": "06-24-2025"
         },
         "filters": {
-            "username": "12BETAFF16612",
+            "username": "12BETAFF16454",
             "page_name": "All",
             "language": "All",
             "device_type": "All"
@@ -18,66 +18,94 @@ class DataLandingPagesYesterday:
     },
     "pages_data": [
         {
-            "page_name": "join",
-            "language": "vi-VN",
-            "total_click": "303",
-            "unique_click": "136",
-            "signups": "52",
+            "page_name": "inr-12join",
+            "language": "en-IN",
+            "total_click": "98",
+            "unique_click": "85",
+            "signups": "15",
             "fdm": "1"
         },
         {
-            "page_name": "none",
-            "language": "none",
-            "total_click": "0",
-            "unique_click": "0",
-            "signups": "1",
+            "page_name": "join",
+            "language": "en-IN",
+            "total_click": "312",
+            "unique_click": "255",
+            "signups": "51",
             "fdm": "0"
         }
     ],
     "website_urls_data": {
-        "join - vi-VN": [
+        "inr-12join - en-IN": [
             {
-                "website_url": "android-app://org.telegram.messenger.web/",
-                "total_clicks": 1,
-                "unique_clicks": 1,
-                "signups": 1,
+                "website_url": "http://instagram.com/",
+                "total_clicks": 57,
+                "unique_clicks": 47,
+                "signups": 11,
+                "fdm": 1
+            },
+            {
+                "website_url": "http://m.facebook.com/",
+                "total_clicks": 7,
+                "unique_clicks": 5,
+                "signups": 2,
                 "fdm": 0
             },
             {
-                "website_url": "android-app://org.telegram.messenger/",
-                "total_clicks": 6,
+                "website_url": "none",
+                "total_clicks": 26,
+                "unique_clicks": 25,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "none",
+                "total_clicks": 8,
+                "unique_clicks": 8,
+                "signups": 2,
+                "fdm": 0
+            }
+        ],
+        "join - en-IN": [
+            {
+                "website_url": "http://instagram.com/",
+                "total_clicks": 100,
+                "unique_clicks": 91,
+                "signups": 25,
+                "fdm": 0
+            },
+            {
+                "website_url": "http://m.facebook.com/",
+                "total_clicks": 92,
+                "unique_clicks": 80,
+                "signups": 21,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://instagram.com/",
+                "total_clicks": 1,
+                "unique_clicks": 1,
+                "signups": 0,
+                "fdm": 0
+            },
+            {
+                "website_url": "https://l.facebook.com/",
+                "total_clicks": 4,
                 "unique_clicks": 4,
                 "signups": 2,
                 "fdm": 0
             },
             {
-                "website_url": "https://wekas18.pro/",
-                "total_clicks": 1,
-                "unique_clicks": 1,
+                "website_url": "none",
+                "total_clicks": 106,
+                "unique_clicks": 73,
                 "signups": 0,
                 "fdm": 0
             },
             {
                 "website_url": "none",
-                "total_clicks": 5,
-                "unique_clicks": 5,
-                "signups": 0,
-                "fdm": 0
-            },
-            {
-                "website_url": "none",
-                "total_clicks": 290,
-                "unique_clicks": 128,
-                "signups": 49,
-                "fdm": 1
-            }
-        ],
-        "none - none": [
-            {
-                "website_url": "none",
-                "total_clicks": 0,
-                "unique_clicks": 0,
-                "signups": 1,
+                "total_clicks": 9,
+                "unique_clicks": 9,
+                "signups": 3,
                 "fdm": 0
             }
         ]

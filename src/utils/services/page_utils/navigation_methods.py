@@ -7,6 +7,7 @@ from src.utils.core import (
     validate_type,
     ExtractTestCaseFailed
 )
+from playwright.sync_api import Page
 
 from config.constants.settings import (
     TIMEOUT
@@ -15,6 +16,11 @@ from config.constants.settings import (
 logger = get_logger(__name__)
 
 class NavigationMethods(ExtractTestCaseFailed):
+    
+    def __init__(self, page: Page):
+        validate_not_none(page, "page")
+        self.page = page
+    
     @log_exceptions(log_level="INFO")
     @monitor_performance()
     def navigate(self, url):

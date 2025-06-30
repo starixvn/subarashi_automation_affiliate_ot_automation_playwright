@@ -7,11 +7,17 @@ from src.utils.core import (
     truncate_string,
     ExtractTestCaseFailed
 )
+from playwright.sync_api import Page
 from lxml import html
 
 logger = get_logger(__name__)
 
 class ExtractionMethods(ExtractTestCaseFailed):
+    
+    def __init__(self, page: Page):
+        validate_not_none(page, "page")
+        self.page = page
+    
     @log_exceptions(log_level="DEBUG")
     def get_attribute(self, elemment, name):
         try:

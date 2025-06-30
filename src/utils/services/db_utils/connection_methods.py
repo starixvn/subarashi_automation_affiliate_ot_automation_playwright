@@ -1,4 +1,5 @@
 import pyodbc
+from typing import Optional
 from config.constants.settings import (
     ENVIRONMENT,
     DB_USERNAME,
@@ -23,6 +24,11 @@ env = ENVIRONMENT
 _env = 'local'
 
 class ConnectionMethods(ExtractTestCaseFailed):
+    
+    def __init__(self):
+        self.dbconnect: Optional[pyodbc.Connection] = None
+        self.cursor: Optional[pyodbc.Cursor] = None
+    
     @log_exceptions(log_level="ERROR")
     @monitor_performance()
     def connect(self, ServerName, DatabaseName):
