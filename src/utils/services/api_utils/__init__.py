@@ -33,13 +33,11 @@ class api(RequestMethods, AssertionMethods, ExtractionMethods):
         try:
             validate_not_none(api, "api")
             validate_type(api, APIRequestContext, "api")
-            
-            # Initialize all parent classes
+    
             RequestMethods.__init__(self)
             AssertionMethods.__init__(self)
             ExtractionMethods.__init__(self)
             
-            # Set the API context for all classes
             self.api = api
             
             logger.debug("API client initialized")
