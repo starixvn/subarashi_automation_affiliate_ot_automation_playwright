@@ -3,6 +3,7 @@ env = ENVIRONMENT
 import random
 from datetime import datetime, timedelta
 
+from src.actions.common.action_common import Common
 from src.actions.common.get_data_on_function.get_data_customer import GetDataCustomer
 from src.test_data.common.data_common import *
 from src.actions.common.get_data_on_function.get_data_player import GetDataPlayer
@@ -30,22 +31,10 @@ class CompareDataMarketingPage(GetDataCustomer):
 
     @staticmethod
     def clear_cache():
-        CompareDataMarketingPage._cache_data = None
-        CompareDataMarketingPage._cache_username = None
+        Common.clear_cache_for_class(CompareDataMarketingPage)
 
     def _compare_channels_data(self, baseline_channels_data, current_channels_data):
-        language_mapping = {
-            "chinese simplified": "zh-cn",
-            "english": "en-us",
-            "bengali": "bn-in",
-            "english (india)": "en-in",
-            "indonesian": "id-id",
-            "japanese": "ja-jp",
-            "korean": "ko-kr",
-            "thai": "th-th",
-            "vietnamese": "vi-vn",
-            "telugu": "te-in"
-        }
+        language_mapping = Common.get_language_mapping()
         
         mismatches = []
         
@@ -164,77 +153,19 @@ class CompareDataMarketingPage(GetDataCustomer):
         return mismatches
     
     def parse_int(self, text):
-        try:
-            if text is None:
-                return 0
-            text_str = str(text).replace(',', '').strip().lower()
-            if text_str in ['', 'none', '-', 'null', 'n/a', 'na']:
-                return 0
-            return int(text_str)
-        except (ValueError, TypeError):
-            return 0
+        return Common.parse_int(text)
     
     def parse_fraction(self, text):
-        try:
-            if '/' in str(text):
-                parts = str(text).split('/')
-                return {
-                    "unique": self.parse_int(parts[0]),
-                    "total": self.parse_int(parts[1]) if len(parts) > 1 else 0
-                }
-            return {"unique": 0, "total": 0}
-        except Exception:
-            return {"unique": 0, "total": 0}
+        return Common.parse_fraction(text)
     
     def _get_username_for_period(self, period, fallback_username):
-        period_mapping = {
-            "last_month": "Marketing_Pages_Last_Month",
-            "last_week": "Marketing_Pages_Last_Week", 
-            "yesterday": "Marketing_Pages_Yesterday"
-        }
-        
-        if period in period_mapping:
-            baseline_key = period_mapping[period]
-            if baseline_key in Data and Data[baseline_key]:
-                return Data[baseline_key]["metadata"]["filters"]["username"]
-        
-        return fallback_username
+        return Common.get_username_for_period_device(period, "All", Data, fallback_username)
     
     def _get_username(self):
-        if ENVIRONMENT == "local":
-            return "12BETAFF001"
-        else:
-            self.data_player = GetDataPlayer()
-            self.data_player.referUtils(self.utils)
-            player_data_api = self.data_player.get_data_player_via_api()
-            return player_data_api["players_data"][0]["affiliate_name"]
+        return Common.get_username()
         
     def _get_date_range(self, period):
-        today = datetime.now()
-        
-        if period == "last_month":
-            first_day_current_month = today.replace(day=1)
-            last_day_previous_month = first_day_current_month - timedelta(days=1)
-            first_day_previous_month = last_day_previous_month.replace(day=1)
-            from_date = first_day_previous_month.strftime("%m-%d-%Y")
-            to_date = last_day_previous_month.strftime("%m-%d-%Y")
-            month_date = last_day_previous_month.strftime("%m-%Y")
-        elif period == "last_week":
-            to_date = (today - timedelta(days=today.weekday() + 1)).strftime("%m-%d-%Y")
-            from_date = (today - timedelta(days=today.weekday() + 7)).strftime("%m-%d-%Y")
-            month_date = today.strftime("%m-%Y")
-        elif period == "yesterday":
-            yesterday = today - timedelta(days=1)
-            from_date = yesterday.strftime("%m-%d-%Y")
-            to_date = yesterday.strftime("%m-%d-%Y")
-            month_date = yesterday.strftime("%m-%Y")
-
-        
-        return {
-            "from_date": from_date,
-            "to_date": to_date,
-            "month_date": month_date
-        }
+        return Common.get_date_range(period)
 
     def preload_all_data(self):
         if CompareDataMarketingPage._cache_data is not None:

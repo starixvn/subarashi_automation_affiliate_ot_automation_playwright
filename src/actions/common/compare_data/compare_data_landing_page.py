@@ -3,6 +3,7 @@ env = ENVIRONMENT
 import random
 from datetime import datetime, timedelta
 
+from src.actions.common.action_common import Common
 from src.actions.common.get_data_on_function.get_data_customer import GetDataCustomer
 from src.test_data.common.data_common import *
 from src.actions.common.get_data_on_function.get_data_player import GetDataPlayer
@@ -42,22 +43,10 @@ class CompareDataLandingPage(GetDataCustomer):
 
     @staticmethod
     def clear_cache():
-        CompareDataLandingPage._cache_data = None
-        CompareDataLandingPage._cache_username = None
+        Common.clear_cache_for_class(CompareDataLandingPage)
 
     def _compare_pages_data(self, baseline_pages_data, current_pages_data):
-        language_mapping = {
-            "chinese simplified": "zh-cn",
-            "english": "en-us",
-            "bengali": "bn-in",
-            "english (india)": "en-in",
-            "indonesian": "id-id",
-            "japanese": "ja-jp",
-            "korean": "ko-kr",
-            "thai": "th-th",
-            "vietnamese": "vi-vn",
-            "telugu": "te-in"
-        }
+        language_mapping = Common.get_language_mapping()
         
         mismatches = []
         
@@ -111,18 +100,7 @@ class CompareDataLandingPage(GetDataCustomer):
         return mismatches
     
     def _compare_website_urls(self, baseline_website_urls_data, current_website_urls_data):
-        language_mapping = {
-            "chinese simplified": "zh-cn",
-            "english": "en-us",
-            "bengali": "bn-in",
-            "english (india)": "en-in",
-            "indonesian": "id-id",
-            "japanese": "ja-jp",
-            "korean": "ko-kr",
-            "thai": "th-th",
-            "vietnamese": "vi-vn",
-            "telugu": "te-in"
-        }
+        language_mapping = Common.get_language_mapping()
         
         consolidated_baseline, baseline_consolidation_stats = self._consolidate_website_urls_data(baseline_website_urls_data)
         consolidated_current, current_consolidation_stats = self._consolidate_website_urls_data(current_website_urls_data)
@@ -205,157 +183,25 @@ class CompareDataLandingPage(GetDataCustomer):
         return mismatches
     
     def parse_int(self, text):
-        try:
-            return int(str(text).replace(',', '').strip() or 0)
-        except (ValueError, TypeError):
-            return 0
+        return Common.parse_int(text)
     
     def parse_fraction(self, text):
-        try:
-            if '/' in str(text):
-                parts = str(text).split('/')
-                return {
-                    "unique": self.parse_int(parts[0]),
-                    "total": self.parse_int(parts[1]) if len(parts) > 1 else 0
-                }
-            return {"unique": 0, "total": 0}
-        except Exception:
-            return {"unique": 0, "total": 0}
+        return Common.parse_fraction(text)
     
     def _consolidate_website_urls_data(self, website_urls_data):
-        consolidated_data = {}
-        consolidation_stats = {
-            "total_original_websites": 0,
-            "total_consolidated_websites": 0,
-            "pages_with_duplicates": 0,
-            "duplicate_urls_found": []
-        }
-        
-        for page_key, website_list in website_urls_data.items():
-            if not isinstance(website_list, list):
-                consolidated_data[page_key] = website_list
-                continue
-                
-            original_count = len(website_list)
-            consolidation_stats["total_original_websites"] += original_count
-            
-            url_groups = {}
-            for website_data in website_list:
-                url = website_data.get("website_url", "")
-                if url not in url_groups:
-                    url_groups[url] = []
-                url_groups[url].append(website_data)
-            
-            page_has_duplicates = False
-            for url, group in url_groups.items():
-                if len(group) > 1:
-                    page_has_duplicates = True
-                    consolidation_stats["duplicate_urls_found"].append({
-                        "page": page_key,
-                        "url": url,
-                        "duplicate_count": len(group)
-                    })
-            
-            if page_has_duplicates:
-                consolidation_stats["pages_with_duplicates"] += 1
-            
-            consolidated_websites = []
-            for url, group in url_groups.items():
-                if len(group) == 1:
-                    consolidated_websites.append(group[0])
-                else:
-                    consolidated_website = {
-                        "website_url": url,
-                        "total_clicks": 0,
-                        "unique_clicks": 0,
-                        "signups": 0,
-                        "fdm": 0
-                    }
-                    
-                    for website_data in group:
-                        consolidated_website["total_clicks"] += self.parse_int(website_data.get("total_clicks", 0))
-                        consolidated_website["unique_clicks"] += self.parse_int(website_data.get("unique_clicks", 0))
-                        
-                        signups_value = 0
-                        if "signups" in website_data:
-                            signups_value = self.parse_int(website_data["signups"])
-                        elif "sign_up" in website_data:
-                            signups_value = self.parse_int(website_data["sign_up"])
-                        consolidated_website["signups"] += signups_value
-                        
-                        consolidated_website["fdm"] += self.parse_int(website_data.get("fdm", 0))
-                    
-                    consolidated_websites.append(consolidated_website)
-            
-            consolidated_data[page_key] = consolidated_websites
-            consolidation_stats["total_consolidated_websites"] += len(consolidated_websites)
-        
-        return consolidated_data, consolidation_stats
+        return Common.consolidate_website_urls_data(website_urls_data)
     
     def _format_test_results(self, results, device_display_name):
-        formatted_result = ""
-        formatted_result += f"\n     + Username: {results['username']}"
-        formatted_result += f"\n     + Device Type: {results['device_type']}"
-        formatted_result += f"\n     + From Date: {results['from_date']}"
-        formatted_result += f"\n     + To Date: {results['to_date']}"
-        
-        if device_display_name == "All":
-            formatted_result += f"\n     + Total Clicks: Statistics={results['statistics_total_clicks']}, Landing Pages={results['landing_pages_total_clicks']}"
-            formatted_result += f"\n     + Unique Clicks: Statistics={results['statistics_unique_clicks']}, Landing Pages={results['landing_pages_unique_clicks']}"
-        else:
-            formatted_result += f"\n     + {device_display_name} Total Clicks: Statistics={results['statistics_total_clicks']}, Landing Pages={results['landing_pages_total_clicks']}"
-        
-        return formatted_result
+        return Common.format_test_results(results, device_display_name, "landing_pages")
     
     def _get_username_for_period_device(self, period, device_type, fallback_username):
-        period_mapping = {
-            "last_month": {"All": "Landing_Pages_Last_Month", "PC / Laptop": "Landing_Pages_Last_Month_By_Desktop", "Mobile": "Landing_Pages_Last_Month_By_Mobile"},
-            "last_week": {"All": "Landing_Pages_Last_Week", "PC / Laptop": "Landing_Pages_Last_Week_By_Desktop", "Mobile": "Landing_Pages_Last_Week_By_Mobile"},
-            "yesterday": {"All": "Landing_Pages_Yesterday", "PC / Laptop": "Landing_Pages_Yesterday_By_Desktop", "Mobile": "Landing_Pages_Yesterday_By_Mobile"}
-        }
-        
-        if period in period_mapping and device_type in period_mapping[period]:
-            baseline_key = period_mapping[period][device_type]
-            if baseline_key in Data and Data[baseline_key]:
-                return Data[baseline_key]["metadata"]["filters"]["username"]
-        
-        return fallback_username
+        return Common.get_username_for_period_device(period, device_type, Data, fallback_username)
 
     def _get_username(self):
-        if ENVIRONMENT == "local":
-            return "12BETAFF001"
-        else:
-            self.data_player = GetDataPlayer()
-            self.data_player.referUtils(self.utils)
-            player_data_api = self.data_player.get_data_player_via_api()
-            return player_data_api["players_data"][0]["affiliate_name"]
+        return Common.get_username()
         
     def _get_date_range(self, period):
-        today = datetime.now()
-        
-        if period == "last_month":
-            first_day_current_month = today.replace(day=1)
-            last_day_previous_month = first_day_current_month - timedelta(days=1)
-            first_day_previous_month = last_day_previous_month.replace(day=1)
-            from_date = first_day_previous_month.strftime("%m-%d-%Y")
-            to_date = last_day_previous_month.strftime("%m-%d-%Y")
-            month_date = last_day_previous_month.strftime("%m-%Y")
-        elif period == "last_week":
-            to_date = (today - timedelta(days=today.weekday() + 1)).strftime("%m-%d-%Y")
-            from_date = (today - timedelta(days=today.weekday() + 7)).strftime("%m-%d-%Y")
-            month_date = today.strftime("%m-%Y")
-        elif period == "yesterday":
-            yesterday = today - timedelta(days=1)
-            from_date = yesterday.strftime("%m-%d-%Y")
-            to_date = yesterday.strftime("%m-%d-%Y")
-            month_date = yesterday.strftime("%m-%Y")
-
-        
-        return {
-            "from_date": from_date,
-            "to_date": to_date,
-            "month_date": month_date
-        }
+        return Common.get_date_range(period)
 
     def preload_all_data(self):
         if CompareDataLandingPage._cache_data is not None:
@@ -614,18 +460,7 @@ class CompareDataLandingPage(GetDataCustomer):
                     current_data = cache["landing_pages"].get(key, {"has_data": False, "pages_data": []})
                     
                     if current_data.get("has_data", True):
-                        language_mapping = {
-                            "chinese simplified": "zh-cn",
-                            "english": "en-us",
-                            "bengali": "bn-in",
-                            "english (india)": "en-in",
-                            "indonesian": "id-id",
-                            "japanese": "ja-jp",
-                            "korean": "ko-kr",
-                            "thai": "th-th",
-                            "vietnamese": "vi-vn",
-                            "telugu": "te-in"
-                        }
+                        language_mapping = Common.get_language_mapping()
                         
                         language_lower = language.lower()
                         if language_lower in language_mapping:
