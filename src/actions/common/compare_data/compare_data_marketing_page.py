@@ -3,6 +3,7 @@ env = ENVIRONMENT
 import random
 from datetime import datetime, timedelta
 
+from src.actions.common.action_common import Common
 from src.actions.common.get_data_on_function.get_data_customer import GetDataCustomer
 from src.test_data.common.data_common import *
 from src.actions.common.get_data_on_function.get_data_player import GetDataPlayer
@@ -30,22 +31,10 @@ class CompareDataMarketingPage(GetDataCustomer):
 
     @staticmethod
     def clear_cache():
-        CompareDataMarketingPage._cache_data = None
-        CompareDataMarketingPage._cache_username = None
+        Common.clear_cache_for_class(CompareDataMarketingPage)
 
     def _compare_channels_data(self, baseline_channels_data, current_channels_data):
-        language_mapping = {
-            "chinese simplified": "zh-cn",
-            "english": "en-us",
-            "bengali": "bn-in",
-            "english (india)": "en-in",
-            "indonesian": "id-id",
-            "japanese": "ja-jp",
-            "korean": "ko-kr",
-            "thai": "th-th",
-            "vietnamese": "vi-vn",
-            "telugu": "te-in"
-        }
+        language_mapping = Common.get_language_mapping()
         
         mismatches = []
         
@@ -53,8 +42,8 @@ class CompareDataMarketingPage(GetDataCustomer):
             mismatches.append(f"Number of channels mismatch. Baseline: {len(baseline_channels_data)}, Current: {len(current_channels_data)}")
         
         for baseline_channel_data in baseline_channels_data:
-            channel_name = baseline_channel_data["channel_name"]
-            language = baseline_channel_data["language"]
+            channel_name = baseline_channel_data.get("channel_name") or ""
+            language = baseline_channel_data.get("language") or ""
             language_lower = language.lower()
             
             if language_lower in language_mapping:
@@ -64,14 +53,16 @@ class CompareDataMarketingPage(GetDataCustomer):
             
             channel_found = False
             for current_channel in current_channels_data:
-                current_language_lower = current_channel["language"].lower()
+                current_language = current_channel.get("language") or ""
+                current_language_lower = current_language.lower()
                 
                 if current_language_lower in language_mapping:
                     current_language_code = language_mapping[current_language_lower]
                 else:
                     current_language_code = current_language_lower
                 
-                if current_channel["channel_name"].lower() == channel_name.lower() and current_language_code == language_code:
+                current_channel_name = current_channel.get("channel_name") or ""
+                if current_channel_name.lower() == channel_name.lower() and current_language_code == language_code:
                     channel_found = True
                     
                     baseline_total_click = baseline_channel_data["total_click"]
@@ -102,7 +93,7 @@ class CompareDataMarketingPage(GetDataCustomer):
         mismatches = []
         
         for channel_key, baseline_urls in baseline_channel_details_data.items():
-            if "none" in channel_key.lower():
+            if channel_key and "none" in str(channel_key).lower():
                 continue
             
             if channel_key not in current_channel_details_data:
@@ -116,12 +107,12 @@ class CompareDataMarketingPage(GetDataCustomer):
             
             for baseline_url in baseline_urls:
                 url_found = False
-                baseline_url_value = baseline_url.get("url", "").strip()
+                baseline_url_value = str(baseline_url.get("url", "")).strip()
                 
                 is_empty_url = baseline_url_value == "" or baseline_url_value.lower() == "none"
                 
                 for current_url in current_urls:
-                    current_url_value = current_url.get("url", "").strip()
+                    current_url_value = str(current_url.get("url", "")).strip()
                     current_is_empty_url = current_url_value == "" or current_url_value.lower() == "none"
                     
                     url_match = False
@@ -162,77 +153,19 @@ class CompareDataMarketingPage(GetDataCustomer):
         return mismatches
     
     def parse_int(self, text):
-        try:
-            if text is None:
-                return 0
-            text_str = str(text).replace(',', '').strip().lower()
-            if text_str in ['', 'none', '-', 'null', 'n/a', 'na']:
-                return 0
-            return int(text_str)
-        except (ValueError, TypeError):
-            return 0
+        return Common.parse_int(text)
     
     def parse_fraction(self, text):
-        try:
-            if '/' in str(text):
-                parts = str(text).split('/')
-                return {
-                    "unique": self.parse_int(parts[0]),
-                    "total": self.parse_int(parts[1]) if len(parts) > 1 else 0
-                }
-            return {"unique": 0, "total": 0}
-        except Exception:
-            return {"unique": 0, "total": 0}
+        return Common.parse_fraction(text)
     
     def _get_username_for_period(self, period, fallback_username):
-        period_mapping = {
-            "last_month": "Marketing_Pages_Last_Month",
-            "last_week": "Marketing_Pages_Last_Week", 
-            "yesterday": "Marketing_Pages_Yesterday"
-        }
-        
-        if period in period_mapping:
-            baseline_key = period_mapping[period]
-            if baseline_key in Data and Data[baseline_key]:
-                return Data[baseline_key]["metadata"]["filters"]["username"]
-        
-        return fallback_username
+        return Common.get_username_for_period_device(period, "All", Data, fallback_username)
     
     def _get_username(self):
-        if ENVIRONMENT == "local":
-            return "12BETAFF001"
-        else:
-            self.data_player = GetDataPlayer()
-            self.data_player.referUtils(self.utils)
-            player_data_api = self.data_player.get_data_player_via_api()
-            return player_data_api["players_data"][0]["affiliate_name"]
+        return Common.get_username()
         
     def _get_date_range(self, period):
-        today = datetime.now()
-        
-        if period == "last_month":
-            first_day_current_month = today.replace(day=1)
-            last_day_previous_month = first_day_current_month - timedelta(days=1)
-            first_day_previous_month = last_day_previous_month.replace(day=1)
-            from_date = first_day_previous_month.strftime("%m-%d-%Y")
-            to_date = last_day_previous_month.strftime("%m-%d-%Y")
-            month_date = last_day_previous_month.strftime("%m-%Y")
-        elif period == "last_week":
-            to_date = (today - timedelta(days=today.weekday() + 1)).strftime("%m-%d-%Y")
-            from_date = (today - timedelta(days=today.weekday() + 7)).strftime("%m-%d-%Y")
-            month_date = today.strftime("%m-%Y")
-        elif period == "yesterday":
-            yesterday = today - timedelta(days=1)
-            from_date = yesterday.strftime("%m-%d-%Y")
-            to_date = yesterday.strftime("%m-%d-%Y")
-            month_date = yesterday.strftime("%m-%Y")
-
-        
-        return {
-            "from_date": from_date,
-            "to_date": to_date,
-            "month_date": month_date
-        }
+        return Common.get_date_range(period)
 
     def preload_all_data(self):
         if CompareDataMarketingPage._cache_data is not None:
@@ -394,8 +327,9 @@ class CompareDataMarketingPage(GetDataCustomer):
             languages = set()
             for channel_key, url_details in baseline_data["channel_details_data"].items():
                 for url_data in url_details:
-                    if url_data["language"] and url_data["language"].lower() not in ["none", "-", "null"] and url_data["language"].strip() != "":
-                        languages.add(url_data["language"])
+                    url_language = url_data.get("language") or ""
+                    if url_language and url_language.lower() not in ["none", "-", "null"] and url_language.strip() != "":
+                        languages.add(url_language)
             
             if languages:
                 test_language = next(iter(languages))
@@ -414,10 +348,10 @@ class CompareDataMarketingPage(GetDataCustomer):
                     for channel_key, url_details in current_data_filtered["channel_details_data"].items():
                         for url_data in url_details:
                             total_urls_checked += 1
-                            url_language = url_data.get("language", "").strip()
+                            url_language = url_data.get("language") or ""
                             
                             if url_language and url_language.lower() not in ["none", "-", "null"] and url_language != "":
-                                if url_language.lower() == test_language.lower():
+                                if url_language.lower() == (test_language or "").lower():
                                     matching_urls += 1
                                 else:
                                     language_verification_passed = False
@@ -507,22 +441,26 @@ class CompareDataMarketingPage(GetDataCustomer):
             "channel_details_data": {}
         }
         
+        if target_language is None:
+            target_language = ""
+        
         for channel in baseline_data["channels_data"]:
             channel_name = channel["channel_name"]
-            channel_language = channel["language"]
+            channel_language = channel.get("language") or ""
             
             channel_key_candidates = [
                 f"1 - {channel_name}",
                 f"2 - {channel_name}",
-                f"{channel_name} - {channel_language}",
-                f"{channel_name} - {target_language}"
+                f"{channel_name} - {channel_language}" if channel_language else f"{channel_name}",
+                f"{channel_name} - {target_language}" if target_language else f"{channel_name}"
             ]
             
             has_target_language = False
             for key_candidate in channel_key_candidates:
                 if key_candidate in baseline_data["channel_details_data"]:
                     for url_data in baseline_data["channel_details_data"][key_candidate]:
-                        if url_data.get("language", "").lower() == target_language.lower():
+                        url_language = url_data.get("language") or ""
+                        if url_language.lower() == target_language.lower():
                             has_target_language = True
                             break
                     if has_target_language:
@@ -534,7 +472,8 @@ class CompareDataMarketingPage(GetDataCustomer):
         for channel_key, url_details in baseline_data["channel_details_data"].items():
             filtered_urls = []
             for url_data in url_details:
-                if url_data.get("language", "").lower() == target_language.lower():
+                url_language = url_data.get("language") or ""
+                if url_language.lower() == target_language.lower():
                     filtered_urls.append(url_data)
             
             if filtered_urls:
@@ -595,17 +534,17 @@ class CompareDataMarketingPage(GetDataCustomer):
                 mismatches = []
                 
                 for channel_data in baseline_data["channels_data"]:
-                    channel_name = channel_data["channel_name"]
+                    channel_name = channel_data.get("channel_name") or ""
                     
                     matching_channel_key = None
                     for detail_key in baseline_data["channel_details_data"].keys():
-                        if detail_key.endswith(f" - {channel_name}"):
+                        if detail_key and detail_key.endswith(f" - {channel_name}"):
                             matching_channel_key = detail_key
                             break
                     
                     if not matching_channel_key:
                         for detail_key in baseline_data["channel_details_data"].keys():
-                            if channel_name.lower() in detail_key.lower():
+                            if channel_name and detail_key and channel_name.lower() in str(detail_key).lower():
                                 matching_channel_key = detail_key
                                 break
                     

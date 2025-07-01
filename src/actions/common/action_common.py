@@ -1,5 +1,6 @@
 import time
 import re
+from datetime import datetime, timedelta
 from playwright.sync_api import Page
 from src.utils.services.utils import utilities
 from config.constants.settings import *
@@ -16,7 +17,269 @@ class Common():
 
     def referUtils(self, Utils):
         self.utils = Utils
+    
+    # Common parsing methods
+    @staticmethod
+    def parse_int(text):
+        """Parse text to integer, handling various edge cases"""
+        try:
+            if text is None:
+                return 0
+            text_str = str(text).replace(',', '').strip().lower()
+            if text_str in ['', 'none', '-', 'null', 'n/a', 'na']:
+                return 0
+            return int(text_str)
+        except (ValueError, TypeError):
+            return 0
+    
+    @staticmethod
+    def parse_fraction(text):
+        """Parse fraction text like '10/20' into dict with unique and total"""
+        try:
+            if '/' in str(text):
+                parts = str(text).split('/')
+                return {
+                    "unique": Common.parse_int(parts[0]),
+                    "total": Common.parse_int(parts[1]) if len(parts) > 1 else 0
+                }
+            return {"unique": 0, "total": 0}
+        except Exception:
+            return {"unique": 0, "total": 0}
+    
+    # Date utility methods
+    @staticmethod
+    def get_date_range(period):
+        """Get date range for given period (last_month, last_week, yesterday)"""
+        today = datetime.now()
         
+        if period == "last_month":
+            first_day_current_month = today.replace(day=1)
+            last_day_previous_month = first_day_current_month - timedelta(days=1)
+            first_day_previous_month = last_day_previous_month.replace(day=1)
+            from_date = first_day_previous_month.strftime("%m-%d-%Y")
+            to_date = last_day_previous_month.strftime("%m-%d-%Y")
+            month_date = last_day_previous_month.strftime("%m-%Y")
+        elif period == "last_week":
+            to_date = (today - timedelta(days=today.weekday() + 1)).strftime("%m-%d-%Y")
+            from_date = (today - timedelta(days=today.weekday() + 7)).strftime("%m-%d-%Y")
+            month_date = today.strftime("%m-%Y")
+        elif period == "yesterday":
+            yesterday = today - timedelta(days=1)
+            from_date = yesterday.strftime("%m-%d-%Y")
+            to_date = yesterday.strftime("%m-%d-%Y")
+            month_date = yesterday.strftime("%m-%Y")
+        else:
+            raise ValueError(f"Unknown period: {period}")
+
+        return {
+            "from_date": from_date,
+            "to_date": to_date,
+            "month_date": month_date
+        }
+    
+    # Username utility methods
+    @staticmethod
+    def get_username():
+        """Get username based on environment"""
+        if ENVIRONMENT == "local":
+            return "12BETAFF001"
+        else:
+            from src.actions.common.get_data_on_function.get_data_player import GetDataPlayer
+            data_player = GetDataPlayer()
+            # Note: utils needs to be passed in actual implementation
+            player_data_api = data_player.get_data_player_via_api()
+            return player_data_api["players_data"][0]["affiliate_name"]
+    
+    @staticmethod
+    def get_username_for_period_device(period, device_type, data_dict, fallback_username):
+        """Get username for specific period and device type from data dictionary"""
+        period_mappings = {
+            "marketing_pages": {
+                "last_month": {"All": "Marketing_Pages_Last_Month"},
+                "last_week": {"All": "Marketing_Pages_Last_Week"},
+                "yesterday": {"All": "Marketing_Pages_Yesterday"}
+            },
+            "landing_pages": {
+                "last_month": {"All": "Landing_Pages_Last_Month", "PC / Laptop": "Landing_Pages_Last_Month_By_Desktop", "Mobile": "Landing_Pages_Last_Month_By_Mobile"},
+                "last_week": {"All": "Landing_Pages_Last_Week", "PC / Laptop": "Landing_Pages_Last_Week_By_Desktop", "Mobile": "Landing_Pages_Last_Week_By_Mobile"},
+                "yesterday": {"All": "Landing_Pages_Yesterday", "PC / Laptop": "Landing_Pages_Yesterday_By_Desktop", "Mobile": "Landing_Pages_Yesterday_By_Mobile"}
+            },
+            "referrers": {
+                "last_month": {"All": "Referres_Last_Month", "PC / Laptop": "Referres_Last_Month_By_Desktop", "Mobile": "Referres_Last_Month_By_Mobile"},
+                "last_week": {"All": "Referres_Last_Week", "PC / Laptop": "Referres_Last_Week_By_Desktop", "Mobile": "Referres_Last_Week_By_Mobile"},
+                "yesterday": {"All": "Referres_Yesterday", "PC / Laptop": "Referres_Yesterday_By_Desktop", "Mobile": "Referres_Yesterday_By_Mobile"}
+            }
+        }
+        
+        # Auto-detect data type based on available keys in data_dict
+        data_type = None
+        for dt, mapping in period_mappings.items():
+            if period in mapping and device_type in mapping[period]:
+                key = mapping[period][device_type]
+                if key in data_dict and data_dict[key]:
+                    data_type = dt
+                    break
+        
+        if data_type and period in period_mappings[data_type] and device_type in period_mappings[data_type][period]:
+            baseline_key = period_mappings[data_type][period][device_type]
+            if baseline_key in data_dict and data_dict[baseline_key]:
+                return data_dict[baseline_key]["metadata"]["filters"]["username"]
+        
+        return fallback_username
+    
+    # Website URLs consolidation (common in landing_pages and referrers)
+    @staticmethod
+    def consolidate_website_urls_data(website_urls_data):
+        """
+        Consolidate duplicate website URLs by summing their metrics.
+        Input: {key: [website_data_list]}
+        Output: ({key: [consolidated_website_data_list]}, consolidation_stats)
+        """
+        consolidated_data = {}
+        consolidation_stats = {
+            "total_original_websites": 0,
+            "total_consolidated_websites": 0,
+            "pages_with_duplicates": 0,  # For landing pages compatibility
+            "sites_with_duplicates": 0,  # For referrers compatibility
+            "duplicate_urls_found": []
+        }
+        
+        for key, website_list in website_urls_data.items():
+            if not isinstance(website_list, list):
+                consolidated_data[key] = website_list
+                continue
+                
+            original_count = len(website_list)
+            consolidation_stats["total_original_websites"] += original_count
+            
+            url_groups = {}
+            for website_data in website_list:
+                url = website_data.get("website_url", "")
+                if url not in url_groups:
+                    url_groups[url] = []
+                url_groups[url].append(website_data)
+            
+            has_duplicates = False
+            for url, group in url_groups.items():
+                if len(group) > 1:
+                    has_duplicates = True
+                    consolidation_stats["duplicate_urls_found"].append({
+                        "page": key,
+                        "url": url,
+                        "duplicate_count": len(group)
+                    })
+            
+            if has_duplicates:
+                consolidation_stats["pages_with_duplicates"] += 1
+                consolidation_stats["sites_with_duplicates"] += 1  # Same value for both keys
+            
+            consolidated_websites = []
+            for url, group in url_groups.items():
+                if len(group) == 1:
+                    consolidated_websites.append(group[0])
+                else:
+                    consolidated_website = {
+                        "website_url": url,
+                        "total_clicks": 0,
+                        "unique_clicks": 0,
+                        "signups": 0,
+                        "fdm": 0
+                    }
+                    
+                    for website_data in group:
+                        consolidated_website["total_clicks"] += Common.parse_int(website_data.get("total_clicks", 0))
+                        consolidated_website["unique_clicks"] += Common.parse_int(website_data.get("unique_clicks", 0))
+                        
+                        signups_value = 0
+                        if "signups" in website_data:
+                            signups_value = Common.parse_int(website_data["signups"])
+                        elif "sign_up" in website_data:
+                            signups_value = Common.parse_int(website_data["sign_up"])
+                        consolidated_website["signups"] += signups_value
+                        
+                        consolidated_website["fdm"] += Common.parse_int(website_data.get("fdm", 0))
+                    
+                    consolidated_websites.append(consolidated_website)
+            
+            consolidated_data[key] = consolidated_websites
+            consolidation_stats["total_consolidated_websites"] += len(consolidated_websites)
+        
+        return consolidated_data, consolidation_stats
+    
+    # Test result formatting
+    @staticmethod
+    def format_test_results(results, device_display_name, data_type="referrers"):
+        """Format test results for display in test reports"""
+        formatted_result = ""
+        formatted_result += f"\n     + Username: {results['username']}"
+        formatted_result += f"\n     + Device Type: {results['device_type']}"
+        formatted_result += f"\n     + From Date: {results['from_date']}"
+        formatted_result += f"\n     + To Date: {results['to_date']}"
+        
+        if device_display_name == "All":
+            formatted_result += f"\n     + Total Clicks: Statistics={results['statistics_total_clicks']}, {data_type.title()}={results.get(f'{data_type}_total_clicks', 'N/A')}"
+            if f'statistics_unique_clicks' in results:
+                formatted_result += f"\n     + Unique Clicks: Statistics={results['statistics_unique_clicks']}, {data_type.title()}={results.get(f'{data_type}_unique_clicks', 'N/A')}"
+        else:
+            formatted_result += f"\n     + {device_display_name} Total Clicks: Statistics={results['statistics_total_clicks']}, {data_type.title()}={results.get(f'{data_type}_total_clicks', 'N/A')}"
+        
+        if 'statistics_signups' in results:
+            formatted_result += f"\n     + Signups: Statistics={results['statistics_signups']}, {data_type.title()}={results.get(f'{data_type}_signups', 'N/A')}"
+        if 'statistics_fdm' in results:
+            formatted_result += f"\n     + FDM: Statistics={results['statistics_fdm']}, {data_type.title()}={results.get(f'{data_type}_fdm', 'N/A')}"
+        
+        return formatted_result
+    
+    # Error handling for test cases
+    @staticmethod
+    def handle_test_case_error(utils, test_case_data, main_checklist, current_index, sub_auto_test_case, sheet_name):
+        """Handle test case errors and update remaining checklist items"""
+        utils.update_result_to_ggsheet(
+            test_case_data["TestCase_spread_sheet_id"], 
+            main_checklist[current_index], 
+            test_case_data["testcase"], 
+            sub_auto_test_case, 
+            test_case_data["TestCase_Auto_Status"][1],
+            sheet_name=sheet_name
+        )
+        current_index += 1
+        if current_index < len(main_checklist):
+            for i in range(current_index, len(main_checklist)):
+                if i >= len(main_checklist):
+                    break
+                utils.update_result_to_ggsheet(
+                    test_case_data["TestCase_spread_sheet_id"], 
+                    main_checklist[i], 
+                    test_case_data["testcase"], 
+                    "", 
+                    test_case_data["TestCase_Auto_Status"][2],
+                    sheet_name=sheet_name
+                )
+    
+    # Language mapping utility
+    @staticmethod
+    def get_language_mapping():
+        """Get standard language mapping dictionary"""
+        return {
+            "chinese simplified": "zh-cn",
+            "english": "en-us",
+            "bengali": "bn-in",
+            "english (india)": "en-in",
+            "indonesian": "id-id",
+            "japanese": "ja-jp",
+            "korean": "ko-kr",
+            "thai": "th-th",
+            "vietnamese": "vi-vn",
+            "telugu": "te-in"
+        }
+    
+    # Cache management
+    @staticmethod
+    def clear_cache_for_class(class_ref):
+        """Clear cache for any class that has _cache_data and _cache_username"""
+        class_ref._cache_data = None
+        class_ref._cache_username = None
+
     def setup(self):
         self.utils = utilities()
         self.playwright = self.utils.page.page

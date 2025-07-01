@@ -14,7 +14,6 @@ from src.utils.core import (
     ExtractTestCaseFailed
 )
 
-# Type checking imports to avoid circular imports
 if TYPE_CHECKING:
     from src.utils.services.page_utils import ui
     from src.utils.services.api_utils import api

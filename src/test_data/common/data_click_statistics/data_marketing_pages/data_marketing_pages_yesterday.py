@@ -1,15 +1,15 @@
-# get data baseline marketing page yesterday at 2025-06-25 12:10:43 +0800 (GMT+8)
+# get data baseline marketing page yesterday at 2025-06-30 14:45:28 +0800 (GMT+8)
 
 class DataMarketingPagesYesterday:
     data_marketing_pages_yesterday = {
     "metadata": {
-        "collected_at": "2025-06-25 12:10:43 +0800",
+        "collected_at": "2025-06-30 14:45:28 +0800",
         "period": {
-            "from_date": "06-24-2025",
-            "to_date": "06-24-2025"
+            "from_date": "06-29-2025",
+            "to_date": "06-29-2025"
         },
         "filters": {
-            "username": "12BETAFF16657",
+            "username": "12BETAFF16007",
             "language": "All",
             "include_inactive_tracking": False
         },
@@ -17,23 +17,23 @@ class DataMarketingPagesYesterday:
     },
     "channels_data": [
         {
-            "channel_name": "MKTviklik",
+            "channel_name": "MKTccn",
             "language": "-",
-            "total_click": 104,
-            "unique_click": 70,
-            "signups": 9,
-            "fdm": 1
+            "total_click": 538,
+            "unique_click": 379,
+            "signups": 83,
+            "fdm": 13
         }
     ],
     "channel_details_data": {
-        "1 - MKTviklik": [
+        "1 - MKTccn": [
             {
-                "url": "https://goto.12bmylink7.com/myr-12join/41349/en/mktviklik/index.html",
-                "language": "English",
-                "total_clicks": 104,
-                "unique_clicks": 70,
-                "signups": 9,
-                "fdm": 1
+                "url": "https://goto.12bvnlink6.com/vnd-12join/15411/vn/mktccn/index.html",
+                "language": "Vietnamese",
+                "total_clicks": 538,
+                "unique_clicks": 379,
+                "signups": 83,
+                "fdm": 13
             }
         ]
     }

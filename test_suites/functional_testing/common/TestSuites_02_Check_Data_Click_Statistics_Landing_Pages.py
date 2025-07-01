@@ -11,7 +11,7 @@ unittest.TestLoader.testMethodPrefix = "TestCase"
 unittest.TestLoader.sortTestMethodsUsing = None
 
 # Add based on your function you define
-from src.actions.common.compare_data.click_statistics_landing_page.compare_data_landing_page import CompareDataLandingPage
+from src.actions.common.compare_data.compare_data_landing_page import CompareDataLandingPage
 from src.utils.core.decorators import measure_test_execution_time
 
 @pytest.mark.compare
