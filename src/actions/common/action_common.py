@@ -139,7 +139,8 @@ class Common():
         consolidation_stats = {
             "total_original_websites": 0,
             "total_consolidated_websites": 0,
-            "pages_with_duplicates": 0,
+            "pages_with_duplicates": 0,  # For landing pages compatibility
+            "sites_with_duplicates": 0,  # For referrers compatibility
             "duplicate_urls_found": []
         }
         
@@ -158,18 +159,19 @@ class Common():
                     url_groups[url] = []
                 url_groups[url].append(website_data)
             
-            page_has_duplicates = False
+            has_duplicates = False
             for url, group in url_groups.items():
                 if len(group) > 1:
-                    page_has_duplicates = True
+                    has_duplicates = True
                     consolidation_stats["duplicate_urls_found"].append({
                         "page": key,
                         "url": url,
                         "duplicate_count": len(group)
                     })
             
-            if page_has_duplicates:
+            if has_duplicates:
                 consolidation_stats["pages_with_duplicates"] += 1
+                consolidation_stats["sites_with_duplicates"] += 1  # Same value for both keys
             
             consolidated_websites = []
             for url, group in url_groups.items():
