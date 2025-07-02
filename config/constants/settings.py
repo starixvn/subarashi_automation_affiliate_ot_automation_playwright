@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent.parent.parent
 CONFIG_DIR = Path(__file__).parent.parent
 
-ENVIRONMENT = "prod"
+ENVIRONMENT = os.getenv('PYTEST_ENV', 'local')
 SITE = os.getenv('PYTEST_SITE', 'admin')
 DEBUG_MODE = os.getenv('PYTEST_DEBUG_MODE', 'false').lower() == 'true'
 HEADLESS_MODE = os.getenv('PYTEST_HEADLESS', 'false').lower() == 'true'
