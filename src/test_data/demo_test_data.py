@@ -2,12 +2,13 @@ from datetime import datetime
 
 class DemoTestData:
     test_data = {
-        "creator": "AAVictor",
-        "07/01/2025 06:12:02": "123456",
-        "message": "test213",
         "important": "Yes",
-        "updated_by": "AAVictor",
-        "updated_date": "07/01/2025 06:12:39",
+        "english": "test message English",
+        "indonesian": "test message Indonesian",
+        "korean": "test message Korean",
+        "thai": "test message Thai",
+        "vietnamese": "test message Vietnamese",
+        "chinese": "test message Chinese",
     }
     # API request templates
     api_templates = {

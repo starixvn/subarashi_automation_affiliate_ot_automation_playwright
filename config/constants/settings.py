@@ -36,7 +36,9 @@ ENABLE_BROWSER = True
 ENABLE_TRACE = True
 TRACE_PATH = "Trace\\trace.zip"
 PROJECT_ROOT = str(ROOT_DIR)
-LOG_LEVEL = "INFO"
+
+LOG_LEVEL = "DEBUG" if DEBUG_MODE else "INFO"
+
 LOG_OUTPUT_DIR = os.path.join(PROJECT_ROOT, "logs")
 LOG_FILENAME_TEMPLATE = "automation_{timestamp}.log"
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -95,3 +97,6 @@ if DEBUG_MODE:
     print("🔧 Configuration Summary:")
     for key, value in get_config_summary().items():
         print(f"   {key}: {value}")
+    print(f"   log_level: {LOG_LEVEL}")
+    print(f"   log_to_console: {LOG_TO_CONSOLE}")
+    print(f"   log_to_file: {LOG_TO_FILE}")

@@ -70,6 +70,8 @@ class AutomationLogger(logging.Logger):
 
 logging.setLoggerClass(AutomationLogger)
 
+_configured = False
+
 def get_logger(
     name: str,
     level: Optional[Union[int, str]] = None,
@@ -78,6 +80,12 @@ def get_logger(
     date_format: Optional[str] = None,
     use_colors: bool = True
 ) -> AutomationLogger:
+    global _configured
+    
+    if not _configured:
+        configure_logging()
+        _configured = True
+    
     logger = logging.getLogger(name)
     
     if level is None:
@@ -87,25 +95,6 @@ def get_logger(
         level = getattr(logging, level.upper(), logging.INFO)
     
     logger.setLevel(level)
-    
-    if logger.handlers:
-        return logger
-    
-    log_format = log_format or DEFAULT_LOG_FORMAT
-    date_format = date_format or DEFAULT_DATE_FORMAT
-    
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(ColoredFormatter(log_format, date_format, use_colors))
-    logger.addHandler(console_handler)
-    
-    if log_file:
-        log_dir = os.path.dirname(log_file)
-        if log_dir and not os.path.exists(log_dir):
-            os.makedirs(log_dir, exist_ok=True)
-        
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setFormatter(logging.Formatter(log_format, date_format))
-        logger.addHandler(file_handler)
     
     return logger
 

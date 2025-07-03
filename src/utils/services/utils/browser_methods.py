@@ -6,7 +6,8 @@ from config.constants.settings import (
     BROWSER,
     ENABLE_BROWSER,
     ENABLE_TRACE,
-    TRACE_PATH
+    TRACE_PATH,
+    DEBUG_MODE
 )
 from src.utils.core import (
     get_logger,
@@ -28,7 +29,7 @@ class BrowserMethods(ExtractTestCaseFailed):
         self.context: Optional[BrowserContext] = None
         self.page: Optional['ui'] = None
         self.api: Optional['api'] = None
-        self.debug: bool = False
+        self.debug: bool = DEBUG_MODE
     
     @log_exceptions(log_level="INFO")
     def initialize_browser(self):
@@ -38,6 +39,14 @@ class BrowserMethods(ExtractTestCaseFailed):
                 return
 
             logger.debug("Browser sessions are enabled, initializing Playwright")
+            if DEBUG_MODE:
+                logger.debug(f"🚀 Browser Configuration:")
+                logger.debug(f"   Browser: {BROWSER}")
+                logger.debug(f"   Headless: {HEADLESS_MODE}")
+                logger.debug(f"   Timeout: {TIMEOUT}s")
+                logger.debug(f"   Trace enabled: {ENABLE_TRACE}")
+                logger.debug(f"   Debug mode: {DEBUG_MODE}")
+                
             self.playwright = sync_playwright().start()
             
             headless_value = HEADLESS_MODE

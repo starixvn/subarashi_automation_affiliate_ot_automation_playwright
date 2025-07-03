@@ -77,7 +77,14 @@ class utilities(BrowserMethods, AssertionMethods, FileMethods, GoogleMethods, Re
             
             self.env = ENVIRONMENT
             self.site = SITE
-            self.debug = DEBUG_MODE if 'DEBUG_MODE' in globals() else False
+            self.debug = DEBUG_MODE
+            
+            if DEBUG_MODE:
+                logger.debug(f"🔧 DEBUG MODE ENABLED")
+                logger.debug(f"   Environment: {ENVIRONMENT}")
+                logger.debug(f"   Site: {SITE}")
+                logger.debug(f"   Browser enabled: {ENABLE_BROWSER}")
+                logger.debug(f"   Database enabled: {ENABLE_DB}")
             
             if ENABLE_BROWSER:
                 self.initialize_browser()
