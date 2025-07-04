@@ -1,0 +1,56 @@
+---
+description: Code Quality and Standards
+globs: *.py
+alwaysApply: true
+---
+
+## CODE QUALITY STANDARDS - ZERO TOLERANCE
+
+### 1. ERROR HANDLING
+- Never use bare `except:` - always specify exception types
+- Always use `self.utils.page.extract_TestCaseFailed(e)` in catch blocks
+- Use custom exceptions from `src.utils.core.exceptions`
+
+### 2. CHECKLIST PATTERN (MANDATORY)
+```python
+mainChecklist = [
+    "First verification point",
+    "Second verification point",
+]
+subAutoTestCase = ''
+indexChl = 0
+
+# For each checklist item:
+subAutoTestCase += f"- Description of what is being verified \n"
+# Logic here
+self.utils.update_result_to_ggsheet(
+    Data["TestCase_spread_sheet_id"], 
+    mainChecklist[indexChl], 
+    testcase, 
+    subAutoTestCase, 
+    Data["TestCase_Auto_Status"][0],
+    sheet_name=Checklist_Sheet_Name
+)
+indexChl += 1
+subAutoTestCase = ''
+```
+
+### 3. ASSERTION METHODS
+- Use `self.utils.should_be_equal()` instead of assert
+- Use `self.utils.should_be_true()` for boolean checks
+- Use `self.utils.should_contain()` for string checks
+
+### 4. WAIT PATTERNS
+- Use `self.utils.page.wait_for_page_loaded()`
+- Use `self.utils.page.wait_for_element_ready()`
+- Use `self.utils.page.verify_element_exist()`
+
+### 5. DATA ACCESS
+- Use `self.utils.page.get_text()` for text extraction
+- Use `self.utils.page.get_attribute()` for attributes
+- Use `self.utils.page.get_element()` for element references
+
+### 6. BROWSER ACTIONS
+- Use `self.utils.page.click()` for clicks
+- Use `self.utils.page.input()` for text input
+- Use `self.utils.page.select_options()` for dropdowns

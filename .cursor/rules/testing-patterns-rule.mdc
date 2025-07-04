@@ -1,0 +1,46 @@
+---
+description: Testing Patterns and Conventions
+globs: test_suites/*.py,src/actions/*.py
+alwaysApply: true
+---
+
+## TESTING PATTERNS - STRICT ADHERENCE
+
+### 1. TEST CASE PARAMETERS
+- Always pass `inspect.currentframe().f_code.co_name` as testcase parameter
+- Use this for Google Sheets tracking
+
+### 2. PYTEST MARKS
+- Use `@pytest.mark.demo` for demo tests
+- Use `@pytest.mark.compare` for comparison tests
+- Use `@pytest.mark.functional` for functional tests
+- Use `@pytest.mark.smoke` for smoke tests
+
+### 3. CACHE MANAGEMENT
+- Use `ClassName.clear_cache()` in setUpClass and tearDownClass
+- Implement cache clearing for data-heavy operations
+
+### 4. SETUP PATTERNS
+```python
+@classmethod
+def setUpClass(self):
+    ActionClass.clear_cache()  # If applicable
+    self.action_instance = ActionClass()
+    self.action_instance.setup()
+    self.utils = self.action_instance.utils
+    # Additional setup if needed
+```
+
+### 5. TEARDOWN PATTERNS
+```python
+@classmethod
+def tearDownClass(self):
+    ActionClass.clear_cache()  # If applicable
+    self.action_instance.tearDown()
+```
+
+### 6. TEST METHOD STRUCTURE
+- Start with test description
+- Use checklist pattern
+- Handle exceptions properly
+- Update Google Sheets for each step

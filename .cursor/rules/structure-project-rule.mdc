@@ -1,0 +1,63 @@
+---
+description: Structure Automation Framework
+globs: *.py,*.json,src/utils/core/*.py,src/utils/services/api_utils/*.py,src/utils/services/db_utils/*.py,src/utils/services/page_utils/*.py,src/utils/services/utils/*.py
+alwaysApply: true
+---
+
+## FRAMEWORK STRUCTURE - ABSOLUTE COMPLIANCE REQUIRED
+
+### 1. CORE UTILITIES (MANDATORY)
+- Logging: `src/utils/core/logging.py`
+- Exceptions: `src/utils/core/exceptions.py` 
+- Decorators: `src/utils/core/decorators.py`
+- Validation: `src/utils/core/validation.py`
+- Utils: `src/utils/core/utils.py`
+- Test Tracker: `src/utils/core/test_tracker.py`
+
+### 2. SERVICE UTILITIES (MANDATORY USAGE)
+- API interactions: `src/utils/services/api_utils/` [assertion_methods.py, extraction_methods.py, request_methods.py]
+- Database operations: `src/utils/services/db_utils/` [connection_methods.py, data_methods.py, query_methods.py]
+- Page operations: `src/utils/services/page_utils/` [element_methods.py, extraction_methods.py, frame_methods.py, navigation_methods.py, screenshot_methods.py, verification_methods.py, file_methods.py, waits.py]
+- Advanced utilities: `src/utils/services/utils/` [assertion_methods.py, browser_methods.py, crypto_methods.py, google_methods.py, report_methods.py, file_methods.py]
+
+### 3. MAIN UTILITIES CLASS (MANDATORY)
+- Use `from src.utils.services.utils import utilities`
+- Initialize: `self.utils = utilities()`
+- Access page: `self.utils.page`
+- Access API: `self.utils.api`
+- Access DB: `self.utils.db`
+
+### 4. ELEMENTS STRUCTURE (MANDATORY)
+- Store in `src/interfaces/` with proper hierarchy
+- Use XPath selectors
+- Follow naming: `btn_`, `inp_`, `lbl_`, `sel_`, `tbl_`, etc.
+- Group by functionality
+
+### 5. ACTIONS STRUCTURE (MANDATORY)
+- Store in `src/actions/` with proper hierarchy
+- Inherit from Common
+- Use checklist pattern
+- Follow Google Sheets integration pattern
+
+### 6. TEST DATA STRUCTURE (MANDATORY)
+- Store in `src/test_data/` with proper hierarchy
+- Use class-based structure
+- Include static methods for dynamic data
+- Follow the pattern in `demo_test_data.py`
+
+### 7. TEST SUITES STRUCTURE (MANDATORY)
+- Store in `test_suites/` with proper hierarchy
+- Use unittest + pytest
+- Follow the exact pattern in existing files
+- Use proper imports and setup/teardown
+
+### 8. CONFIGURATION STRUCTURE (MANDATORY)
+- Environment files in `config/environments/`
+- Constants in `config/constants/settings.py`
+- Secrets in `config/secrets/`
+- Use ENV_CONFIG pattern
+
+### 9. JOBS STRUCTURE (MANDATORY)
+- Store in `src/jobs/` for background tasks
+- Follow the same patterns as actions
+- Use proper inheritance and decorators

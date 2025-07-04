@@ -1,0 +1,113 @@
+---
+description: Rule when implement automation test scripts
+globs: 
+alwaysApply: true
+---
+
+## CRITICAL FRAMEWORK PATTERNS - MUST FOLLOW EXACTLY
+
+### 1. IMPORT ORGANIZATION (MANDATORY ORDER)
+```python
+# Must import, please don't fix it
+import sys
+from os.path import dirname as d
+from os.path import abspath, join
+root_dir = d(d(abspath(__file__)))
+sys.path.append(root_dir)
+import unittest
+import inspect
+import pytest
+unittest.TestLoader.testMethodPrefix = "TestCase"
+unittest.TestLoader.sortTestMethodsUsing = None
+
+# Then: System imports (os, time, etc.)
+# Then: Third-party imports (requests, etc.)
+# Then: Local imports (src/)
+# Then: Config imports (config/)
+```
+
+### 2. LOGGING SYSTEM (MANDATORY)
+- Always use logging from `src.utils.core.logging import get_logger`
+- Initialize logger: `logger = get_logger(__name__)`
+- Use appropriate log levels: TRACE, DEBUG, VERBOSE, INFO, NOTICE, SUCCESS, WARNING, ERROR, CRITICAL
+- Never use print() - always use logger
+
+### 3. EXCEPTION HANDLING (MANDATORY PATTERN)
+```python
+try:
+    # Logic here
+except Exception as e:
+    self.utils.page.extract_TestCaseFailed(e)
+```
+
+### 4. CLASS INHERITANCE (MANDATORY)
+- All action classes MUST inherit from Common: `class ActionDemo(Common):`
+- All utilities classes inherit from multiple base classes
+- Use `super()` for initialization
+
+### 5. DECORATORS (MANDATORY)
+- All test methods MUST use: `@measure_test_execution_time`
+- Use `@pytest.mark.{category}` for test categorization
+- Use `@log_exceptions(log_level="INFO")` for critical methods
+- Use `@monitor_performance()` for performance tracking
+
+### 6. VALIDATION (MANDATORY)
+- Always validate inputs using `validate_not_none()`, `validate_not_empty()`, `validate_type()`
+- Import from `src.utils.core`
+
+### 7. CONFIGURATION (MANDATORY)
+- Use `ENV_CONFIG` for environment-specific settings
+- Use encrypted passwords with `utilities.decrypt()`
+- Load from `config.constants.settings`
+
+### 8. GOOGLE SHEETS INTEGRATION (MANDATORY PATTERN)
+```python
+Data = {
+    "TestCase_spread_sheet_id": TestCase_Spread_Sheet_Id,
+    "TestCase_Auto_Status": TestCase_Auto_Status,
+}
+Checklist_Sheet_Name = "SheetName"
+
+# In methods:
+self.utils.update_result_to_ggsheet(
+    Data["TestCase_spread_sheet_id"], 
+    mainChecklist[indexChl], 
+    testcase, 
+    subAutoTestCase, 
+    Data["TestCase_Auto_Status"][0],
+    sheet_name=Checklist_Sheet_Name
+)
+```
+
+### 9. TEST STRUCTURE (MANDATORY)
+```python
+class TestClassName(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        # Initialize action class
+        # Call setup()
+        # Store utils reference
+        
+    @classmethod
+    def tearDownClass(self):
+        # Call tearDown()
+        
+    @pytest.mark.category
+    @measure_test_execution_time
+    def TestCase_001_Description(self):
+        # Use inspect.currentframe().f_code.co_name
+```
+
+### 10. NAMING CONVENTIONS (MANDATORY)
+- Methods: `snake_case`
+- Classes: `PascalCase`
+- Constants: `UPPER_CASE`
+- Test methods: `TestCase_001_Description`
+- Files: `snake_case.py`
+
+### 11. RESPONSE MESSAGE (MANDATORY)
+- When creating a new file, it must be placed in the correct folder. If the folder does not exist, create a folder corresponding to the components.
+
+### 12. RESPONSE MESSAGE (MANDATORY)
+After reviewing, always respond with:
+"Hi Victor, I have read and understood the current folder structure and code style."
