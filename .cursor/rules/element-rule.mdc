@@ -1,0 +1,258 @@
+# ELEMENT MAPPING STANDARDS - ABSOLUTE COMPLIANCE REQUIRED
+
+## ELEMENT MAPPING STANDARDS - ZERO TOLERANCE
+
+### 1. FILE STRUCTURE (MANDATORY)
+```python
+"""
+[PageName] Elements - Absolute Stable XPath mappings for 12BetAdmin2 Portal [Module]
+Based on actual HTML structure analysis from live site - NO data-ref dependencies
+Production-ready element mappings with multiple fallback strategies for [functionality]
+"""
+
+class [PageName]Elements:
+    """
+    [PageName] Elements - Complete stable XPath mapping for [functionality] operations
+    [Additional description of trigger/context]
+    """
+```
+
+### 2. ELEMENT ORGANIZATION (MANDATORY SECTIONS)
+```python
+    # ========== SECTION NAME ==========
+    # Comment describing the section - STABLE by [strategy]
+    element_name = "//xpath[@attribute='value']"
+    element_name_by_class = "//xpath[@class='value']"
+    element_name_by_id = "//xpath[@id='value']"
+```
+
+**Required Sections Order:**
+1. **MODAL/PAGE CONTAINER & STRUCTURE**
+2. **HEADER ELEMENTS** 
+3. **FORM FIELDS/INPUT ELEMENTS**
+4. **ACTION BUTTONS**
+5. **TABLE STRUCTURE** (if applicable)
+6. **PAGINATION SECTION** (if applicable)
+7. **DYNAMIC HELPER METHODS**
+8. **MULTIPLE FALLBACK STRATEGIES**
+
+### 3. NAMING CONVENTIONS (MANDATORY)
+```python
+# Element Type Prefixes - STRICT COMPLIANCE
+btn_element_name = "//button"           # Buttons
+inp_element_name = "//input"            # Input fields
+sel_element_name = "//select"           # Select dropdowns
+lbl_element_name = "//label"            # Labels
+div_element_name = "//div"              # Containers
+tbl_element_name = "//table"            # Tables
+lnk_element_name = "//a"                # Links
+chk_element_name = "//input[@type='checkbox']"  # Checkboxes
+opt_element_name = "//option"           # Options
+th_element_name = "//th"                # Table headers
+td_element_name = "//td"                # Table cells
+tr_element_name = "//tr"                # Table rows
+span_element_name = "//span"            # Spans
+h1_to_h6_element_name = "//h1-h6"       # Headings
+```
+
+### 4. XPATH STRATEGIES (MANDATORY PRIORITY)
+```python
+# Priority 1: ID and Name attributes - HIGHEST STABILITY
+element_main = "//input[@id='ElementId' and @name='ElementName']"
+
+# Priority 2: Class with ID/Name combination
+element_by_class = "//input[@name='ElementName' and @class='form-control']"
+
+# Priority 3: For attribute relationships
+element_by_for = "//label[@for='ElementId']/..//input[@type='text']"
+
+# Priority 4: Content-based (text, title, aria-label)
+element_by_text = "//button[@type='button' and text()='Button Text']"
+element_by_title = "//button[@title='Button Title']"
+element_by_aria = "//button[@aria-label='Button Label']"
+
+# Priority 5: Structural relationships
+element_by_parent = "//div[@class='modal-content']//input[@name='ElementName']"
+```
+
+### 5. ELEMENT VARIANTS (MANDATORY)
+```python
+# Main element - Primary strategy
+inp_element = "//input[@id='ElementId' and @name='ElementName']"
+
+# Variants - Alternative strategies
+inp_element_by_class = "//input[@name='ElementName' and @class='form-control']"
+inp_element_by_for = "//label[@for='ElementId']/..//input[@type='text']"
+inp_element_disabled = "//input[@name='ElementName' and @disabled]"
+```
+
+### 6. COMMENT STANDARDS (MANDATORY)
+```python
+# Element description - STABLE by [strategy/attribute]
+element_name = "//xpath[@attribute='value']"
+```
+
+**Required Comment Format:**
+- **Description** - What the element is
+- **STABLE by** - What makes it stable (ID, name, class, for, content, etc.)
+- **Additional context** if needed
+
+### 7. DYNAMIC HELPER METHODS (MANDATORY)
+```python
+# ========== DYNAMIC HELPER METHODS ==========
+@staticmethod
+def get_element_by_value(value):
+    """Get element by value - STABLE"""
+    return f"//element[@value='{value}']"
+
+@staticmethod
+def get_element_by_text(text):
+    """Get element by text content - STABLE"""
+    return f"//element[text()='{text}']"
+
+@staticmethod
+def get_element_by_row_column(row, column):
+    """Get element by row and column - STABLE"""
+    return f"//table/tbody/tr[{row}]/td[{column}]"
+```
+
+### 8. MULTIPLE FALLBACK STRATEGIES (MANDATORY)
+```python
+# ========== MULTIPLE FALLBACK STRATEGIES ==========
+@staticmethod
+def get_element_all_strategies():
+    """Multiple strategies for element - HIGHEST RELIABILITY"""
+    return [
+        "//element[@id='ElementId' and @name='ElementName']",
+        "//element[@name='ElementName' and @class='form-control']",
+        "//label[@for='ElementId']/..//element[@type='text']",
+        "//div[@class='container']//element[@name='ElementName']"
+    ]
+```
+
+### 9. VERIFICATION METHODS (MANDATORY)
+```python
+@staticmethod
+def verify_page_loaded():
+    """Verify page is properly loaded - STABLE CHECK"""
+    return [
+        "//element[contains(., 'Expected Text')]",
+        "//button[@type='button' and @aria-label='Expected Label']",
+        "//table//th[text()='Expected Header']",
+        "//div[@class='expected-container']"
+    ]
+
+@staticmethod
+def verify_page_closed():
+    """Verify page is properly closed - STABLE CHECK"""
+    return [
+        "//element[@style='display: none;']",
+        "//backdrop[@style='display: none;']"
+    ]
+```
+
+### 10. OPTION GROUPS (MANDATORY FOR SELECT ELEMENTS)
+```python
+# Select options - STABLE by value and text
+opt_option_name = "//select[@name='SelectName']/option[@value='OptionValue']"
+opt_option_name_text = "//select[@name='SelectName']/option[text()='Option Text']"
+```
+
+### 11. FORBIDDEN PRACTICES (ZERO TOLERANCE)
+```python
+# ❌ NEVER USE - Unstable strategies
+element_bad = "//div[1]/span[2]"                    # Positional without context
+element_bad = "//*[@data-ref='ref-123']"            # Data-ref dependencies
+element_bad = "//div[@style='display: block;']"     # Style-based (changes dynamically)
+element_bad = "//element[contains(@class, 'generated-class-')]"  # Generated classes
+```
+
+### 12. REQUIRED ATTRIBUTES IN COMMENTS
+```python
+# Element description - STABLE by [ID/name/class/for/content/structure]
+# Additional context about when/how element appears
+element_name = "//stable[@xpath='here']"
+```
+
+**Stability Indicators:**
+- **ID** - HTML ID attribute
+- **name** - HTML name attribute  
+- **class** - CSS class (only if stable)
+- **for** - Label for attribute
+- **content** - Text content or title
+- **structure** - DOM structure relationship
+- **aria** - ARIA attributes
+
+### 13. ELEMENT GROUPING (MANDATORY)
+```python
+# ========== SECTION CONTAINERS ==========
+# Main containers first
+
+# ========== FORM ELEMENTS ==========
+# All form inputs grouped together
+
+# ========== BUTTONS ==========
+# All buttons grouped together
+
+# ========== LINKS ==========
+# All links grouped together
+```
+
+### 14. PRODUCTION READINESS CHECKLIST
+- [ ] File header with description and NO data-ref note
+- [ ] Class docstring with complete description
+- [ ] All sections properly commented and organized
+- [ ] Element naming follows prefix conventions
+- [ ] XPath priorities followed (ID > name > class > content > structure)
+- [ ] Multiple variants for critical elements
+- [ ] Dynamic helper methods for parameterized elements
+- [ ] Multiple fallback strategies for critical elements
+- [ ] Verification methods for page state
+- [ ] No forbidden practices used
+- [ ] All elements have stability comments
+- [ ] Options properly mapped for select elements
+
+### 15. TESTING REQUIREMENTS
+```python
+# Every element must be tested with:
+# 1. Primary XPath strategy
+# 2. At least one fallback strategy  
+# 3. Verification method if applicable
+# 4. Dynamic helper method if applicable
+```
+
+### 16. MAINTENANCE STANDARDS
+```python
+# When updating elements:
+# 1. Keep original XPath as fallback
+# 2. Add new strategy as primary
+# 3. Update comments with change reason
+# 4. Test all fallback strategies
+# 5. Update verification methods if needed
+```
+
+### 17. ELEMENT STABILITY RANKING
+```python
+# Rank 1: ID + Name combination
+element_rank1 = "//input[@id='ElementId' and @name='ElementName']"
+
+# Rank 2: ID or Name alone
+element_rank2 = "//input[@id='ElementId']"
+
+# Rank 3: For attribute relationships
+element_rank3 = "//label[@for='ElementId']/..//input"
+
+# Rank 4: Stable class combinations
+element_rank4 = "//input[@name='ElementName' and @class='form-control']"
+
+# Rank 5: Content-based
+element_rank5 = "//button[text()='Button Text']"
+```
+
+### 18. RESPONSE MESSAGE (MANDATORY)
+After creating element files, always respond with:
+"Hi Victor, I have created the element mapping file following the absolute compliance standards from edit_deal_modal_elements.py and deal_table_elements.py patterns."
+description:
+globs:
+alwaysApply: false
+---
