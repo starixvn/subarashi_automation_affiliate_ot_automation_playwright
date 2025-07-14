@@ -3,6 +3,10 @@ from src.interfaces.demo_elements import DemoElements as elm_demo
 from src.test_data.demo_test_data import DemoTestData as data_demo
 from config.constants.settings import *
 from src.test_data.common.data_common import *
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.utils.services.utils import utilities
 
 Data = {
     "TestCase_spread_sheet_id": TestCase_Spread_Sheet_Id,
@@ -15,6 +19,7 @@ data = {
 }
 
 class ActionDemo(Common):
+    utils: 'utilities'
 
     def verify_ui_message_page(self, testcase):
         try:

@@ -3,7 +3,10 @@ import pytest
 import os
 import pandas as pd
 import re
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Any
+import playwright.sync_api as playwright_api
+from playwright.sync_api import expect
+from types import ModuleType
 from config.constants.settings import (
     ENABLE_BROWSER,
     ENABLE_TRACE,
@@ -44,6 +47,7 @@ if TYPE_CHECKING:
     from src.utils.services.page_utils import ui
     from src.utils.services.api_utils import api
     from src.utils.services.db_utils import db
+    import playwright.sync_api as PlaywrightModule
 
 logger = get_logger(__name__)
 
@@ -53,6 +57,8 @@ class utilities(BrowserMethods, AssertionMethods, FileMethods, GoogleMethods, Re
     page: Optional['ui'] = None
     api: Optional['api'] = None  
     db: Optional['db'] = None
+    playwright: 'PlaywrightModule' = playwright_api
+    expect = expect
     
     @log_exceptions(log_level="INFO")
     def __init__(self):

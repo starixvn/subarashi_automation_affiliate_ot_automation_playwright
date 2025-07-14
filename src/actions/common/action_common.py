@@ -11,7 +11,9 @@ from src.interfaces.admin.common.header_elements import HeaderElements as elm_he
 from src.interfaces.admin.customer.left_panel_elements import LeftPanelElements as elm_left_panel
 from src.interfaces.user.ui.header.header_elements import HeaderElements as elm_header
 
-class Common():    
+class Common():
+    utils: 'utilities'
+    
     def __init__(self):
         self.playwright = None
 
